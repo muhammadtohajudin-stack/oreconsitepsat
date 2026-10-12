@@ -120,8 +120,8 @@
 
             <!-- TAB 1: DASHBOARD & COST CONTROL -->
             <section id="tab-dashboard" class="space-y-6">
-                <!-- Executive KPI Cards Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Executive KPI Cards Grid (Sporthall) -->
+                <div id="kpi-grid-sporthall" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Nilai Kontrak Utama</p>
                         <h3 id="kpiContract" class="text-2xl font-bold text-white mt-2">Rp 0</h3>
@@ -141,13 +141,61 @@
                     </div>
                 </div>
 
-                <!-- Form Transaksi Keuangan -->
-                <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
+                <!-- Executive Summary Cards Grid (Penataan Lahan Mess) -->
+                <div id="kpi-grid-mess" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 hidden">
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Nilai Kontrak Utama</p>
+                        <h3 id="messKpiContract" class="text-2xl font-bold text-white mt-2">Rp 0</h3>
+                    </div>
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Total Jam Exca & Compact</p>
+                        <h3 id="messKpiTotalHours" class="text-2xl font-bold text-cyan-400 mt-2">0.0 Jam</h3>
+                        <p id="messKpiFuelSummary" class="text-xs text-slate-400 mt-1">Fuel: 0.0 L (Rp 0)</p>
+                    </div>
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Total Pendapatan Kontrak</p>
+                        <h3 id="messKpiRevenue" class="text-2xl font-bold text-emerald-400 mt-2">Rp 0</h3>
+                        <p class="text-xs text-slate-400 mt-1">Berdasarkan tarif alat berat</p>
+                    </div>
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Total HPP Alat Berat</p>
+                        <h3 id="messKpiHpp" class="text-2xl font-bold text-amber-400 mt-2">Rp 0</h3>
+                        <p class="text-xs text-slate-400 mt-1">Exca/Compact (excl) + Fuel + DT</p>
+                    </div>
+                </div>
+
+                <!-- Tabel Analisa Finansial (Mess) -->
+                <div id="messComparisonSection" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card hidden">
+                    <h2 class="text-base font-semibold text-white mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-scale-balanced text-cyan-400"></i> Analisa Finansial: Pendapatan Kontrak vs HPP Alat Berat
+                    </h2>
+                    <p class="text-xs text-slate-400 mb-4">Perbandingan tarif kontrak alat berat dengan perhitungan HPP operasional aktual.</p>
+                    <div class="overflow-x-auto rounded-xl border border-slate-700/50">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                            <thead>
+                                <tr class="bg-slate-900 border-b border-slate-700 text-slate-400 font-semibold text-[11px]">
+                                    <th class="py-3 px-4">Alat Berat / Pekerjaan</th>
+                                    <th class="py-3 px-4 text-center">Volume Aktual</th>
+                                    <th class="py-3 px-4 text-right">Pendapatan Kontrak</th>
+                                    <th class="py-3 px-4 text-right">Total HPP Aktual</th>
+                                    <th class="py-3 px-4 text-right">Proyeksi Margin</th>
+                                </tr>
+                            </thead>
+                            <tbody id="messComparisonTableBody" class="divide-y divide-slate-700/50"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Form Transaksi Keuangan (Sporthall) -->
+                <div id="sporthallTxFormWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
                     <h2 class="text-base font-semibold text-white mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-square-plus text-cyan-400"></i> Catat Transaksi Keuangan Baru
                     </h2>
                     <form id="transactionForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-                        <div><label class="block text-xs font-medium text-slate-300 mb-1">Tanggal</label><input type="date" id="trxDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Pilih Tanggal Transaksi</label>
+                            <input type="date" id="trxDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 cursor-pointer">
+                        </div>
                         <div><label class="block text-xs font-medium text-slate-300 mb-1">Tipe</label><select id="trxType" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></select></div>
                         <div><label class="block text-xs font-medium text-slate-300 mb-1">Kategori / Pos Pekerjaan</label><select id="trxCategory" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></select></div>
                         <div><label class="block text-xs font-medium text-slate-300 mb-1">Nominal (IDR)</label><input type="number" id="trxAmount" placeholder="350000000" required min="1" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
@@ -156,14 +204,14 @@
                     </form>
                 </div>
 
-                <!-- Charts Grid -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Charts Grid (Sporthall) -->
+                <div id="sporthallChartsWrapper" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card"><h3 class="text-sm font-semibold text-white mb-4">Cost Control (RAP vs Realisasi)</h3><div class="relative h-64"><canvas id="costControlChart"></canvas></div></div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card"><h3 class="text-sm font-semibold text-white mb-4">Akumulasi Cashflow</h3><div class="relative h-64"><canvas id="cashflowChart"></canvas></div></div>
                 </div>
 
-                <!-- Ledger Table -->
-                <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                <!-- Ledger Table (Sporthall) -->
+                <div id="sporthallLedgerWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                     <div class="flex justify-between items-center mb-4"><h2 class="text-base font-semibold text-white">Jurnal Transaksi Keuangan</h2><span id="txCount" class="text-xs bg-slate-700 text-slate-300 px-3 py-1 rounded-full">0 Transaksi</span></div>
                     <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                         <table class="w-full text-left border-collapse text-xs sm:text-sm">
@@ -181,7 +229,7 @@
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
                         <h2 class="text-base font-semibold text-white mb-2">Tambah Data Pre-Order (PO) Baru</h2>
                         <form id="poForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div><label class="block text-xs font-medium text-slate-300 mb-1">Tanggal PO</label><input type="date" id="poDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                            <div><label class="block text-xs font-medium text-slate-300 mb-1">Pilih Tanggal PO</label><input type="date" id="poDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer"></div>
                             <div><label class="block text-xs font-medium text-slate-300 mb-1">Nama Barang / Jasa</label><input type="text" id="poItemName" placeholder="Baja WF" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                             <div><label class="block text-xs font-medium text-slate-300 mb-1">Vendor / Supplier</label><input type="text" id="poVendor" placeholder="PT Vendor" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                             <div><label class="block text-xs font-medium text-slate-300 mb-1">Spesifikasi</label><input type="text" id="poSpecs" placeholder="Spesifikasi" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
@@ -209,7 +257,7 @@
                         <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
                             <h3 class="text-sm font-bold text-white mb-3">Input Daily Log HM & Fuel Excavator</h3>
                             <form id="excaForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                                <div><label class="block text-xs text-slate-300 mb-1">Tanggal</label><input type="date" id="excaDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                                <div><label class="block text-xs text-slate-300 mb-1">Pilih Tanggal</label><input type="date" id="excaDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">HM Awal</label><input type="number" step="0.1" id="excaHmAwal" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">HM Akhir</label><input type="number" step="0.1" id="excaHmAkhir" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">Volume Fuel (Liter)</label><input type="number" step="0.1" id="excaFuelVol" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
@@ -238,7 +286,7 @@
                         <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
                             <h3 class="text-sm font-bold text-white mb-3">Input Daily Log HM & Fuel Compact</h3>
                             <form id="compactForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                                <div><label class="block text-xs text-slate-300 mb-1">Tanggal</label><input type="date" id="compactDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                                <div><label class="block text-xs text-slate-300 mb-1">Pilih Tanggal</label><input type="date" id="compactDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">HM Awal</label><input type="number" step="0.1" id="compactHmAwal" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">HM Akhir</label><input type="number" step="0.1" id="compactHmAkhir" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">Volume Fuel (Liter)</label><input type="number" step="0.1" id="compactFuelVol" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
@@ -267,7 +315,7 @@
                         <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
                             <h3 class="text-sm font-bold text-white mb-3">Input Daily Log Ritase Dump Truck</h3>
                             <form id="dtForm" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                <div><label class="block text-xs text-slate-300 mb-1">Tanggal</label><input type="date" id="dtDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                                <div><label class="block text-xs text-slate-300 mb-1">Pilih Tanggal</label><input type="date" id="dtDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">Jumlah Ritase (Rit)</label><input type="number" id="dtRitase" required min="1" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">Harga / Rit (IDR)</label><input type="number" id="dtPrice" required min="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div class="sm:col-span-3 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs">Simpan Record Ritase</button></div>
@@ -303,9 +351,8 @@
         <span id="toastMsg" class="text-xs sm:text-sm font-medium">Notifikasi</span>
     </div>
 
-    <!-- JavaScript Application Logic (Cloud Sync Direct) -->
+    <!-- JavaScript Application Logic -->
     <script>
-        // URL Web App Google Sheets Anda yang baru
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyZ6hO4VBQqFv-PSQizTSTbUQSuCMgYPvuYGZl4aoKoqZGelGeZko-xygCSjerhm2mx/exec';
 
         const projectsData = {
@@ -322,12 +369,7 @@
             mess: {
                 name: "Penataan Lahan Mess",
                 contractValue: 270000000,
-                budgets: {
-                    "Pekerjaan Land Clearing & Galian": 100000000,
-                    "Sewa Alat Berat (Excavator & Dozer)": 110000000,
-                    "Pengurukan & Finishing Lahan": 40000000,
-                    "Mobilisasi & Overhead": 20000000
-                }
+                budgets: {}
             }
         };
 
@@ -412,12 +454,32 @@
 
             const navPoText = document.getElementById('nav-po-text');
             const navPoIcon = document.getElementById('nav-po-icon');
+            
+            const kpiSporthall = document.getElementById('kpi-grid-sporthall');
+            const kpiMess = document.getElementById('kpi-grid-mess');
+            const messComparison = document.getElementById('messComparisonSection');
+            const sporthallTx = document.getElementById('sporthallTxFormWrapper');
+            const sporthallCharts = document.getElementById('sporthallChartsWrapper');
+            const sporthallLedger = document.getElementById('sporthallLedgerWrapper');
+
             if (projId === 'mess') {
                 navPoText.innerText = "Alat Berat & Ritase DT";
                 navPoIcon.className = "fa-solid fa-truck-monster w-4 text-center";
+                kpiSporthall.classList.add('hidden');
+                kpiMess.classList.remove('hidden');
+                messComparison.classList.remove('hidden');
+                sporthallTx.classList.add('hidden');
+                sporthallCharts.classList.add('hidden');
+                sporthallLedger.classList.add('hidden');
             } else {
                 navPoText.innerText = "Manajemen Pre-Order (PO)";
                 navPoIcon.className = "fa-solid fa-file-invoice-dollar w-4 text-center";
+                kpiSporthall.classList.remove('hidden');
+                kpiMess.classList.add('hidden');
+                messComparison.classList.add('hidden');
+                sporthallTx.classList.remove('hidden');
+                sporthallCharts.classList.remove('hidden');
+                sporthallLedger.classList.remove('hidden');
             }
 
             document.getElementById('pageTitle').innerText = projectsData[projId].name;
@@ -485,12 +547,13 @@
             document.getElementById(`subnav-${sub}`).className = "px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-600 text-white transition";
         }
 
-        // Form Submission Handlers
+        // Form Submission Handlers (TETAP MENJAGA TANGGAL PILIHAN USER)
         document.getElementById('transactionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            const selectedDate = document.getElementById('trxDate').value;
             const newTx = {
                 id: Date.now(),
-                date: document.getElementById('trxDate').value,
+                date: selectedDate,
                 type: document.getElementById('trxType').value,
                 category: document.getElementById('trxCategory').value,
                 amount: parseFloat(document.getElementById('trxAmount').value),
@@ -499,15 +562,16 @@
             transactions.push(newTx);
             updateDashboard();
             this.reset();
-            document.getElementById('trxDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('trxDate').value = selectedDate; // Tetap menjaga tanggal yang dipilih
             await saveCloudData('transactions', newTx);
         });
 
         document.getElementById('poForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            const selectedDate = document.getElementById('poDate').value;
             const newPO = {
                 id: Date.now(),
-                date: document.getElementById('poDate').value,
+                date: selectedDate,
                 itemName: document.getElementById('poItemName').value,
                 vendor: document.getElementById('poVendor').value,
                 specs: document.getElementById('poSpecs').value,
@@ -517,12 +581,13 @@
             purchaseOrders.push(newPO);
             renderPOTable();
             this.reset();
-            document.getElementById('poDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('poDate').value = selectedDate; // Tetap menjaga tanggal yang dipilih
             await saveCloudData('po', newPO);
         });
 
         document.getElementById('excaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            const selectedDate = document.getElementById('excaDate').value;
             const hmAwal = parseFloat(document.getElementById('excaHmAwal').value) || 0;
             const hmAkhir = parseFloat(document.getElementById('excaHmAkhir').value) || 0;
             const fuelVol = parseFloat(document.getElementById('excaFuelVol').value) || 0;
@@ -530,7 +595,7 @@
 
             const log = {
                 id: Date.now(),
-                date: document.getElementById('excaDate').value,
+                date: selectedDate,
                 hmAwal, hmAkhir,
                 totalHours: (hmAkhir - hmAwal),
                 fuelVol, fuelPrice,
@@ -538,13 +603,15 @@
             };
             excaLogs.push(log);
             renderExcaTable();
+            updateDashboard();
             this.reset();
-            document.getElementById('excaDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('excaDate').value = selectedDate; // Tetap menjaga tanggal yang dipilih
             await saveCloudData('exca', log);
         });
 
         document.getElementById('compactForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            const selectedDate = document.getElementById('compactDate').value;
             const hmAwal = parseFloat(document.getElementById('compactHmAwal').value) || 0;
             const hmAkhir = parseFloat(document.getElementById('compactHmAkhir').value) || 0;
             const fuelVol = parseFloat(document.getElementById('compactFuelVol').value) || 0;
@@ -552,7 +619,7 @@
 
             const log = {
                 id: Date.now(),
-                date: document.getElementById('compactDate').value,
+                date: selectedDate,
                 hmAwal, hmAkhir,
                 totalHours: (hmAkhir - hmAwal),
                 fuelVol, fuelPrice,
@@ -560,24 +627,27 @@
             };
             compactLogs.push(log);
             renderCompactTable();
+            updateDashboard();
             this.reset();
-            document.getElementById('compactDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('compactDate').value = selectedDate; // Tetap menjaga tanggal yang dipilih
             await saveCloudData('compact', log);
         });
 
         document.getElementById('dtForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            const selectedDate = document.getElementById('dtDate').value;
             const log = {
                 id: Date.now(),
-                date: document.getElementById('dtDate').value,
+                date: selectedDate,
                 ritase: parseInt(document.getElementById('dtRitase').value) || 0,
                 price: parseFloat(document.getElementById('dtPrice').value) || 0,
                 totalCost: (parseInt(document.getElementById('dtRitase').value) || 0) * (parseFloat(document.getElementById('dtPrice').value) || 0)
             };
             dtLogs.push(log);
             renderDtTable();
+            updateDashboard();
             this.reset();
-            document.getElementById('dtDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('dtDate').value = selectedDate; // Tetap menjaga tanggal yang dipilih
             await saveCloudData('dt', log);
         });
 
@@ -600,6 +670,7 @@
             if (confirm('Hapus log Exca ini?')) {
                 excaLogs = excaLogs.filter(l => l.id !== id);
                 renderExcaTable();
+                updateDashboard();
                 await deleteCloudData('exca', id);
             }
         }
@@ -607,6 +678,7 @@
             if (confirm('Hapus log Compact ini?')) {
                 compactLogs = compactLogs.filter(l => l.id !== id);
                 renderCompactTable();
+                updateDashboard();
                 await deleteCloudData('compact', id);
             }
         }
@@ -614,6 +686,7 @@
             if (confirm('Hapus log Ritase DT ini?')) {
                 dtLogs = dtLogs.filter(l => l.id !== id);
                 renderDtTable();
+                updateDashboard();
                 await deleteCloudData('dt', id);
             }
         }
@@ -667,12 +740,87 @@
         }
 
         function updateDashboard() {
-            renderKPIs();
-            renderTable();
-            renderCharts();
+            if (currentProjectId === 'mess') {
+                renderMessDashboard();
+            } else {
+                renderSporthallDashboard();
+            }
         }
 
-        function renderKPIs() {
+        function renderMessDashboard() {
+            let totalExcaHours = 0, totalExcaFuelVol = 0, totalExcaFuelCost = 0;
+            excaLogs.forEach(l => {
+                totalExcaHours += Number(l.totalHours) || 0;
+                totalExcaFuelVol += Number(l.fuelVol) || 0;
+                totalExcaFuelCost += Number(l.totalCost) || 0;
+            });
+
+            let totalCompactHours = 0, totalCompactFuelVol = 0, totalCompactFuelCost = 0;
+            compactLogs.forEach(l => {
+                totalCompactHours += Number(l.totalHours) || 0;
+                totalCompactFuelVol += Number(l.fuelVol) || 0;
+                totalCompactFuelCost += Number(l.totalCost) || 0;
+            });
+
+            let totalDtRit = 0;
+            dtLogs.forEach(l => {
+                totalDtRit += Number(l.ritase) || 0;
+            });
+
+            const combinedHours = totalExcaHours + totalCompactHours;
+            const combinedFuelVol = totalExcaFuelVol + totalCompactFuelVol;
+            const combinedFuelCost = totalExcaFuelCost + totalCompactFuelCost;
+
+            document.getElementById('messKpiContract').innerText = formatIDR(currentContractValue);
+            document.getElementById('messKpiTotalHours').innerText = combinedHours.toFixed(1) + ' Jam';
+            document.getElementById('messKpiFuelSummary').innerText = `Fuel: ${combinedFuelVol.toFixed(1)} L (${formatIDR(combinedFuelCost)})`;
+
+            // Pendapatan Kontrak Alat Berat:
+            // Exca: 576.000 / jam
+            // Compact: 675.000 / jam
+            // DT: 572.000 per 10 rit (57.200 per rit)
+            const excaRevenue = totalExcaHours * 576000;
+            const compactRevenue = totalCompactHours * 675000;
+            const dtRevenue = totalDtRit * (572000 / 10);
+            const totalRevenue = excaRevenue + compactRevenue + dtRevenue;
+
+            // HPP Aktual Alat Berat:
+            // Exca HPP: (250.000 * hours) + fuel cost aktual
+            // Compact HPP: (210.000 * hours) + fuel cost aktual
+            // DT HPP: 50.000 * ritase
+            const excaHpp = (totalExcaHours * 250000) + totalExcaFuelCost;
+            const compactHpp = (totalCompactHours * 210000) + totalCompactFuelCost;
+            const dtHpp = totalDtRit * 50000;
+            const totalHpp = excaHpp + compactHpp + dtHpp;
+
+            document.getElementById('messKpiRevenue').innerText = formatIDR(totalRevenue);
+            document.getElementById('messKpiHpp').innerText = formatIDR(totalHpp);
+
+            // Render Comparison Table
+            const tbody = document.getElementById('messComparisonTableBody');
+            tbody.innerHTML = '';
+
+            const items = [
+                { name: 'Excavator', vol: totalExcaHours.toFixed(1) + ' Jam', rev: excaRevenue, hpp: excaHpp },
+                { name: 'Compact Roller', vol: totalCompactHours.toFixed(1) + ' Jam', rev: compactRevenue, hpp: compactHpp },
+                { name: 'Dump Truck', vol: totalDtRit + ' Rit', rev: dtRevenue, hpp: dtHpp }
+            ];
+
+            items.forEach(item => {
+                const margin = item.rev - item.hpp;
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-700/40">
+                        <td class="py-3 px-4 font-semibold text-white">${item.name}</td>
+                        <td class="py-3 px-4 text-center font-mono">${item.vol}</td>
+                        <td class="py-3 px-4 text-right font-mono text-emerald-400">${formatIDR(item.rev)}</td>
+                        <td class="py-3 px-4 text-right font-mono text-amber-400">${formatIDR(item.hpp)}</td>
+                        <td class="py-3 px-4 text-right font-mono font-bold ${margin >= 0 ? 'text-cyan-400' : 'text-red-400'}">${formatIDR(margin)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderSporthallDashboard() {
             let totalIncome = 0, totalExpense = 0;
             transactions.forEach(t => {
                 if (t.type === 'INCOME') totalIncome += Number(t.amount);
@@ -688,10 +836,14 @@
             document.getElementById('kpiMargin').innerText = formatIDR(netMargin);
             document.getElementById('kpiMarginPct').innerText = `${marginPct.toFixed(1)}% dari nilai kontrak`;
             document.getElementById('kpiCash').innerText = formatIDR(netCash);
+
+            renderTable();
+            renderCharts();
         }
 
         function renderTable() {
             const tbody = document.getElementById('transactionTableBody');
+            if (!tbody) return;
             tbody.innerHTML = '';
             document.getElementById('txCount').innerText = transactions.length + ' Transaksi';
             transactions.forEach(t => {
@@ -713,39 +865,46 @@
                 else cExp += Number(t.amount);
             });
 
-            const ctxCost = document.getElementById('costControlChart').getContext('2d');
-            if (costControlChartInstance) costControlChartInstance.destroy();
-            const cats = Object.keys(initialBudgets);
-            costControlChartInstance = new Chart(ctxCost, {
-                type: 'bar',
-                data: {
-                    labels: cats,
-                    datasets: [
-                        { label: 'Budget RAP', data: cats.map(c => initialBudgets[c]), backgroundColor: 'rgba(14, 165, 233, 0.5)' },
-                        { label: 'Realisasi', data: cats.map(c => actuals[c] || 0), backgroundColor: 'rgba(244, 63, 94, 0.6)' }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#94a3b8', font: { size: 9 } } }, y: { ticks: { color: '#94a3b8' } } } }
-            });
+            const ctxCostEl = document.getElementById('costControlChart');
+            if (ctxCostEl) {
+                const ctxCost = ctxCostEl.getContext('2d');
+                if (costControlChartInstance) costControlChartInstance.destroy();
+                const cats = Object.keys(initialBudgets);
+                costControlChartInstance = new Chart(ctxCost, {
+                    type: 'bar',
+                    data: {
+                        labels: cats,
+                        datasets: [
+                            { label: 'Budget RAP', data: cats.map(c => initialBudgets[c]), backgroundColor: 'rgba(14, 165, 233, 0.5)' },
+                            { label: 'Realisasi', data: cats.map(c => actuals[c] || 0), backgroundColor: 'rgba(244, 63, 94, 0.6)' }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#94a3b8', font: { size: 9 } } }, y: { ticks: { color: '#94a3b8' } } } }
+                });
+            }
 
-            const ctxCash = document.getElementById('cashflowChart').getContext('2d');
-            if (cashflowChartInstance) cashflowChartInstance.destroy();
-            cashflowChartInstance = new Chart(ctxCash, {
-                type: 'line',
-                data: {
-                    labels: ['Awal', 'Saat Ini'],
-                    datasets: [
-                        { label: 'Kas Masuk', data: [0, cInc], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true },
-                        { label: 'Kas Keluar', data: [0, cExp], borderColor: '#f87171', backgroundColor: 'rgba(244, 63, 94, 0.1)', fill: true }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
+            const ctxCashEl = document.getElementById('cashflowChart');
+            if (ctxCashEl) {
+                const ctxCash = ctxCashEl.getContext('2d');
+                if (cashflowChartInstance) cashflowChartInstance.destroy();
+                cashflowChartInstance = new Chart(ctxCash, {
+                    type: 'line',
+                    data: {
+                        labels: ['Awal', 'Saat Ini'],
+                        datasets: [
+                            { label: 'Kas Masuk', data: [0, cInc], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true },
+                            { label: 'Kas Keluar', data: [0, cExp], borderColor: '#f87171', backgroundColor: 'rgba(244, 63, 94, 0.1)', fill: true }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
         }
 
         function populateFormDropdowns() {
             const typeSelect = document.getElementById('trxType');
             const categorySelect = document.getElementById('trxCategory');
+            if (!typeSelect || !categorySelect) return;
             typeSelect.innerHTML = '';
             transactionTypes.forEach(t => typeSelect.innerHTML += `<option value="${t.id}">${t.name}</option>`);
             
