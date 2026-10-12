@@ -44,8 +44,8 @@
     <aside class="w-full md:w-64 bg-slate-800/90 backdrop-blur-md border-r border-slate-700/80 flex flex-col justify-between no-print sticky top-0 h-auto md:h-screen z-40">
         <div>
             <!-- Sidebar Header / Logo Brand dengan Fitur Ganti Logo -->
-            <div class="p-4 border-b border-slate-700/80 flex items-center gap-3 relative group">
-                <div class="relative flex-shrink-0 w-11 h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center overflow-hidden shadow-inner">
+            <div class="p-3.5 border-b border-slate-700/80 flex items-center gap-3 relative group">
+                <div class="relative flex-shrink-0 w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center overflow-hidden shadow-inner">
                     <img id="companyLogoImg" src="" class="w-full h-full object-contain hidden" alt="Logo Perusahaan">
                     <div id="companyLogoPlaceholder" class="w-full h-full bg-red-600 flex items-center justify-center p-1">
                         <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
@@ -55,34 +55,43 @@
                             <path d="M 42 50 L 32 82 M 58 50 L 68 82" stroke="white" stroke-width="8" stroke-linecap="round"/>
                         </svg>
                     </div>
-                    <!-- Tombol Upload Logo saat Hover -->
-                    <label for="uploadLogoInput" class="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-[9px] text-white opacity-0 group-hover:opacity-100 transition cursor-pointer font-medium text-center p-0.5">
-                        <i class="fa-solid fa-camera text-xs mb-0.5 text-cyan-400"></i> Ganti Logo
+                    <label for="uploadLogoInput" class="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-[8px] text-white opacity-0 group-hover:opacity-100 transition cursor-pointer font-medium text-center p-0.5">
+                        <i class="fa-solid fa-camera text-[10px] mb-0.5 text-cyan-400"></i> Logo
                     </label>
                     <input type="file" id="uploadLogoInput" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
                 </div>
                 <div class="overflow-hidden">
-                    <h1 class="text-xs font-bold text-white tracking-tight uppercase truncate">Sporthall PRO</h1>
+                    <h1 class="text-xs font-bold text-white tracking-tight uppercase">Orecon PRO</h1>
                     <p class="text-[10px] text-slate-300 font-semibold leading-tight truncate">PT. Orecon Putra Perkasa</p>
                     <p class="text-[8px] text-slate-400">member of PPA</p>
                 </div>
             </div>
 
-            <!-- Menu Navigation Links -->
-            <nav class="p-4 space-y-1.5">
-                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20">
+            <!-- Area Pilih Proyek Minimalis & Ringkas -->
+            <div class="px-3 py-2.5 bg-slate-800/40 border-b border-slate-700/60">
+                <div class="relative">
+                    <select id="projectSelect" onchange="switchProject(this.value)" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-lg py-1.5 px-2 text-[11px] font-semibold text-cyan-400 focus:outline-none focus:border-cyan-500 transition cursor-pointer text-ellipsis overflow-hidden">
+                        <option value="sporthall">🏢 Proyek Sporthall Indoor</option>
+                        <option value="mess">🚜 Penataan Lahan Mess</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Menu Navigasi -->
+            <nav class="p-3 space-y-1">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20">
                     <i class="fa-solid fa-chart-pie w-4 text-center"></i> Dashboard & Cost Control
                 </button>
-                <button onclick="switchTab('po')" id="nav-po" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white">
+                <button onclick="switchTab('po')" id="nav-po" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white">
                     <i class="fa-solid fa-file-invoice-dollar w-4 text-center"></i> Manajemen Pre-Order (PO)
                 </button>
             </nav>
         </div>
 
         <!-- Sidebar Footer / User Info -->
-        <div class="p-4 border-t border-slate-700/80 text-xs text-slate-400">
-            <p class="font-medium text-slate-200">Muhammad Tegar Tohajudin</p>
-            <p class="text-[10px] text-slate-500">Site Engineer / PM</p>
+        <div class="p-3 border-t border-slate-700/80 text-xs text-slate-400">
+            <p class="font-medium text-slate-200">Muhammad Tegar Tohajudin[cite: 1]</p>
+            <p class="text-[10px] text-slate-500">Site Engineer / PM[cite: 1]</p>
         </div>
     </aside>
 
@@ -93,8 +102,9 @@
         <header class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700/80 sticky top-0 z-30 shadow-lg no-print">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center gap-4">
                 <div>
-                    <h2 id="pageTitle" class="text-base sm:text-lg font-bold text-white tracking-tight">Dashboard Cost Control & Cashflow</h2>
-                    <p class="text-xs text-slate-400">Nilai Kontrak Utama: <span class="text-cyan-400 font-semibold">Rp 9.888.000.000</span></p>
+                    <!-- Judul Otomatis Mengikuti Nama Proyek -->
+                    <h2 id="pageTitle" class="text-base sm:text-lg font-bold text-white tracking-tight">Proyek Sporthall Indoor</h2>
+                    <p class="text-xs text-slate-400">Nilai Kontrak Proyek: <span id="headerContractVal" class="text-cyan-400 font-semibold">Rp 9.888.000.000</span></p>
                 </div>
                 <div class="flex items-center gap-2.5">
                     <button onclick="exportDataJSON()" title="Export JSON Backup" class="px-3 py-2 text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition font-medium flex items-center gap-1.5 border border-slate-600">
@@ -278,23 +288,23 @@
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Nama Barang / Jasa</label>
-                            <input type="text" id="poItemName" placeholder="Mis: Baja WF 250 x 125" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+                            <input type="text" id="poItemName" placeholder="Mis: Sewa Excavator PC200" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Vendor / Supplier</label>
-                            <input type="text" id="poVendor" placeholder="Mis: PT Baja Perkasa" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+                            <input type="text" id="poVendor" placeholder="Mis: PT Rental Alat Perkasa" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Spesifikasi</label>
-                            <input type="text" id="poSpecs" placeholder="Mis: Grade SS400, Panjang 12m" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+                            <input type="text" id="poSpecs" placeholder="Mis: Jam Operasi / Harian" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Volume / Jumlah</label>
-                            <input type="text" id="poVolume" placeholder="Mis: 50 Batang / 15 Ton" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+                            <input type="text" id="poVolume" placeholder="Mis: 150 Jam" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Total Harga (IDR)</label>
-                            <input type="number" id="poTotal" placeholder="Mis: 250000000" min="0" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+                            <input type="number" id="poTotal" placeholder="Mis: 45000000" min="0" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
                         </div>
                         <div class="sm:col-span-2 lg:col-span-2">
                             <label class="block text-xs font-medium text-slate-300 mb-1">Lampirkan Dokumen PO (PDF / Gambar)</label>
@@ -341,7 +351,7 @@
 
         <!-- Footer -->
         <footer class="bg-slate-800 border-t border-slate-700 py-4 text-center text-xs text-slate-500">
-            Dashboard Cost Control Proyek Sporthall Indoor &copy; 2026 PT. Orecon Putra Perkasa - All Rights Reserved
+            Dashboard Cost Control Proyek &copy; 2026 PT. Orecon Putra Perkasa - All Rights Reserved
         </footer>
     </div>
 
@@ -396,13 +406,41 @@
 
     <!-- JavaScript Application Logic -->
     <script>
-        const CONTRACT_VALUE = 9888000000; // Rp 9.888.000.000
-        
-        const defaultBudgets = {
-            "Pekerjaan Struktur & Atap Baja": 3500000000,
-            "Pekerjaan Lapangan & Arsitektur": 2400000000,
-            "Pekerjaan MEP & Pencahayaan": 1400000000,
-            "Persiapan, K3 & Overhead": 900000000
+        const projectsData = {
+            sporthall: {
+                name: "Proyek Sporthall Indoor",
+                contractValue: 9888000000,
+                budgets: {
+                    "Pekerjaan Struktur & Atap Baja": 3500000000,
+                    "Pekerjaan Lapangan & Arsitektur": 2400000000,
+                    "Pekerjaan MEP & Pencahayaan": 1400000000,
+                    "Persiapan, K3 & Overhead": 900000000
+                },
+                transactions: [
+                    { id: 101, date: '2026-03-01', type: 'INCOME', category: 'Termin Pembayaran Owner', desc: 'Uang Muka / Termin 1 Project (20%)', amount: 1977600000 },
+                    { id: 102, date: '2026-03-12', type: 'EXPENSE', category: 'Pekerjaan Struktur & Atap Baja', desc: 'DP Material Baja WF & Anchor Bolt', amount: 1200000000 },
+                    { id: 103, date: '2026-03-25', type: 'EXPENSE', category: 'Persiapan, K3 & Overhead', desc: 'Sewa Alat Berat, Direksi Keet & APK K3', amount: 250000000 },
+                    { id: 104, date: '2026-04-05', type: 'EXPENSE', category: 'Pekerjaan Lapangan & Arsitektur', desc: 'Pekerjaan Sub-Base Lantai Sporthall', amount: 450000000 },
+                    { id: 105, date: '2026-04-20', type: 'EXPENSE', category: 'Pekerjaan MEP & Pencahayaan', desc: 'DP Lampu Highbay LED & Panel Listrik', amount: 300000000 }
+                ],
+                purchaseOrders: []
+            },
+            mess: {
+                name: "Penataan Lahan Mess",
+                contractValue: 270000000,
+                budgets: {
+                    "Pekerjaan Land Clearing & Galian": 100000000,
+                    "Sewa Alat Berat (Excavator & Dozer)": 110000000,
+                    "Pengurukan & Finishing Lahan": 40000000,
+                    "Mobilisasi & Overhead": 20000000
+                },
+                transactions: [
+                    { id: 201, date: '2026-04-01', type: 'INCOME', category: 'Termin Pembayaran Owner', desc: 'Termin 1 (Uang Muka 50%)', amount: 135000000 },
+                    { id: 202, date: '2026-04-03', type: 'EXPENSE', category: 'Mobilisasi & Overhead', desc: 'Mobilisasi Alat Berat ke Lokasi Mess', amount: 15000000 },
+                    { id: 203, date: '2026-04-10', type: 'EXPENSE', category: 'Sewa Alat Berat (Excavator & Dozer)', desc: 'Pembayaran Sewa Mingguan Excavator', amount: 35000000 }
+                ],
+                purchaseOrders: []
+            }
         };
 
         const defaultTypes = [
@@ -410,25 +448,61 @@
             { id: 'EXPENSE', name: 'Pengeluaran (Biaya / Cash Out)', behavior: 'EXPENSE' }
         ];
 
-        const defaultTransactions = [
-            { id: 101, date: '2026-03-01', type: 'INCOME', category: 'Termin Pembayaran Owner', desc: 'Uang Muka / Termin 1 Project (20%)', amount: 1977600000 },
-            { id: 102, date: '2026-03-12', type: 'EXPENSE', category: 'Pekerjaan Struktur & Atap Baja', desc: 'DP Material Baja WF & Anchor Bolt', amount: 1200000000 },
-            { id: 103, date: '2026-03-25', type: 'EXPENSE', category: 'Persiapan, K3 & Overhead', desc: 'Sewa Alat Berat, Direksi Keet & APK K3', amount: 250000000 },
-            { id: 104, date: '2026-04-05', type: 'EXPENSE', category: 'Pekerjaan Lapangan & Arsitektur', desc: 'Pekerjaan Sub-Base Lantai Sporthall', amount: 450000000 },
-            { id: 105, date: '2026-04-20', type: 'EXPENSE', category: 'Pekerjaan MEP & Pencahayaan', desc: 'DP Lampu Highbay LED & Panel Listrik', amount: 300000000 }
-        ];
+        let currentProjectId = localStorage.getItem('sporthall_active_project') || 'sporthall';
+        document.getElementById('projectSelect').value = currentProjectId;
 
-        // State Management with LocalStorage
-        let transactions = JSON.parse(localStorage.getItem('sporthall_v3_transactions')) || defaultTransactions;
-        let initialBudgets = JSON.parse(localStorage.getItem('sporthall_v3_budgets')) || defaultBudgets;
-        let transactionTypes = JSON.parse(localStorage.getItem('sporthall_v3_types')) || defaultTypes;
-        let purchaseOrders = JSON.parse(localStorage.getItem('sporthall_v3_po')) || [];
-        let savedCompanyLogo = localStorage.getItem('sporthall_v3_logo') || '';
-        
+        let transactionTypes = JSON.parse(localStorage.getItem('orecon_v3_types')) || defaultTypes;
+        let savedCompanyLogo = localStorage.getItem('orecon_v3_logo') || '';
+
+        function getProjectStorageKey(key) {
+            return `orecon_proj_${currentProjectId}_${key}`;
+        }
+
+        let transactions = JSON.parse(localStorage.getItem(getProjectStorageKey('transactions')));
+        if (!transactions) {
+            transactions = projectsData[currentProjectId].transactions;
+            localStorage.setItem(getProjectStorageKey('transactions'), JSON.stringify(transactions));
+        }
+
+        let initialBudgets = JSON.parse(localStorage.getItem(getProjectStorageKey('budgets')));
+        if (!initialBudgets) {
+            initialBudgets = projectsData[currentProjectId].budgets;
+            localStorage.setItem(getProjectStorageKey('budgets'), JSON.stringify(initialBudgets));
+        }
+
+        let purchaseOrders = JSON.parse(localStorage.getItem(getProjectStorageKey('po')));
+        if (!purchaseOrders) {
+            purchaseOrders = projectsData[currentProjectId].purchaseOrders;
+            localStorage.setItem(getProjectStorageKey('po'), JSON.stringify(purchaseOrders));
+        }
+
+        let currentContractValue = projectsData[currentProjectId].contractValue;
+
         let costControlChartInstance = null;
         let cashflowChartInstance = null;
 
-        // Handle Custom Logo Upload
+        function switchProject(projId) {
+            currentProjectId = projId;
+            localStorage.setItem('sporthall_active_project', projId);
+
+            currentContractValue = projectsData[projId].contractValue;
+
+            transactions = JSON.parse(localStorage.getItem(getProjectStorageKey('transactions'))) || projectsData[projId].transactions;
+            initialBudgets = JSON.parse(localStorage.getItem(getProjectStorageKey('budgets'))) || projectsData[projId].budgets;
+            purchaseOrders = JSON.parse(localStorage.getItem(getProjectStorageKey('po'))) || projectsData[projId].purchaseOrders;
+
+            // Update Header Title & Contract Value Dynamically
+            document.getElementById('pageTitle').innerText = projectsData[projId].name;
+            document.getElementById('headerContractVal').innerText = formatIDR(currentContractValue);
+            
+            populateFormDropdowns();
+            updateDashboard();
+            if(!document.getElementById('tab-po').classList.contains('hidden')) {
+                renderPOTable();
+            }
+            showToast(`Beralih ke: ${projectsData[projId].name}`, 'info');
+        }
+
         function handleLogoUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -436,7 +510,7 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const base64Img = e.target.result;
-                localStorage.setItem('sporthall_v3_logo', base64Img);
+                localStorage.setItem('orecon_v3_logo', base64Img);
                 applyCompanyLogo(base64Img);
                 showToast('Logo perusahaan berhasil diperbarui!', 'success');
             };
@@ -456,26 +530,22 @@
             }
         }
 
-        // Navigation Tab Switching
         function switchTab(tabId) {
             const dashboardTab = document.getElementById('tab-dashboard');
             const poTab = document.getElementById('tab-po');
             const navDashboard = document.getElementById('nav-dashboard');
             const navPo = document.getElementById('nav-po');
-            const pageTitle = document.getElementById('pageTitle');
 
             if (tabId === 'dashboard') {
                 dashboardTab.classList.remove('hidden');
                 poTab.classList.add('hidden');
-                navDashboard.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
-                navPo.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white";
-                pageTitle.innerText = "Dashboard Cost Control & Cashflow";
+                navDashboard.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
+                navPo.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white";
             } else {
                 dashboardTab.classList.add('hidden');
                 poTab.classList.remove('hidden');
-                navPo.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
-                navDashboard.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white";
-                pageTitle.innerText = "Manajemen Pre-Order (PO) Proyek";
+                navPo.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
+                navDashboard.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white";
                 renderPOTable();
             }
         }
@@ -578,7 +648,7 @@
 
             if (!name) return;
             transactionTypes.push({ id, name, behavior });
-            localStorage.setItem('sporthall_v3_types', JSON.stringify(transactionTypes));
+            localStorage.setItem('orecon_v3_types', JSON.stringify(transactionTypes));
             
             document.getElementById('newTypeName').value = '';
             renderCustomLists();
@@ -598,7 +668,7 @@
             }
 
             initialBudgets[name] = budget;
-            localStorage.setItem('sporthall_v3_budgets', JSON.stringify(initialBudgets));
+            localStorage.setItem(getProjectStorageKey('budgets'), JSON.stringify(initialBudgets));
             
             document.getElementById('newCategoryName').value = '';
             document.getElementById('newCategoryBudget').value = '';
@@ -610,7 +680,7 @@
 
         function deleteCustomType(id) {
             transactionTypes = transactionTypes.filter(t => t.id !== id);
-            localStorage.setItem('sporthall_v3_types', JSON.stringify(transactionTypes));
+            localStorage.setItem('orecon_v3_types', JSON.stringify(transactionTypes));
             renderCustomLists();
             populateFormDropdowns();
             showToast('Tipe transaksi dihapus', 'info');
@@ -618,14 +688,13 @@
 
         function deleteCustomCategory(cat) {
             delete initialBudgets[cat];
-            localStorage.setItem('sporthall_v3_budgets', JSON.stringify(initialBudgets));
+            localStorage.setItem(getProjectStorageKey('budgets'), JSON.stringify(initialBudgets));
             renderCustomLists();
             populateFormDropdowns();
             updateDashboard();
             showToast('Kategori pekerjaan dihapus', 'info');
         }
 
-        // Handle Purchase Order (PO) Form
         document.getElementById('poForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const date = document.getElementById('poDate').value;
@@ -672,7 +741,7 @@
 
         function savePOData(poObj) {
             purchaseOrders.push(poObj);
-            localStorage.setItem('sporthall_v3_po', JSON.stringify(purchaseOrders));
+            localStorage.setItem(getProjectStorageKey('po'), JSON.stringify(purchaseOrders));
 
             document.getElementById('poForm').reset();
             document.getElementById('poDate').value = new Date().toISOString().split('T')[0];
@@ -771,7 +840,7 @@
         function deletePO(id) {
             if (confirm('Hapus data Pre-Order (PO) ini?')) {
                 purchaseOrders = purchaseOrders.filter(p => p.id !== id);
-                localStorage.setItem('sporthall_v3_po', JSON.stringify(purchaseOrders));
+                localStorage.setItem(getProjectStorageKey('po'), JSON.stringify(purchaseOrders));
                 renderPOTable();
                 showToast('Data PO berhasil dihapus', 'info');
             }
@@ -798,11 +867,11 @@
                 }
             });
 
-            const netMargin = CONTRACT_VALUE - totalExpense;
-            const marginPct = (netMargin / CONTRACT_VALUE) * 100;
+            const netMargin = currentContractValue - totalExpense;
+            const marginPct = (netMargin / currentContractValue) * 100;
             const netCash = totalIncome - totalExpense;
 
-            document.getElementById('kpiContract').innerText = formatIDR(CONTRACT_VALUE);
+            document.getElementById('kpiContract').innerText = formatIDR(currentContractValue);
             document.getElementById('kpiRAP').innerText = formatIDR(totalExpense);
             
             const marginEl = document.getElementById('kpiMargin');
@@ -919,12 +988,13 @@
         }
 
         function saveAndRefresh() {
-            localStorage.setItem('sporthall_v3_transactions', JSON.stringify(transactions));
+            localStorage.setItem(getProjectStorageKey('transactions'), JSON.stringify(transactions));
             updateDashboard();
         }
 
         function exportDataJSON() {
             const exportBundle = {
+                currentProjectId,
                 transactions,
                 initialBudgets,
                 transactionTypes,
@@ -934,7 +1004,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportBundle, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `sporthall_cost_control_${new Date().toISOString().split('T')[0]}.json`);
+            downloadAnchor.setAttribute("download", `orecon_${currentProjectId}_backup_${new Date().toISOString().split('T')[0]}.json`);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
@@ -981,7 +1051,7 @@
             costControlChartInstance = new Chart(ctxCost, {
                 type: 'bar',
                 data: {
-                    labels: categories.map(c => c.replace('Pekerjaan ', '')),
+                    labels: categories.map(c => c.length > 22 ? c.substring(0, 22) + '...' : c),
                     datasets: [
                         {
                             label: 'Budget (RAP Target)',
@@ -1023,7 +1093,7 @@
                             ticks: { 
                                 color: '#94a3b8', 
                                 font: { family: 'Inter', size: 10 },
-                                callback: (val) => (val / 1000000000).toFixed(1) + 'M' 
+                                callback: (val) => currentContractValue > 1000000000 ? (val / 1000000000).toFixed(1) + 'M' : (val / 1000000).toFixed(0) + 'jt' 
                             }, 
                             grid: { color: 'rgba(51, 65, 85, 0.3)' } 
                         }
@@ -1079,7 +1149,7 @@
                             ticks: { 
                                 color: '#94a3b8', 
                                 font: { family: 'Inter', size: 10 },
-                                callback: (val) => (val / 1000000000).toFixed(1) + 'M' 
+                                callback: (val) => currentContractValue > 1000000000 ? (val / 1000000000).toFixed(1) + 'M' : (val / 1000000).toFixed(0) + 'jt'
                             }, 
                             grid: { color: 'rgba(51, 65, 85, 0.3)' } 
                         }
@@ -1091,6 +1161,8 @@
         window.onload = function() {
             document.getElementById('trxDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('poDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('pageTitle').innerText = projectsData[currentProjectId].name;
+            document.getElementById('headerContractVal').innerText = formatIDR(currentContractValue);
             if (savedCompanyLogo) {
                 applyCompanyLogo(savedCompanyLogo);
             }
