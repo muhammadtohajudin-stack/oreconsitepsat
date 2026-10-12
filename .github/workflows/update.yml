@@ -1,0 +1,25 @@
+name: Auto Update Dashboard
+on:
+  workflow_dispatch:
+    inputs:
+      new_contract:
+        description: 'Nilai Kontrak Baru (Opsional)'
+        required: false
+      category_name:
+        description: 'Kategori Biaya yang Diupdate'
+        required: false
+      expense_amount:
+        description: 'Nominal Penambahan Pengeluaran'
+        required: false
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Update Script
+        run: |
+          echo "Memperbarui data proyek sporthall..."
+          # Script otomatis akan memproses pembaruan data.json di sini
