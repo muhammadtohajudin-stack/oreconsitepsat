@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Cost Control & Pre-Order - Indoor Sporthall</title>
+    <title>Dashboard Cost Control & Pre-Order - PT. Orecon Putra Perkasa</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -43,14 +43,28 @@
     <!-- Sidebar Navigation (Kiri) -->
     <aside class="w-full md:w-64 bg-slate-800/90 backdrop-blur-md border-r border-slate-700/80 flex flex-col justify-between no-print sticky top-0 h-auto md:h-screen z-40">
         <div>
-            <!-- Sidebar Header / Logo Brand -->
-            <div class="p-4 border-b border-slate-700/80 flex items-center gap-3">
-                <div class="p-2.5 bg-cyan-500/10 border border-cyan-500/20 rounded-xl text-cyan-400">
-                    <i class="fa-solid fa-volleyball text-xl"></i>
+            <!-- Sidebar Header / Logo Brand dengan Fitur Ganti Logo -->
+            <div class="p-4 border-b border-slate-700/80 flex items-center gap-3 relative group">
+                <div class="relative flex-shrink-0 w-11 h-11 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center overflow-hidden shadow-inner">
+                    <img id="companyLogoImg" src="" class="w-full h-full object-contain hidden" alt="Logo Perusahaan">
+                    <div id="companyLogoPlaceholder" class="w-full h-full bg-red-600 flex items-center justify-center p-1">
+                        <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
+                            <circle cx="50" cy="50" r="46" fill="none" stroke="white" stroke-width="8"/>
+                            <circle cx="50" cy="32" r="8"/>
+                            <path d="M 30 52 C 30 40, 70 40, 70 52 C 60 52, 40 52, 30 52 Z" />
+                            <path d="M 42 50 L 32 82 M 58 50 L 68 82" stroke="white" stroke-width="8" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <!-- Tombol Upload Logo saat Hover -->
+                    <label for="uploadLogoInput" class="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-[9px] text-white opacity-0 group-hover:opacity-100 transition cursor-pointer font-medium text-center p-0.5">
+                        <i class="fa-solid fa-camera text-xs mb-0.5 text-cyan-400"></i> Ganti Logo
+                    </label>
+                    <input type="file" id="uploadLogoInput" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
                 </div>
-                <div>
-                    <h1 class="text-sm font-bold text-white tracking-tight">Sporthall PRO</h1>
-                    <p class="text-[10px] text-slate-400">PT Orecon Putra</p>
+                <div class="overflow-hidden">
+                    <h1 class="text-xs font-bold text-white tracking-tight uppercase truncate">Sporthall PRO</h1>
+                    <p class="text-[10px] text-slate-300 font-semibold leading-tight truncate">PT. Orecon Putra Perkasa</p>
+                    <p class="text-[8px] text-slate-400">member of PPA</p>
                 </div>
             </div>
 
@@ -327,7 +341,7 @@
 
         <!-- Footer -->
         <footer class="bg-slate-800 border-t border-slate-700 py-4 text-center text-xs text-slate-500">
-            Dashboard Cost Control Proyek Sporthall Indoor &copy; 2026 - All Rights Reserved
+            Dashboard Cost Control Proyek Sporthall Indoor &copy; 2026 PT. Orecon Putra Perkasa - All Rights Reserved
         </footer>
     </div>
 
@@ -409,9 +423,38 @@
         let initialBudgets = JSON.parse(localStorage.getItem('sporthall_v3_budgets')) || defaultBudgets;
         let transactionTypes = JSON.parse(localStorage.getItem('sporthall_v3_types')) || defaultTypes;
         let purchaseOrders = JSON.parse(localStorage.getItem('sporthall_v3_po')) || [];
+        let savedCompanyLogo = localStorage.getItem('sporthall_v3_logo') || '';
         
         let costControlChartInstance = null;
         let cashflowChartInstance = null;
+
+        // Handle Custom Logo Upload
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Img = e.target.result;
+                localStorage.setItem('sporthall_v3_logo', base64Img);
+                applyCompanyLogo(base64Img);
+                showToast('Logo perusahaan berhasil diperbarui!', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function applyCompanyLogo(dataUrl) {
+            const imgEl = document.getElementById('companyLogoImg');
+            const placeholderEl = document.getElementById('companyLogoPlaceholder');
+            if (dataUrl) {
+                imgEl.src = dataUrl;
+                imgEl.classList.remove('hidden');
+                placeholderEl.classList.add('hidden');
+            } else {
+                imgEl.classList.add('hidden');
+                placeholderEl.classList.remove('hidden');
+            }
+        }
 
         // Navigation Tab Switching
         function switchTab(tabId) {
@@ -885,7 +928,8 @@
                 transactions,
                 initialBudgets,
                 transactionTypes,
-                purchaseOrders
+                purchaseOrders,
+                savedCompanyLogo
             };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportBundle, null, 2));
             const downloadAnchor = document.createElement('a');
@@ -1047,6 +1091,9 @@
         window.onload = function() {
             document.getElementById('trxDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('poDate').value = new Date().toISOString().split('T')[0];
+            if (savedCompanyLogo) {
+                applyCompanyLogo(savedCompanyLogo);
+            }
             populateFormDropdowns();
             updateDashboard();
         };
