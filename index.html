@@ -23,7 +23,7 @@
             }
         }
     </script>
-    <!-- Chart.js for data visualization -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -40,10 +40,10 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col md:flex-row antialiased">
 
-    <!-- Sidebar Navigation (Kiri) -->
+    <!-- Sidebar Navigation -->
     <aside class="w-full md:w-64 bg-slate-800/90 backdrop-blur-md border-r border-slate-700/80 flex flex-col justify-between no-print sticky top-0 h-auto md:h-screen z-40">
         <div>
-            <!-- Sidebar Header / Logo Brand dengan Fitur Ganti Logo -->
+            <!-- Sidebar Header -->
             <div class="p-3.5 border-b border-slate-700/80 flex items-center gap-3 relative group">
                 <div class="relative flex-shrink-0 w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center overflow-hidden shadow-inner">
                     <img id="companyLogoImg" src="" class="w-full h-full object-contain hidden" alt="Logo Perusahaan">
@@ -67,14 +67,12 @@
                 </div>
             </div>
 
-            <!-- Area Pilih Proyek Minimalis & Ringkas -->
+            <!-- Pilih Proyek -->
             <div class="px-3 py-2.5 bg-slate-800/40 border-b border-slate-700/60">
-                <div class="relative">
-                    <select id="projectSelect" onchange="switchProject(this.value)" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-lg py-1.5 px-2 text-[11px] font-semibold text-cyan-400 focus:outline-none focus:border-cyan-500 transition cursor-pointer text-ellipsis overflow-hidden">
-                        <option value="sporthall">🏢 Proyek Sporthall Indoor</option>
-                        <option value="mess">🚜 Penataan Lahan Mess</option>
-                    </select>
-                </div>
+                <select id="projectSelect" onchange="switchProject(this.value)" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-lg py-1.5 px-2 text-[11px] font-semibold text-cyan-400 focus:outline-none focus:border-cyan-500 transition cursor-pointer">
+                    <option value="sporthall">🏢 Proyek Sporthall Indoor</option>
+                    <option value="mess">🚜 Penataan Lahan Mess</option>
+                </select>
             </div>
 
             <!-- Menu Navigasi -->
@@ -89,7 +87,7 @@
             </nav>
         </div>
 
-        <!-- Sidebar Footer / User Info -->
+        <!-- Sidebar Footer -->
         <div class="p-3 border-t border-slate-700/80 text-xs text-slate-400">
             <p class="font-medium text-slate-200">Muhammad Tegar Tohajudin[cite: 1]</p>
             <p class="text-[10px] text-slate-500">Site Engineer / PM[cite: 1]</p>
@@ -124,150 +122,53 @@
             <section id="tab-dashboard" class="space-y-6">
                 <!-- Executive KPI Cards Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card hover:border-slate-600 transition">
-                        <div class="flex items-center justify-between">
-                            <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Nilai Kontrak Utama</p>
-                            <span class="p-2 bg-blue-500/10 text-blue-400 rounded-lg text-sm"><i class="fa-solid fa-file-contract"></i></span>
-                        </div>
-                        <h3 id="kpiContract" class="text-2xl font-bold text-white mt-2 tracking-tight">Rp 9.888.000.000</h3>
-                        <div class="mt-2 text-xs text-slate-400 flex items-center gap-1">
-                            <span class="text-emerald-400 font-medium"><i class="fa-solid fa-circle-check"></i> Fixed Price</span> Contract Value
-                        </div>
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Nilai Kontrak Utama</p>
+                        <h3 id="kpiContract" class="text-2xl font-bold text-white mt-2">Rp 0</h3>
                     </div>
-
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card hover:border-slate-600 transition">
-                        <div class="flex items-center justify-between">
-                            <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Realisasi Biaya (RAP)</p>
-                            <span class="p-2 bg-amber-500/10 text-amber-400 rounded-lg text-sm"><i class="fa-solid fa-calculator"></i></span>
-                        </div>
-                        <h3 id="kpiRAP" class="text-2xl font-bold text-amber-400 mt-2 tracking-tight">Rp 0</h3>
-                        <div id="kpiRAPProgress" class="mt-2 text-xs text-slate-400 flex items-center justify-between">
-                            <span>Pengeluaran Aktual Proyek</span>
-                        </div>
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Realisasi Biaya (RAP)</p>
+                        <h3 id="kpiRAP" class="text-2xl font-bold text-amber-400 mt-2">Rp 0</h3>
                     </div>
-
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card hover:border-slate-600 transition">
-                        <div class="flex items-center justify-between">
-                            <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Proyeksi Net Margin</p>
-                            <span class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg text-sm"><i class="fa-solid fa-chart-line"></i></span>
-                        </div>
-                        <h3 id="kpiMargin" class="text-2xl font-bold text-emerald-400 mt-2 tracking-tight">Rp 0</h3>
-                        <div class="mt-2 text-xs">
-                            <span id="kpiMarginPct" class="font-semibold text-emerald-400">0.0% dari nilai kontrak</span>
-                        </div>
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Proyeksi Net Margin</p>
+                        <h3 id="kpiMargin" class="text-2xl font-bold text-emerald-400 mt-2">Rp 0</h3>
+                        <p id="kpiMarginPct" class="text-xs text-emerald-400 mt-1">0.0%</p>
                     </div>
-
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card hover:border-slate-600 transition">
-                        <div class="flex items-center justify-between">
-                            <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Saldo Kas Proyek</p>
-                            <span class="p-2 bg-cyan-500/10 text-cyan-400 rounded-lg text-sm"><i class="fa-solid fa-wallet"></i></span>
-                        </div>
-                        <h3 id="kpiCash" class="text-2xl font-bold text-cyan-400 mt-2 tracking-tight">Rp 0</h3>
-                        <div class="mt-2 text-xs text-slate-400 flex items-center justify-between">
-                            <span>Kas Masuk - Kas Keluar</span>
-                        </div>
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Saldo Kas Proyek</p>
+                        <h3 id="kpiCash" class="text-2xl font-bold text-cyan-400 mt-2">Rp 0</h3>
                     </div>
                 </div>
 
-                <!-- Input Transaction & Custom Configuration Form -->
+                <!-- Form Transaksi Keuangan -->
                 <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
-                    <h2 class="text-base font-semibold text-white mb-4 flex items-center justify-between">
-                        <span class="flex items-center gap-2">
-                            <i class="fa-solid fa-square-plus text-cyan-400"></i> Catat Transaksi Keuangan Baru
-                        </span>
-                        <button type="button" onclick="openCustomSettingsModal()" class="text-xs bg-slate-700 hover:bg-slate-600 text-cyan-300 px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5 border border-slate-600">
-                            <i class="fa-solid fa-gear"></i> Kelola Tipe & Kategori Custom
-                        </button>
+                    <h2 class="text-base font-semibold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-square-plus text-cyan-400"></i> Catat Transaksi Keuangan Baru
                     </h2>
                     <form id="transactionForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Tanggal Transaksi</label>
-                            <input type="date" id="trxDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-500 transition">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Tipe Transaksi</label>
-                            <select id="trxType" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-500 transition">
-                                <!-- Populated dynamically -->
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Kategori / Pos Pekerjaan</label>
-                            <select id="trxCategory" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-500 transition">
-                                <!-- Populated dynamically -->
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Nominal (IDR)</label>
-                            <input type="number" id="trxAmount" placeholder="Contoh: 350000000" required min="1" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Keterangan / Deskripsi</label>
-                            <input type="text" id="trxDesc" placeholder="Uraian item pembayaran" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition">
-                        </div>
-                        <div class="flex items-end">
-                            <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 active:bg-cyan-700 text-white font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-cyan-600/20 flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-floppy-disk"></i> Simpan
-                            </button>
-                        </div>
+                        <div><label class="block text-xs font-medium text-slate-300 mb-1">Tanggal</label><input type="date" id="trxDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                        <div><label class="block text-xs font-medium text-slate-300 mb-1">Tipe</label><select id="trxType" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></select></div>
+                        <div><label class="block text-xs font-medium text-slate-300 mb-1">Kategori / Pos Pekerjaan</label><select id="trxCategory" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></select></div>
+                        <div><label class="block text-xs font-medium text-slate-300 mb-1">Nominal (IDR)</label><input type="number" id="trxAmount" placeholder="350000000" required min="1" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                        <div><label class="block text-xs font-medium text-slate-300 mb-1">Keterangan</label><input type="text" id="trxDesc" placeholder="Uraian" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                        <div class="flex items-end"><button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 rounded-xl text-xs">Simpan</button></div>
                     </form>
                 </div>
 
                 <!-- Charts Grid -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-sm font-semibold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-chart-column text-cyan-400"></i> Cost Control (RAP vs Realisasi)
-                            </h3>
-                            <span class="text-xs text-slate-400">Per Pos Pekerjaan</span>
-                        </div>
-                        <div class="relative h-64 sm:h-72">
-                            <canvas id="costControlChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-sm font-semibold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-chart-area text-emerald-400"></i> Akumulasi Cashflow (Masuk vs Keluar)
-                            </h3>
-                            <span class="text-xs text-slate-400">Proyeksi & Realisasi</span>
-                        </div>
-                        <div class="relative h-64 sm:h-72">
-                            <canvas id="cashflowChart"></canvas>
-                        </div>
-                    </div>
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card"><h3 class="text-sm font-semibold text-white mb-4">Cost Control (RAP vs Realisasi)</h3><div class="relative h-64"><canvas id="costControlChart"></canvas></div></div>
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card"><h3 class="text-sm font-semibold text-white mb-4">Akumulasi Cashflow</h3><div class="relative h-64"><canvas id="cashflowChart"></canvas></div></div>
                 </div>
 
-                <!-- Ledger Transactions Table -->
+                <!-- Ledger Table -->
                 <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-                        <div>
-                            <h2 class="text-base font-semibold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-receipt text-amber-400"></i> Jurnal Transaksi Keuangan
-                            </h2>
-                            <p class="text-xs text-slate-400 mt-0.5">Catatan seluruh pengeluaran dan pembayaran termin</p>
-                        </div>
-                        <span id="txCount" class="text-xs font-medium bg-slate-700/80 border border-slate-600/80 text-slate-300 px-3 py-1 rounded-full">
-                            0 Transaksi
-                        </span>
-                    </div>
-
+                    <div class="flex justify-between items-center mb-4"><h2 class="text-base font-semibold text-white">Jurnal Transaksi Keuangan</h2><span id="txCount" class="text-xs bg-slate-700 text-slate-300 px-3 py-1 rounded-full">0 Transaksi</span></div>
                     <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                         <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                            <thead>
-                                <tr class="bg-slate-900/80 border-b border-slate-700 text-slate-400 uppercase font-semibold tracking-wider text-[11px]">
-                                    <th class="py-3 px-4">Tanggal</th>
-                                    <th class="py-3 px-4">Tipe</th>
-                                    <th class="py-3 px-4">Kategori Pekerjaan</th>
-                                    <th class="py-3 px-4">Keterangan</th>
-                                    <th class="py-3 px-4 text-right">Nominal (IDR)</th>
-                                    <th class="py-3 px-4 text-center no-print">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="transactionTableBody" class="divide-y divide-slate-700/50">
-                                <!-- Populated dynamically -->
-                            </tbody>
+                            <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 font-semibold text-[11px]"><th class="py-3 px-4">Tanggal</th><th class="py-3 px-4">Tipe</th><th class="py-3 px-4">Kategori Pekerjaan</th><th class="py-3 px-4">Keterangan</th><th class="py-3 px-4 text-right">Nominal (IDR)</th><th class="py-3 px-4 text-center no-print">Aksi</th></tr></thead>
+                            <tbody id="transactionTableBody" class="divide-y divide-slate-700/50"></tbody>
                         </table>
                     </div>
                 </div>
@@ -275,72 +176,27 @@
 
             <!-- TAB 2: MANAJEMEN PRE-ORDER (PO) / ALAT BERAT -->
             <section id="tab-po" class="space-y-6 hidden">
-                <!-- MODUL 1: PRE-ORDER (Khusus Sporthall) -->
+                <!-- MODUL PRE-ORDER -->
                 <div id="module-po" class="space-y-6">
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
-                        <h2 class="text-base font-semibold text-white mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-cart-plus text-cyan-400"></i> Tambah Data Pre-Order (PO) Baru
-                        </h2>
+                        <h2 class="text-base font-semibold text-white mb-2">Tambah Data Pre-Order (PO) Baru</h2>
                         <form id="poForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-300 mb-1">Tanggal PO</label>
-                                <input type="date" id="poDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-300 mb-1">Nama Barang / Jasa</label>
-                                <input type="text" id="poItemName" placeholder="Mis: Baja WF" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-300 mb-1">Vendor / Supplier</label>
-                                <input type="text" id="poVendor" placeholder="Mis: PT Vendor" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-300 mb-1">Spesifikasi</label>
-                                <input type="text" id="poSpecs" placeholder="Spesifikasi" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-300 mb-1">Volume / Jumlah</label>
-                                <input type="text" id="poVolume" placeholder="Volume" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-300 mb-1">Total Harga (IDR)</label>
-                                <input type="number" id="poTotal" placeholder="Total Harga" min="0" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white">
-                            </div>
-                            <div class="sm:col-span-2 lg:col-span-2">
-                                <label class="block text-xs font-medium text-slate-300 mb-1">Catatan / Keterangan</label>
-                                <input type="text" id="poFile" placeholder="Catatan dokumen pendukung" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white">
-                            </div>
-                            <div class="flex items-end">
-                                <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-4 rounded-xl text-xs transition">Simpan PO</button>
-                            </div>
+                            <div><label class="block text-xs font-medium text-slate-300 mb-1">Tanggal PO</label><input type="date" id="poDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                            <div><label class="block text-xs font-medium text-slate-300 mb-1">Nama Barang / Jasa</label><input type="text" id="poItemName" placeholder="Baja WF" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                            <div><label class="block text-xs font-medium text-slate-300 mb-1">Vendor / Supplier</label><input type="text" id="poVendor" placeholder="PT Vendor" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                            <div><label class="block text-xs font-medium text-slate-300 mb-1">Spesifikasi</label><input type="text" id="poSpecs" placeholder="Spesifikasi" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                            <div><label class="block text-xs font-medium text-slate-300 mb-1">Volume / Jumlah</label><input type="text" id="poVolume" placeholder="Volume" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                            <div><label class="block text-xs font-medium text-slate-300 mb-1">Total Harga (IDR)</label><input type="number" id="poTotal" placeholder="Total Harga" min="0" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                            <div class="flex items-end sm:col-span-3"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs">Simpan PO</button></div>
                         </form>
                     </div>
-
-                    <!-- Daftar PO Tersimpan -->
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-sm font-semibold text-white">Daftar Pre-Order (PO) Proyek</h3>
-                            <span id="poCount" class="text-xs font-medium bg-slate-700 text-slate-300 px-3 py-1 rounded-full">0 PO</span>
-                        </div>
-                        <div class="overflow-x-auto rounded-xl border border-slate-700/50">
-                            <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                                <thead>
-                                    <tr class="bg-slate-900/80 border-b border-slate-700 text-slate-400 uppercase font-semibold text-[11px]">
-                                        <th class="py-3 px-4">Tanggal</th>
-                                        <th class="py-3 px-4">Nama Barang</th>
-                                        <th class="py-3 px-4">Vendor</th>
-                                        <th class="py-3 px-4">Spesifikasi & Volume</th>
-                                        <th class="py-3 px-4 text-right">Total Harga</th>
-                                        <th class="py-3 px-4 text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="poTableBody" class="divide-y divide-slate-700/50"></tbody>
-                            </table>
-                        </div>
+                        <div class="flex justify-between items-center mb-4"><h3 class="text-sm font-semibold text-white">Daftar Pre-Order (PO) Proyek</h3><span id="poCount" class="text-xs bg-slate-700 text-slate-300 px-3 py-1 rounded-full">0 PO</span></div>
+                        <div class="overflow-x-auto rounded-xl border border-slate-700/50"><table class="w-full text-left border-collapse text-xs sm:text-sm"><thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 font-semibold text-[11px]"><th class="py-3 px-4">Tanggal</th><th class="py-3 px-4">Nama Barang</th><th class="py-3 px-4">Vendor</th><th class="py-3 px-4">Spesifikasi & Volume</th><th class="py-3 px-4 text-right">Total Harga</th><th class="py-3 px-4 text-center">Aksi</th></tr></thead><tbody id="poTableBody" class="divide-y divide-slate-700/50"></tbody></table></div>
                     </div>
                 </div>
 
-                <!-- MODUL 2: OPERASIONAL ALAT BERAT & RITASE (Khusus Penataan Mess) -->
+                <!-- MODUL OPERASIONAL ALAT BERAT -->
                 <div id="module-heavy" class="space-y-6 hidden">
                     <div class="flex flex-wrap gap-2 border-b border-slate-700 pb-3">
                         <button onclick="switchHeavySubTab('exca')" id="subnav-exca" class="px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-600 text-white transition"><i class="fa-solid fa-truck-monster"></i> HM Excavator</button>
@@ -348,84 +204,84 @@
                         <button onclick="switchHeavySubTab('dt')" id="subnav-dt" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-700 transition"><i class="fa-solid fa-truck-moving"></i> Ritase DT</button>
                     </div>
 
-                    <!-- SUB-TAB 1: EXCAVATOR -->
+                    <!-- EXCAVATOR -->
                     <div id="heavy-exca" class="space-y-6">
                         <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
-                            <h3 class="text-sm font-bold text-white mb-3">Input Log HM & Fuel Excavator</h3>
+                            <h3 class="text-sm font-bold text-white mb-3">Input Daily Log HM & Fuel Excavator</h3>
                             <form id="excaForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                                 <div><label class="block text-xs text-slate-300 mb-1">Tanggal</label><input type="date" id="excaDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">HM Awal</label><input type="number" step="0.1" id="excaHmAwal" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">HM Akhir</label><input type="number" step="0.1" id="excaHmAkhir" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div><label class="block text-xs text-slate-300 mb-1">Volume Fuel (L)</label><input type="number" step="0.1" id="excaFuelVol" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                                <div><label class="block text-xs text-slate-300 mb-1">Volume Fuel (Liter)</label><input type="number" step="0.1" id="excaFuelVol" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">Harga Fuel (IDR/L)</label><input type="number" id="excaFuelPrice" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div class="lg:col-span-5 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 px-6 rounded-xl text-xs">Simpan Log Exca</button></div>
+                                <div class="lg:col-span-5 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs">Simpan Record Excavator</button></div>
                             </form>
                         </div>
                         <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4">
-                            <h3 class="text-sm font-semibold text-white">Log Excavator</h3>
+                            <h3 class="text-sm font-semibold text-white">Log Operasional Excavator</h3>
                             <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2 px-3">Tanggal</th><th class="py-2 px-3 text-center">HM Awal</th><th class="py-2 px-3 text-center">HM Akhir</th><th class="py-2 px-3 text-center">Total Jam</th><th class="py-2 px-3 text-center">Fuel</th><th class="py-2 px-3 text-right">Biaya Fuel</th><th class="py-2 px-3 text-center">Aksi</th></tr></thead>
+                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">HM Awal</th><th class="py-2.5 px-4 text-center">HM Akhir</th><th class="py-2.5 px-4 text-center">Total Jam</th><th class="py-2.5 px-4 text-center">Fuel</th><th class="py-2.5 px-4 text-right">Total Biaya</th><th class="py-2.5 px-4 text-center">Aksi</th></tr></thead>
                                     <tbody id="excaTableBody" class="divide-y divide-slate-700/50"></tbody>
                                 </table>
                             </div>
-                            <div class="grid grid-cols-3 gap-3 bg-slate-900 p-3 rounded-xl text-xs font-mono">
-                                <div>Total Jam: <span id="sumExcaHours" class="text-cyan-400 font-bold">0 Jam</span></div>
-                                <div>Total Fuel: <span id="sumExcaFuel" class="text-amber-400 font-bold">0 L</span></div>
+                            <div class="grid grid-cols-3 gap-3 bg-slate-900 p-4 rounded-xl text-xs font-mono">
+                                <div>Total Jam: <span id="sumExcaHours" class="text-cyan-400 font-bold">0.0 Jam</span></div>
+                                <div>Total Fuel: <span id="sumExcaFuel" class="text-amber-400 font-bold">0.0 Liter</span></div>
                                 <div>Total Biaya: <span id="sumExcaCost" class="text-emerald-400 font-bold">Rp 0</span></div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- SUB-TAB 2: COMPACT -->
+                    <!-- COMPACT -->
                     <div id="heavy-compact" class="space-y-6 hidden">
                         <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
-                            <h3 class="text-sm font-bold text-white mb-3">Input Log HM & Fuel Compact</h3>
+                            <h3 class="text-sm font-bold text-white mb-3">Input Daily Log HM & Fuel Compact</h3>
                             <form id="compactForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                                 <div><label class="block text-xs text-slate-300 mb-1">Tanggal</label><input type="date" id="compactDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">HM Awal</label><input type="number" step="0.1" id="compactHmAwal" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">HM Akhir</label><input type="number" step="0.1" id="compactHmAkhir" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div><label class="block text-xs text-slate-300 mb-1">Volume Fuel (L)</label><input type="number" step="0.1" id="compactFuelVol" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                                <div><label class="block text-xs text-slate-300 mb-1">Volume Fuel (Liter)</label><input type="number" step="0.1" id="compactFuelVol" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">Harga Fuel (IDR/L)</label><input type="number" id="compactFuelPrice" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div class="lg:col-span-5 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 px-6 rounded-xl text-xs">Simpan Log Compact</button></div>
+                                <div class="lg:col-span-5 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs">Simpan Record Compact</button></div>
                             </form>
                         </div>
                         <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4">
-                            <h3 class="text-sm font-semibold text-white">Log Compact Roller</h3>
+                            <h3 class="text-sm font-semibold text-white">Log Operasional Compact Roller</h3>
                             <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2 px-3">Tanggal</th><th class="py-2 px-3 text-center">HM Awal</th><th class="py-2 px-3 text-center">HM Akhir</th><th class="py-2 px-3 text-center">Total Jam</th><th class="py-2 px-3 text-center">Fuel</th><th class="py-2 px-3 text-right">Biaya Fuel</th><th class="py-2 px-3 text-center">Aksi</th></tr></thead>
+                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">HM Awal</th><th class="py-2.5 px-4 text-center">HM Akhir</th><th class="py-2.5 px-4 text-center">Total Jam</th><th class="py-2.5 px-4 text-center">Fuel</th><th class="py-2.5 px-4 text-right">Total Biaya</th><th class="py-2.5 px-4 text-center">Aksi</th></tr></thead>
                                     <tbody id="compactTableBody" class="divide-y divide-slate-700/50"></tbody>
                                 </table>
                             </div>
-                            <div class="grid grid-cols-3 gap-3 bg-slate-900 p-3 rounded-xl text-xs font-mono">
-                                <div>Total Jam: <span id="sumCompactHours" class="text-cyan-400 font-bold">0 Jam</span></div>
-                                <div>Total Fuel: <span id="sumCompactFuel" class="text-amber-400 font-bold">0 L</span></div>
+                            <div class="grid grid-cols-3 gap-3 bg-slate-900 p-4 rounded-xl text-xs font-mono">
+                                <div>Total Jam: <span id="sumCompactHours" class="text-cyan-400 font-bold">0.0 Jam</span></div>
+                                <div>Total Fuel: <span id="sumCompactFuel" class="text-amber-400 font-bold">0.0 Liter</span></div>
                                 <div>Total Biaya: <span id="sumCompactCost" class="text-emerald-400 font-bold">Rp 0</span></div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- SUB-TAB 3: RITASE DUMP TRUCK -->
+                    <!-- DUMP TRUCK -->
                     <div id="heavy-dt" class="space-y-6 hidden">
                         <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
-                            <h3 class="text-sm font-bold text-white mb-3">Input Log Ritase Dump Truck</h3>
+                            <h3 class="text-sm font-bold text-white mb-3">Input Daily Log Ritase Dump Truck</h3>
                             <form id="dtForm" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div><label class="block text-xs text-slate-300 mb-1">Tanggal</label><input type="date" id="dtDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">Jumlah Ritase (Rit)</label><input type="number" id="dtRitase" required min="1" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">Harga / Rit (IDR)</label><input type="number" id="dtPrice" required min="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div class="sm:col-span-3 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 px-6 rounded-xl text-xs">Simpan Ritase DT</button></div>
+                                <div class="sm:col-span-3 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs">Simpan Record Ritase</button></div>
                             </form>
                         </div>
                         <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4">
                             <h3 class="text-sm font-semibold text-white">Log Ritase Dump Truck</h3>
                             <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2 px-3">Tanggal</th><th class="py-2 px-3 text-center">Jumlah Rit</th><th class="py-2 px-3 text-right">Harga/Rit</th><th class="py-2 px-3 text-right">Total Biaya</th><th class="py-2 px-3 text-center">Aksi</th></tr></thead>
+                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">Jumlah Rit</th><th class="py-2.5 px-4 text-right">Harga/Rit</th><th class="py-2.5 px-4 text-right">Total Biaya</th><th class="py-2.5 px-4 text-center">Aksi</th></tr></thead>
                                     <tbody id="dtTableBody" class="divide-y divide-slate-700/50"></tbody>
                                 </table>
                             </div>
-                            <div class="grid grid-cols-2 gap-3 bg-slate-900 p-3 rounded-xl text-xs font-mono">
+                            <div class="grid grid-cols-2 gap-3 bg-slate-900 p-4 rounded-xl text-xs font-mono">
                                 <div>Total Ritase: <span id="sumDtRitase" class="text-cyan-400 font-bold">0 Rit</span></div>
                                 <div>Total Biaya: <span id="sumDtCost" class="text-emerald-400 font-bold">Rp 0</span></div>
                             </div>
@@ -447,41 +303,10 @@
         <span id="toastMsg" class="text-xs sm:text-sm font-medium">Notifikasi</span>
     </div>
 
-    <!-- Modal Kelola Custom Tipe & Kategori -->
-    <div id="customSettingsModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden">
-        <div class="bg-slate-800 border border-slate-700 w-full max-w-lg p-6 rounded-2xl shadow-2xl space-y-6 mx-4">
-            <div class="flex items-center justify-between border-b border-slate-700 pb-4">
-                <h3 class="text-base font-bold text-white flex items-center gap-2"><i class="fa-solid fa-sliders text-cyan-400"></i> Kelola Tipe & Kategori Custom</h3>
-                <button onclick="closeCustomSettingsModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div class="space-y-5">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-2">Tambah Tipe Transaksi Baru</label>
-                    <form id="addTypeForm" class="flex gap-2">
-                        <input type="text" id="newTypeName" placeholder="Nama Tipe" required class="flex-grow bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
-                        <select id="newTypeBehavior" class="bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white"><option value="INCOME">Pemasukan</option><option value="EXPENSE">Pengeluaran</option></select>
-                        <button type="submit" class="bg-cyan-600 px-3 rounded-xl text-xs text-white">Tambah</button>
-                    </form>
-                    <div id="customTypeList" class="mt-2 flex flex-wrap gap-1.5"></div>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-2">Tambah Kategori Pekerjaan</label>
-                    <form id="addCategoryForm" class="flex gap-2">
-                        <input type="text" id="newCategoryName" placeholder="Nama Kategori" required class="flex-grow bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
-                        <input type="number" id="newCategoryBudget" placeholder="Target RAP" min="0" class="w-28 bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
-                        <button type="submit" class="bg-cyan-600 px-3 rounded-xl text-xs text-white">Tambah</button>
-                    </form>
-                    <div id="customCategoryList" class="mt-2 flex flex-wrap gap-1.5 max-h-36 overflow-y-auto"></div>
-                </div>
-            </div>
-            <div class="flex justify-end pt-3 border-t border-slate-700"><button onclick="closeCustomSettingsModal()" class="bg-slate-700 text-white px-4 py-2 rounded-xl text-xs">Selesai</button></div>
-        </div>
-    </div>
-
-    <!-- JavaScript Application Logic (Cloud Connected via Google Apps Script) -->
+    <!-- JavaScript Application Logic (Cloud Sync Direct) -->
     <script>
-        // URL Web App Google Sheets Anda
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzQ9ang0TmVb6GJG1SsvyMn6Cz8Y7P5SgBwTfa16eEzdlLlbPzWsMV8zpwf6Bolh5X3/exec';
+        // URL Web App Google Sheets Anda yang baru
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyZ6hO4VBQqFv-PSQizTSTbUQSuCMgYPvuYGZl4aoKoqZGelGeZko-xygCSjerhm2mx/exec';
 
         const projectsData = {
             sporthall: {
@@ -514,7 +339,7 @@
         let currentProjectId = localStorage.getItem('orecon_active_project') || 'sporthall';
         document.getElementById('projectSelect').value = currentProjectId;
 
-        let transactionTypes = JSON.parse(localStorage.getItem('orecon_v3_types')) || defaultTypes;
+        let transactionTypes = defaultTypes;
         let savedCompanyLogo = localStorage.getItem('orecon_v3_logo') || '';
 
         let transactions = [];
@@ -536,36 +361,46 @@
             try {
                 const res = await fetch(`${WEB_APP_URL}?projKey=${getCloudKey(type)}`);
                 const data = await res.json();
-                return data;
+                return Array.isArray(data) ? data : [];
             } catch (err) {
-                console.error("Gagal mengambil data cloud:", err);
+                console.error("Gagal mengambil data:", err);
                 return [];
             }
         }
 
         async function saveCloudData(type, payload) {
+            showToast('Menyimpan data ke Google Sheets...', 'info');
             try {
+                const bodyObj = {
+                    action: 'save',
+                    projKey: getCloudKey(type),
+                    payload: payload
+                };
+                
                 await fetch(WEB_APP_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'save', projKey: getCloudKey(type), payload })
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(bodyObj)
                 });
+                showToast('Berhasil tersimpan di Cloud!', 'success');
             } catch (err) {
-                console.error("Gagal menyimpan ke cloud:", err);
+                console.error("Gagal menyimpan:", err);
+                showToast('Gagal terhubung ke Google Sheets', 'error');
             }
         }
 
         async function deleteCloudData(type, id) {
+            showToast('Menghapus data di Cloud...', 'info');
             try {
+                const bodyObj = { action: 'delete', projKey: getCloudKey(type), id: id };
                 await fetch(WEB_APP_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'delete', projKey: getCloudKey(type), id })
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(bodyObj)
                 });
+                showToast('Data terhapus!', 'info');
             } catch (err) {
-                console.error("Gagal menghapus di cloud:", err);
+                console.error("Gagal menghapus:", err);
             }
         }
 
@@ -589,11 +424,10 @@
             document.getElementById('headerContractVal').innerText = formatIDR(currentContractValue);
             
             await syncDataFromCloud();
-            showToast(`Beralih ke: ${projectsData[projId].name}`, 'info');
         }
 
         async function syncDataFromCloud() {
-            showToast('Menyinkronkan data dari Google Sheets...', 'info');
+            showToast('Mengambil data terbaru dari Google Sheets...', 'info');
             transactions = await fetchCloudData('transactions');
             purchaseOrders = await fetchCloudData('po');
             excaLogs = await fetchCloudData('exca');
@@ -605,7 +439,7 @@
             if (!document.getElementById('tab-po').classList.contains('hidden')) {
                 renderTabTwoContent();
             }
-            showToast('Sinkronisasi Google Sheets selesai!', 'success');
+            showToast('Data telah diperbarui!', 'success');
         }
 
         function switchTab(tabId) {
@@ -651,7 +485,7 @@
             document.getElementById(`subnav-${sub}`).className = "px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-600 text-white transition";
         }
 
-        // Form Submit Handlers dengan Cloud Save
+        // Form Submission Handlers
         document.getElementById('transactionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const newTx = {
@@ -663,11 +497,10 @@
                 desc: document.getElementById('trxDesc').value
             };
             transactions.push(newTx);
-            await saveCloudData('transactions', newTx);
             updateDashboard();
             this.reset();
             document.getElementById('trxDate').value = new Date().toISOString().split('T')[0];
-            showToast('Transaksi berhasil disimpan ke Cloud!', 'success');
+            await saveCloudData('transactions', newTx);
         });
 
         document.getElementById('poForm').addEventListener('submit', async function(e) {
@@ -679,15 +512,13 @@
                 vendor: document.getElementById('poVendor').value,
                 specs: document.getElementById('poSpecs').value,
                 volume: document.getElementById('poVolume').value,
-                total: parseFloat(document.getElementById('poTotal').value),
-                fileName: document.getElementById('poFile').value
+                total: parseFloat(document.getElementById('poTotal').value)
             };
             purchaseOrders.push(newPO);
-            await saveCloudData('po', newPO);
             renderPOTable();
             this.reset();
             document.getElementById('poDate').value = new Date().toISOString().split('T')[0];
-            showToast('PO disimpan ke Cloud!', 'success');
+            await saveCloudData('po', newPO);
         });
 
         document.getElementById('excaForm').addEventListener('submit', async function(e) {
@@ -706,11 +537,10 @@
                 totalCost: (fuelVol * fuelPrice)
             };
             excaLogs.push(log);
-            await saveCloudData('exca', log);
             renderExcaTable();
             this.reset();
             document.getElementById('excaDate').value = new Date().toISOString().split('T')[0];
-            showToast('Log Excavator disimpan ke Cloud!', 'success');
+            await saveCloudData('exca', log);
         });
 
         document.getElementById('compactForm').addEventListener('submit', async function(e) {
@@ -729,11 +559,10 @@
                 totalCost: (fuelVol * fuelPrice)
             };
             compactLogs.push(log);
-            await saveCloudData('compact', log);
             renderCompactTable();
             this.reset();
             document.getElementById('compactDate').value = new Date().toISOString().split('T')[0];
-            showToast('Log Compact disimpan ke Cloud!', 'success');
+            await saveCloudData('compact', log);
         });
 
         document.getElementById('dtForm').addEventListener('submit', async function(e) {
@@ -746,63 +575,57 @@
                 totalCost: (parseInt(document.getElementById('dtRitase').value) || 0) * (parseFloat(document.getElementById('dtPrice').value) || 0)
             };
             dtLogs.push(log);
-            await saveCloudData('dt', log);
             renderDtTable();
             this.reset();
             document.getElementById('dtDate').value = new Date().toISOString().split('T')[0];
-            showToast('Log Ritase DT disimpan ke Cloud!', 'success');
+            await saveCloudData('dt', log);
         });
 
         // Delete Handlers
         async function deleteTransaction(id) {
             if (confirm('Hapus transaksi ini?')) {
                 transactions = transactions.filter(t => t.id !== id);
-                await deleteCloudData('transactions', id);
                 updateDashboard();
-                showToast('Transaksi dihapus', 'info');
+                await deleteCloudData('transactions', id);
             }
         }
         async function deletePO(id) {
             if (confirm('Hapus PO ini?')) {
                 purchaseOrders = purchaseOrders.filter(p => p.id !== id);
-                await deleteCloudData('po', id);
                 renderPOTable();
-                showToast('PO dihapus', 'info');
+                await deleteCloudData('po', id);
             }
         }
         async function deleteExcaLog(id) {
-            if (confirm('Hapus log Exca?')) {
+            if (confirm('Hapus log Exca ini?')) {
                 excaLogs = excaLogs.filter(l => l.id !== id);
-                await deleteCloudData('exca', id);
                 renderExcaTable();
-                showToast('Log dihapus', 'info');
+                await deleteCloudData('exca', id);
             }
         }
         async function deleteCompactLog(id) {
-            if (confirm('Hapus log Compact?')) {
+            if (confirm('Hapus log Compact ini?')) {
                 compactLogs = compactLogs.filter(l => l.id !== id);
-                await deleteCloudData('compact', id);
                 renderCompactTable();
-                showToast('Log dihapus', 'info');
+                await deleteCloudData('compact', id);
             }
         }
         async function deleteDtLog(id) {
-            if (confirm('Hapus log Ritase?')) {
+            if (confirm('Hapus log Ritase DT ini?')) {
                 dtLogs = dtLogs.filter(l => l.id !== id);
-                await deleteCloudData('dt', id);
                 renderDtTable();
-                showToast('Log dihapus', 'info');
+                await deleteCloudData('dt', id);
             }
         }
 
-        // Render Tables & Summaries
+        // Render Functions
         function renderExcaTable() {
             const tbody = document.getElementById('excaTableBody');
             tbody.innerHTML = '';
             let sumH = 0, sumF = 0, sumC = 0;
             excaLogs.forEach(l => {
-                sumH += l.totalHours; sumF += l.fuelVol; sumC += l.totalCost;
-                tbody.innerHTML += `<tr class="border-b border-slate-700/40"><td class="py-2 px-3 font-mono">${l.date}</td><td class="py-2 px-3 text-center">${l.hmAwal}</td><td class="py-2 px-3 text-center">${l.hmAkhir}</td><td class="py-2 px-3 text-center text-cyan-400 font-bold">${l.totalHours.toFixed(1)} Jam</td><td class="py-2 px-3 text-center text-amber-400">${l.fuelVol} L</td><td class="py-2 px-3 text-right text-emerald-400">${formatIDR(l.totalCost)}</td><td class="py-2 px-3 text-center"><button onclick="deleteExcaLog(${l.id})" class="text-red-400"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+                sumH += Number(l.totalHours); sumF += Number(l.fuelVol); sumC += Number(l.totalCost);
+                tbody.innerHTML += `<tr class="border-b border-slate-700/40"><td class="py-2.5 px-4 font-mono text-slate-300">${l.date}</td><td class="py-2.5 px-4 text-center font-mono">${Number(l.hmAwal).toFixed(1)}</td><td class="py-2.5 px-4 text-center font-mono">${Number(l.hmAkhir).toFixed(1)}</td><td class="py-2.5 px-4 text-center font-semibold text-cyan-400 font-mono">${Number(l.totalHours).toFixed(1)} Jam</td><td class="py-2.5 px-4 text-center font-mono text-amber-400">${Number(l.fuelVol).toFixed(1)} L</td><td class="py-2.5 px-4 text-right font-mono text-emerald-400">${formatIDR(l.totalCost)}</td><td class="py-2.5 px-4 text-center"><button onclick="deleteExcaLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
             });
             document.getElementById('sumExcaHours').innerText = sumH.toFixed(1) + ' Jam';
             document.getElementById('sumExcaFuel').innerText = sumF.toFixed(1) + ' L';
@@ -814,8 +637,8 @@
             tbody.innerHTML = '';
             let sumH = 0, sumF = 0, sumC = 0;
             compactLogs.forEach(l => {
-                sumH += l.totalHours; sumF += l.fuelVol; sumC += l.totalCost;
-                tbody.innerHTML += `<tr class="border-b border-slate-700/40"><td class="py-2 px-3 font-mono">${l.date}</td><td class="py-2 px-3 text-center">${l.hmAwal}</td><td class="py-2 px-3 text-center">${l.hmAkhir}</td><td class="py-2 px-3 text-center text-cyan-400 font-bold">${l.totalHours.toFixed(1)} Jam</td><td class="py-2 px-3 text-center text-amber-400">${l.fuelVol} L</td><td class="py-2 px-3 text-right text-emerald-400">${formatIDR(l.totalCost)}</td><td class="py-2 px-3 text-center"><button onclick="deleteCompactLog(${l.id})" class="text-red-400"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+                sumH += Number(l.totalHours); sumF += Number(l.fuelVol); sumC += Number(l.totalCost);
+                tbody.innerHTML += `<tr class="border-b border-slate-700/40"><td class="py-2.5 px-4 font-mono text-slate-300">${l.date}</td><td class="py-2.5 px-4 text-center font-mono">${Number(l.hmAwal).toFixed(1)}</td><td class="py-2.5 px-4 text-center font-mono">${Number(l.hmAkhir).toFixed(1)}</td><td class="py-2.5 px-4 text-center font-semibold text-cyan-400 font-mono">${Number(l.totalHours).toFixed(1)} Jam</td><td class="py-2.5 px-4 text-center font-mono text-amber-400">${Number(l.fuelVol).toFixed(1)} L</td><td class="py-2.5 px-4 text-right font-mono text-emerald-400">${formatIDR(l.totalCost)}</td><td class="py-2.5 px-4 text-center"><button onclick="deleteCompactLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
             });
             document.getElementById('sumCompactHours').innerText = sumH.toFixed(1) + ' Jam';
             document.getElementById('sumCompactFuel').innerText = sumF.toFixed(1) + ' L';
@@ -827,8 +650,8 @@
             tbody.innerHTML = '';
             let sumR = 0, sumC = 0;
             dtLogs.forEach(l => {
-                sumR += l.ritase; sumC += l.totalCost;
-                tbody.innerHTML += `<tr class="border-b border-slate-700/40"><td class="py-2 px-3 font-mono">${l.date}</td><td class="py-2 px-3 text-center text-cyan-400 font-bold">${l.ritase} Rit</td><td class="py-2 px-3 text-right">${formatIDR(l.price)}</td><td class="py-2 px-3 text-right text-emerald-400">${formatIDR(l.totalCost)}</td><td class="py-2 px-3 text-center"><button onclick="deleteDtLog(${l.id})" class="text-red-400"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+                sumR += Number(l.ritase); sumC += Number(l.totalCost);
+                tbody.innerHTML += `<tr class="border-b border-slate-700/40"><td class="py-2.5 px-4 font-mono text-slate-300">${l.date}</td><td class="py-2.5 px-4 text-center font-bold text-cyan-400 font-mono">${l.ritase} Rit</td><td class="py-2.5 px-4 text-right font-mono text-slate-300">${formatIDR(l.price)}</td><td class="py-2.5 px-4 text-right font-mono text-emerald-400">${formatIDR(l.totalCost)}</td><td class="py-2.5 px-4 text-center"><button onclick="deleteDtLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
             });
             document.getElementById('sumDtRitase').innerText = sumR + ' Rit';
             document.getElementById('sumDtCost').innerText = formatIDR(sumC);
@@ -852,12 +675,8 @@
         function renderKPIs() {
             let totalIncome = 0, totalExpense = 0;
             transactions.forEach(t => {
-                const typeObj = transactionTypes.find(tp => tp.id === t.type);
-                if ((typeObj && typeObj.behavior === 'INCOME') || t.type === 'INCOME') {
-                    totalIncome += Number(t.amount);
-                } else {
-                    totalExpense += Number(t.amount);
-                }
+                if (t.type === 'INCOME') totalIncome += Number(t.amount);
+                else totalExpense += Number(t.amount);
             });
 
             const netMargin = currentContractValue - totalExpense;
@@ -876,10 +695,8 @@
             tbody.innerHTML = '';
             document.getElementById('txCount').innerText = transactions.length + ' Transaksi';
             transactions.forEach(t => {
-                const typeObj = transactionTypes.find(tp => tp.id === t.type);
-                const typeName = typeObj ? typeObj.name : t.type;
-                const isIncome = (typeObj?.behavior === 'INCOME' || t.type === 'INCOME');
-                tbody.innerHTML += `<tr class="border-b border-slate-700/40"><td class="py-3 px-4 font-mono text-xs">${t.date}</td><td class="py-3 px-4"><span class="px-2 py-0.5 text-[11px] rounded-full border ${isIncome ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30'}">${typeName}</span></td><td class="py-3 px-4 font-medium">${t.category}</td><td class="py-3 px-4 text-slate-400">${t.desc}</td><td class="py-3 px-4 text-right font-mono font-semibold ${isIncome ? 'text-emerald-400' : 'text-slate-200'}">${isIncome ? '+' : '-'} ${formatIDR(t.amount)}</td><td class="py-3 px-4 text-center"><button onclick="deleteTransaction(${t.id})" class="text-red-400"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+                const isIncome = t.type === 'INCOME';
+                tbody.innerHTML += `<tr class="border-b border-slate-700/40"><td class="py-3 px-4 font-mono text-xs">${t.date}</td><td class="py-3 px-4"><span class="px-2 py-0.5 text-[11px] rounded-full border ${isIncome ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30'}">${isIncome ? 'Pemasukan' : 'Pengeluaran'}</span></td><td class="py-3 px-4 font-medium">${t.category}</td><td class="py-3 px-4 text-slate-400">${t.desc}</td><td class="py-3 px-4 text-right font-mono font-semibold ${isIncome ? 'text-emerald-400' : 'text-slate-200'}">${isIncome ? '+' : '-'} ${formatIDR(t.amount)}</td><td class="py-3 px-4 text-center"><button onclick="deleteTransaction(${t.id})" class="text-red-400"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
             });
         }
 
@@ -889,15 +706,13 @@
             let cInc = 0, cExp = 0;
 
             transactions.forEach(t => {
-                const typeObj = transactionTypes.find(tp => tp.id === t.type);
-                if (typeObj?.behavior === 'EXPENSE' && t.type !== 'INCOME') {
+                if (t.type !== 'INCOME') {
                     actuals[t.category] = (actuals[t.category] || 0) + Number(t.amount);
                 }
-                if (typeObj?.behavior === 'INCOME' || t.type === 'INCOME') cInc += Number(t.amount);
+                if (t.type === 'INCOME') cInc += Number(t.amount);
                 else cExp += Number(t.amount);
             });
 
-            // Cost Control Chart
             const ctxCost = document.getElementById('costControlChart').getContext('2d');
             if (costControlChartInstance) costControlChartInstance.destroy();
             const cats = Object.keys(initialBudgets);
@@ -913,7 +728,6 @@
                 options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#94a3b8', font: { size: 9 } } }, y: { ticks: { color: '#94a3b8' } } } }
             });
 
-            // Cashflow Chart
             const ctxCash = document.getElementById('cashflowChart').getContext('2d');
             if (cashflowChartInstance) cashflowChartInstance.destroy();
             cashflowChartInstance = new Chart(ctxCash, {
@@ -962,9 +776,6 @@
             };
             reader.readAsDataURL(file);
         }
-
-        function openCustomSettingsModal() { document.getElementById('customSettingsModal').classList.remove('hidden'); }
-        function closeCustomSettingsModal() { document.getElementById('customSettingsModal').classList.add('hidden'); }
 
         window.onload = function() {
             const today = new Date().toISOString().split('T')[0];
