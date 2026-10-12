@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Cost Control & Pre-Order - PT. Orecon Putra Perkasa</title>
+    <title>Dashboard Cost Control & Alat Berat - PT. Orecon Putra Perkasa</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -83,7 +83,8 @@
                     <i class="fa-solid fa-chart-pie w-4 text-center"></i> Dashboard & Cost Control
                 </button>
                 <button onclick="switchTab('po')" id="nav-po" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white">
-                    <i class="fa-solid fa-file-invoice-dollar w-4 text-center"></i> Manajemen Pre-Order (PO)
+                    <i id="nav-po-icon" class="fa-solid fa-file-invoice-dollar w-4 text-center"></i> 
+                    <span id="nav-po-text">Manajemen Pre-Order (PO)</span>
                 </button>
             </nav>
         </div>
@@ -102,7 +103,6 @@
         <header class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700/80 sticky top-0 z-30 shadow-lg no-print">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center gap-4">
                 <div>
-                    <!-- Judul Otomatis Mengikuti Nama Proyek -->
                     <h2 id="pageTitle" class="text-base sm:text-lg font-bold text-white tracking-tight">Proyek Sporthall Indoor</h2>
                     <p class="text-xs text-slate-400">Nilai Kontrak Proyek: <span id="headerContractVal" class="text-cyan-400 font-semibold">Rp 9.888.000.000</span></p>
                 </div>
@@ -273,77 +273,298 @@
                 </div>
             </section>
 
-            <!-- TAB 2: MANAJEMEN PRE-ORDER (PO) -->
+            <!-- TAB 2: MANAJEMEN PRE-ORDER (PO) / MANAJEMEN ALAT BERAT & RITASE DT -->
             <section id="tab-po" class="space-y-6 hidden">
-                <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
-                    <h2 class="text-base font-semibold text-white mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-cart-plus text-cyan-400"></i> Tambah Data Pre-Order (PO) Baru
-                    </h2>
-                    <p class="text-xs text-slate-400 mb-4">Catat pesanan barang/jasa, spesifikasi, vendor, serta lampirkan dokumen pendukung PO.</p>
-                    
-                    <form id="poForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Tanggal PO</label>
-                            <input type="date" id="poDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Nama Barang / Jasa</label>
-                            <input type="text" id="poItemName" placeholder="Mis: Sewa Excavator PC200" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Vendor / Supplier</label>
-                            <input type="text" id="poVendor" placeholder="Mis: PT Rental Alat Perkasa" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Spesifikasi</label>
-                            <input type="text" id="poSpecs" placeholder="Mis: Jam Operasi / Harian" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Volume / Jumlah</label>
-                            <input type="text" id="poVolume" placeholder="Mis: 150 Jam" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Total Harga (IDR)</label>
-                            <input type="number" id="poTotal" placeholder="Mis: 45000000" min="0" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
-                        </div>
-                        <div class="sm:col-span-2 lg:col-span-2">
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Lampirkan Dokumen PO (PDF / Gambar)</label>
-                            <input type="file" id="poFile" accept=".pdf,.png,.jpg,.jpeg" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-1.5 text-xs text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-500">
-                        </div>
-                        <div class="flex items-end">
-                            <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-cyan-600/20 flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-floppy-disk"></i> Simpan Data PO
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Daftar PO Tersimpan -->
-                <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-sm font-semibold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-list-check text-amber-400"></i> Daftar Pre-Order (PO) Proyek
-                        </h3>
-                        <span id="poCount" class="text-xs font-medium bg-slate-700/80 text-slate-300 px-3 py-1 rounded-full">0 PO</span>
+                <!-- MODUL 1: PRE-ORDER (Khusus Sporthall) -->
+                <div id="module-po" class="space-y-6">
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
+                        <h2 class="text-base font-semibold text-white mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-cart-plus text-cyan-400"></i> Tambah Data Pre-Order (PO) Baru
+                        </h2>
+                        <p class="text-xs text-slate-400 mb-4">Catat pesanan barang/jasa, spesifikasi, vendor, serta lampirkan dokumen pendukung PO.</p>
+                        
+                        <form id="poForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Tanggal PO</label>
+                                <input type="date" id="poDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Nama Barang / Jasa</label>
+                                <input type="text" id="poItemName" placeholder="Mis: Baja WF 250 x 125" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Vendor / Supplier</label>
+                                <input type="text" id="poVendor" placeholder="Mis: PT Baja Perkasa" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Spesifikasi</label>
+                                <input type="text" id="poSpecs" placeholder="Mis: Grade SS400, Panjang 12m" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Volume / Jumlah</label>
+                                <input type="text" id="poVolume" placeholder="Mis: 50 Batang / 15 Ton" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Total Harga (IDR)</label>
+                                <input type="number" id="poTotal" placeholder="Mis: 250000000" min="0" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+                            </div>
+                            <div class="sm:col-span-2 lg:col-span-2">
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Lampirkan Dokumen PO (PDF / Gambar)</label>
+                                <input type="file" id="poFile" accept=".pdf,.png,.jpg,.jpeg" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-1.5 text-xs text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-500">
+                            </div>
+                            <div class="flex items-end">
+                                <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-cyan-600/20 flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-floppy-disk"></i> Simpan Data PO
+                                </button>
+                            </div>
+                        </form>
                     </div>
 
-                    <div class="overflow-x-auto rounded-xl border border-slate-700/50">
-                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                            <thead>
-                                <tr class="bg-slate-900/80 border-b border-slate-700 text-slate-400 uppercase font-semibold text-[11px]">
-                                    <th class="py-3 px-4">Tanggal</th>
-                                    <th class="py-3 px-4">Nama Barang / Jasa</th>
-                                    <th class="py-3 px-4">Vendor</th>
-                                    <th class="py-3 px-4">Spesifikasi & Volume</th>
-                                    <th class="py-3 px-4 text-right">Total Harga (IDR)</th>
-                                    <th class="py-3 px-4 text-center">Lampiran PO</th>
-                                    <th class="py-3 px-4 text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="poTableBody" class="divide-y divide-slate-700/50">
-                                <!-- Populated dynamically -->
-                            </tbody>
-                        </table>
+                    <!-- Daftar PO Tersimpan -->
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-amber-400"></i> Daftar Pre-Order (PO) Proyek
+                            </h3>
+                            <span id="poCount" class="text-xs font-medium bg-slate-700/80 text-slate-300 px-3 py-1 rounded-full">0 PO</span>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-xl border border-slate-700/50">
+                            <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                                <thead>
+                                    <tr class="bg-slate-900/80 border-b border-slate-700 text-slate-400 uppercase font-semibold text-[11px]">
+                                        <th class="py-3 px-4">Tanggal</th>
+                                        <th class="py-3 px-4">Nama Barang / Jasa</th>
+                                        <th class="py-3 px-4">Vendor</th>
+                                        <th class="py-3 px-4">Spesifikasi & Volume</th>
+                                        <th class="py-3 px-4 text-right">Total Harga (IDR)</th>
+                                        <th class="py-3 px-4 text-center">Lampiran PO</th>
+                                        <th class="py-3 px-4 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="poTableBody" class="divide-y divide-slate-700/50">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODUL 2: OPERASIONAL ALAT BERAT & RITASE (Khusus Penataan Mess) -->
+                <div id="module-heavy" class="space-y-6 hidden">
+                    <!-- Sub-Navigasi Alat Berat -->
+                    <div class="flex flex-wrap gap-2 border-b border-slate-700 pb-3">
+                        <button onclick="switchHeavySubTab('exca')" id="subnav-exca" class="px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-600 text-white transition flex items-center gap-2">
+                            <i class="fa-solid fa-truck-monster"></i> Hour Meter Excavator
+                        </button>
+                        <button onclick="switchHeavySubTab('compact')" id="subnav-compact" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-700/60 hover:text-white transition flex items-center gap-2">
+                            <i class="fa-solid fa-[#f59e0b] fa-compact-disc"></i> Hour Meter Compact
+                        </button>
+                        <button onclick="switchHeavySubTab('dt')" id="subnav-dt" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-700/60 hover:text-white transition flex items-center gap-2">
+                            <i class="fa-solid fa-truck-moving"></i> Ritase Dump Truck
+                        </button>
+                    </div>
+
+                    <!-- SUB-TAB 1: EXCAVATOR -->
+                    <div id="heavy-exca" class="space-y-6">
+                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
+                            <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-plus-circle text-cyan-400"></i> Input Daily Log Hour Meter & Fuel Excavator
+                            </h3>
+                            <form id="excaForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">Tanggal</label>
+                                    <input type="date" id="excaDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">HM Awal</label>
+                                    <input type="number" step="0.1" id="excaHmAwal" placeholder="Contoh: 1250.0" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">HM Akhir</label>
+                                    <input type="number" step="0.1" id="excaHmAkhir" placeholder="Contoh: 1258.5" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">Volume Fuel (Liter)</label>
+                                    <input type="number" step="0.1" id="excaFuelVol" placeholder="Contoh: 80" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">Harga Fuel (IDR/Liter)</label>
+                                    <input type="number" id="excaFuelPrice" placeholder="Contoh: 15000" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div class="lg:col-span-5 flex justify-end">
+                                    <button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition shadow-lg shadow-cyan-600/20 flex items-center gap-2">
+                                        <i class="fa-solid fa-floppy-disk"></i> Simpan Record Excavator
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Table Exca -->
+                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4">
+                            <h3 class="text-sm font-semibold text-white">Log Operasional Excavator</h3>
+                            <div class="overflow-x-auto rounded-xl border border-slate-700/50">
+                                <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                                    <thead>
+                                        <tr class="bg-slate-900/80 border-b border-slate-700 text-slate-400 uppercase font-semibold text-[11px]">
+                                            <th class="py-3 px-4">Tanggal</th>
+                                            <th class="py-3 px-4 text-center">HM Awal</th>
+                                            <th class="py-3 px-4 text-center">HM Akhir</th>
+                                            <th class="py-3 px-4 text-center">Total Jam</th>
+                                            <th class="py-3 px-4 text-center">Fuel (Liter)</th>
+                                            <th class="py-3 px-4 text-right">Total Biaya Fuel</th>
+                                            <th class="py-3 px-4 text-center">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="excaTableBody" class="divide-y divide-slate-700/50"></tbody>
+                                </table>
+                            </div>
+                            <!-- Summary Bar Exca -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-900/90 border border-slate-700 p-4 rounded-xl text-xs">
+                                <div>
+                                    <span class="text-slate-400 block mb-0.5">Total Jam Operasi Exca:</span>
+                                    <span id="sumExcaHours" class="text-base font-bold text-cyan-400">0.0 Jam</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-400 block mb-0.5">Total Volume Fuel:</span>
+                                    <span id="sumExcaFuel" class="text-base font-bold text-amber-400">0.0 Liter</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-400 block mb-0.5">Total Biaya Solar Exca:</span>
+                                    <span id="sumExcaCost" class="text-base font-bold text-emerald-400">Rp 0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUB-TAB 2: COMPACT -->
+                    <div id="heavy-compact" class="space-y-6 hidden">
+                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
+                            <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-plus-circle text-cyan-400"></i> Input Daily Log Hour Meter & Fuel Compact
+                            </h3>
+                            <form id="compactForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">Tanggal</label>
+                                    <input type="date" id="compactDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">HM Awal</label>
+                                    <input type="number" step="0.1" id="compactHmAwal" placeholder="Contoh: 800.0" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">HM Akhir</label>
+                                    <input type="number" step="0.1" id="compactHmAkhir" placeholder="Contoh: 806.0" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">Volume Fuel (Liter)</label>
+                                    <input type="number" step="0.1" id="compactFuelVol" placeholder="Contoh: 50" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">Harga Fuel (IDR/Liter)</label>
+                                    <input type="number" id="compactFuelPrice" placeholder="Contoh: 15000" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div class="lg:col-span-5 flex justify-end">
+                                    <button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition shadow-lg shadow-cyan-600/20 flex items-center gap-2">
+                                        <i class="fa-solid fa-floppy-disk"></i> Simpan Record Compact
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Table Compact -->
+                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4">
+                            <h3 class="text-sm font-semibold text-white">Log Operasional Compact Roller</h3>
+                            <div class="overflow-x-auto rounded-xl border border-slate-700/50">
+                                <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                                    <thead>
+                                        <tr class="bg-slate-900/80 border-b border-slate-700 text-slate-400 uppercase font-semibold text-[11px]">
+                                            <th class="py-3 px-4">Tanggal</th>
+                                            <th class="py-3 px-4 text-center">HM Awal</th>
+                                            <th class="py-3 px-4 text-center">HM Akhir</th>
+                                            <th class="py-3 px-4 text-center">Total Jam</th>
+                                            <th class="py-3 px-4 text-center">Fuel (Liter)</th>
+                                            <th class="py-3 px-4 text-right">Total Biaya Fuel</th>
+                                            <th class="py-3 px-4 text-center">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="compactTableBody" class="divide-y divide-slate-700/50"></tbody>
+                                </table>
+                            </div>
+                            <!-- Summary Bar Compact -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-900/90 border border-slate-700 p-4 rounded-xl text-xs">
+                                <div>
+                                    <span class="text-slate-400 block mb-0.5">Total Jam Operasi Compact:</span>
+                                    <span id="sumCompactHours" class="text-base font-bold text-cyan-400">0.0 Jam</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-400 block mb-0.5">Total Volume Fuel:</span>
+                                    <span id="sumCompactFuel" class="text-base font-bold text-amber-400">0.0 Liter</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-400 block mb-0.5">Total Biaya Solar Compact:</span>
+                                    <span id="sumCompactCost" class="text-base font-bold text-emerald-400">Rp 0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUB-TAB 3: RITASE DUMP TRUCK -->
+                    <div id="heavy-dt" class="space-y-6 hidden">
+                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
+                            <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-plus-circle text-cyan-400"></i> Input Daily Log Ritase Dump Truck (DT)
+                            </h3>
+                            <form id="dtForm" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">Tanggal</label>
+                                    <input type="date" id="dtDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">Jumlah Ritase (Rit)</label>
+                                    <input type="number" id="dtRitase" placeholder="Contoh: 12" required min="1" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">Harga per Ritase (IDR/Rit)</label>
+                                    <input type="number" id="dtPrice" placeholder="Contoh: 85000" required min="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div class="sm:col-span-3 flex justify-end">
+                                    <button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition shadow-lg shadow-cyan-600/20 flex items-center gap-2">
+                                        <i class="fa-solid fa-floppy-disk"></i> Simpan Record Ritase
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Table Ritase DT -->
+                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4">
+                            <h3 class="text-sm font-semibold text-white">Log Ritase Dump Truck</h3>
+                            <div class="overflow-x-auto rounded-xl border border-slate-700/50">
+                                <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                                    <thead>
+                                        <tr class="bg-slate-900/80 border-b border-slate-700 text-slate-400 uppercase font-semibold text-[11px]">
+                                            <th class="py-3 px-4">Tanggal</th>
+                                            <th class="py-3 px-4 text-center">Jumlah Ritase</th>
+                                            <th class="py-3 px-4 text-right">Harga / Rit</th>
+                                            <th class="py-3 px-4 text-right">Total Biaya Ritase</th>
+                                            <th class="py-3 px-4 text-center">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dtTableBody" class="divide-y divide-slate-700/50"></tbody>
+                                </table>
+                            </div>
+                            <!-- Summary Bar DT -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-900/90 border border-slate-700 p-4 rounded-xl text-xs">
+                                <div>
+                                    <span class="text-slate-400 block mb-0.5">Total Ritase Dump Truck:</span>
+                                    <span id="sumDtRitase" class="text-base font-bold text-cyan-400">0 Rit</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-400 block mb-0.5">Total Biaya Ritase DT:</span>
+                                    <span id="sumDtCost" class="text-base font-bold text-emerald-400">Rp 0</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -439,7 +660,10 @@
                     { id: 202, date: '2026-04-03', type: 'EXPENSE', category: 'Mobilisasi & Overhead', desc: 'Mobilisasi Alat Berat ke Lokasi Mess', amount: 15000000 },
                     { id: 203, date: '2026-04-10', type: 'EXPENSE', category: 'Sewa Alat Berat (Excavator & Dozer)', desc: 'Pembayaran Sewa Mingguan Excavator', amount: 35000000 }
                 ],
-                purchaseOrders: []
+                purchaseOrders: [],
+                excaLogs: [],
+                compactLogs: [],
+                dtLogs: []
             }
         };
 
@@ -458,23 +682,14 @@
             return `orecon_proj_${currentProjectId}_${key}`;
         }
 
-        let transactions = JSON.parse(localStorage.getItem(getProjectStorageKey('transactions')));
-        if (!transactions) {
-            transactions = projectsData[currentProjectId].transactions;
-            localStorage.setItem(getProjectStorageKey('transactions'), JSON.stringify(transactions));
-        }
+        let transactions = JSON.parse(localStorage.getItem(getProjectStorageKey('transactions'))) || projectsData[currentProjectId].transactions;
+        let initialBudgets = JSON.parse(localStorage.getItem(getProjectStorageKey('budgets'))) || projectsData[currentProjectId].budgets;
+        let purchaseOrders = JSON.parse(localStorage.getItem(getProjectStorageKey('po'))) || projectsData[currentProjectId].purchaseOrders;
 
-        let initialBudgets = JSON.parse(localStorage.getItem(getProjectStorageKey('budgets')));
-        if (!initialBudgets) {
-            initialBudgets = projectsData[currentProjectId].budgets;
-            localStorage.setItem(getProjectStorageKey('budgets'), JSON.stringify(initialBudgets));
-        }
-
-        let purchaseOrders = JSON.parse(localStorage.getItem(getProjectStorageKey('po')));
-        if (!purchaseOrders) {
-            purchaseOrders = projectsData[currentProjectId].purchaseOrders;
-            localStorage.setItem(getProjectStorageKey('po'), JSON.stringify(purchaseOrders));
-        }
+        // Heavy Equipment State for Mess Project
+        let excaLogs = JSON.parse(localStorage.getItem('orecon_mess_exca')) || [];
+        let compactLogs = JSON.parse(localStorage.getItem('orecon_mess_compact')) || [];
+        let dtLogs = JSON.parse(localStorage.getItem('orecon_mess_dt')) || [];
 
         let currentContractValue = projectsData[currentProjectId].contractValue;
 
@@ -491,18 +706,311 @@
             initialBudgets = JSON.parse(localStorage.getItem(getProjectStorageKey('budgets'))) || projectsData[projId].budgets;
             purchaseOrders = JSON.parse(localStorage.getItem(getProjectStorageKey('po'))) || projectsData[projId].purchaseOrders;
 
-            // Update Header Title & Contract Value Dynamically
+            // Adjust Sidebar Tab 2 Label
+            const navPoText = document.getElementById('nav-po-text');
+            const navPoIcon = document.getElementById('nav-po-icon');
+            if (projId === 'mess') {
+                navPoText.innerText = "Alat Berat & Ritase DT";
+                navPoIcon.className = "fa-solid fa-truck-monster w-4 text-center";
+            } else {
+                navPoText.innerText = "Manajemen Pre-Order (PO)";
+                navPoIcon.className = "fa-solid fa-file-invoice-dollar w-4 text-center";
+            }
+
             document.getElementById('pageTitle').innerText = projectsData[projId].name;
             document.getElementById('headerContractVal').innerText = formatIDR(currentContractValue);
             
             populateFormDropdowns();
             updateDashboard();
-            if(!document.getElementById('tab-po').classList.contains('hidden')) {
-                renderPOTable();
+            if (!document.getElementById('tab-po').classList.contains('hidden')) {
+                renderTabTwoContent();
             }
             showToast(`Beralih ke: ${projectsData[projId].name}`, 'info');
         }
 
+        function switchTab(tabId) {
+            const dashboardTab = document.getElementById('tab-dashboard');
+            const poTab = document.getElementById('tab-po');
+            const navDashboard = document.getElementById('nav-dashboard');
+            const navPo = document.getElementById('nav-po');
+
+            if (tabId === 'dashboard') {
+                dashboardTab.classList.remove('hidden');
+                poTab.classList.add('hidden');
+                navDashboard.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
+                navPo.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white";
+            } else {
+                dashboardTab.classList.add('hidden');
+                poTab.classList.remove('hidden');
+                navPo.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
+                navDashboard.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white";
+                renderTabTwoContent();
+            }
+        }
+
+        function renderTabTwoContent() {
+            const modPo = document.getElementById('module-po');
+            const modHeavy = document.getElementById('module-heavy');
+
+            if (currentProjectId === 'mess') {
+                modPo.classList.add('hidden');
+                modHeavy.classList.remove('hidden');
+                renderExcaTable();
+                renderCompactTable();
+                renderDtTable();
+            } else {
+                modPo.classList.remove('hidden');
+                modHeavy.classList.add('hidden');
+                renderPOTable();
+            }
+        }
+
+        // Sub-Tab Switcher for Heavy Equipment Mod
+        function switchHeavySubTab(sub) {
+            const excaDiv = document.getElementById('heavy-exca');
+            const compactDiv = document.getElementById('heavy-compact');
+            const dtDiv = document.getElementById('heavy-dt');
+
+            const btnExca = document.getElementById('subnav-exca');
+            const btnCompact = document.getElementById('subnav-compact');
+            const btnDt = document.getElementById('subnav-dt');
+
+            excaDiv.classList.add('hidden');
+            compactDiv.classList.add('hidden');
+            dtDiv.classList.add('hidden');
+
+            btnExca.className = "px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-700/60 hover:text-white transition flex items-center gap-2";
+            btnCompact.className = "px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-700/60 hover:text-white transition flex items-center gap-2";
+            btnDt.className = "px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-700/60 hover:text-white transition flex items-center gap-2";
+
+            if (sub === 'exca') {
+                excaDiv.classList.remove('hidden');
+                btnExca.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-600 text-white transition flex items-center gap-2";
+            } else if (sub === 'compact') {
+                compactDiv.classList.remove('hidden');
+                btnCompact.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-600 text-white transition flex items-center gap-2";
+            } else if (sub === 'dt') {
+                dtDiv.classList.remove('hidden');
+                btnDt.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-600 text-white transition flex items-center gap-2";
+            }
+        }
+
+        // --- HEAVY EQUIPMENT LOGIC ---
+        // Excavator Form
+        document.getElementById('excaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const date = document.getElementById('excaDate').value;
+            const hmAwal = parseFloat(document.getElementById('excaHmAwal').value) || 0;
+            const hmAkhir = parseFloat(document.getElementById('excaHmAkhir').value) || 0;
+            const fuelVol = parseFloat(document.getElementById('excaFuelVol').value) || 0;
+            const fuelPrice = parseFloat(document.getElementById('excaFuelPrice').value) || 0;
+
+            if (hmAkhir < hmAwal) {
+                showToast('HM Akhir tidak boleh lebih kecil dari HM Awal', 'error');
+                return;
+            }
+
+            excaLogs.push({
+                id: Date.now(),
+                date,
+                hmAwal,
+                hmAkhir,
+                totalHours: (hmAkhir - hmAwal),
+                fuelVol,
+                fuelPrice,
+                totalCost: (fuelVol * fuelPrice)
+            });
+
+            localStorage.setItem('orecon_mess_exca', JSON.stringify(excaLogs));
+            this.reset();
+            document.getElementById('excaDate').value = new Date().toISOString().split('T')[0];
+            renderExcaTable();
+            showToast('Record Excavator disimpan!', 'success');
+        });
+
+        function renderExcaTable() {
+            const tbody = document.getElementById('excaTableBody');
+            tbody.innerHTML = '';
+            let sumHours = 0, sumFuel = 0, sumCost = 0;
+
+            if (excaLogs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-slate-500">Belum ada data log Excavator.</td></tr>`;
+            } else {
+                [...excaLogs].sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(log => {
+                    sumHours += log.totalHours;
+                    sumFuel += log.fuelVol;
+                    sumCost += log.totalCost;
+
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-slate-700/40 hover:bg-slate-700/30 transition";
+                    tr.innerHTML = `
+                        <td class="py-2.5 px-4 font-mono text-slate-300">${log.date}</td>
+                        <td class="py-2.5 px-4 text-center font-mono">${log.hmAwal.toFixed(1)}</td>
+                        <td class="py-2.5 px-4 text-center font-mono">${log.hmAkhir.toFixed(1)}</td>
+                        <td class="py-2.5 px-4 text-center font-semibold text-cyan-400 font-mono">${log.totalHours.toFixed(1)} Jam</td>
+                        <td class="py-2.5 px-4 text-center font-mono text-amber-400">${log.fuelVol.toFixed(1)} L</td>
+                        <td class="py-2.5 px-4 text-right font-mono text-emerald-400">${formatIDR(log.totalCost)}</td>
+                        <td class="py-2.5 px-4 text-center">
+                            <button onclick="deleteExcaLog(${log.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('sumExcaHours').innerText = `${sumHours.toFixed(1)} Jam`;
+            document.getElementById('sumExcaFuel').innerText = `${sumFuel.toFixed(1)} Liter`;
+            document.getElementById('sumExcaCost').innerText = formatIDR(sumCost);
+        }
+
+        function deleteExcaLog(id) {
+            if (confirm('Hapus log Excavator ini?')) {
+                excaLogs = excaLogs.filter(l => l.id !== id);
+                localStorage.setItem('orecon_mess_exca', JSON.stringify(excaLogs));
+                renderExcaTable();
+                showToast('Log Excavator dihapus', 'info');
+            }
+        }
+
+        // Compact Form
+        document.getElementById('compactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const date = document.getElementById('compactDate').value;
+            const hmAwal = parseFloat(document.getElementById('compactHmAwal').value) || 0;
+            const hmAkhir = parseFloat(document.getElementById('compactHmAkhir').value) || 0;
+            const fuelVol = parseFloat(document.getElementById('compactFuelVol').value) || 0;
+            const fuelPrice = parseFloat(document.getElementById('compactFuelPrice').value) || 0;
+
+            if (hmAkhir < hmAwal) {
+                showToast('HM Akhir tidak boleh lebih kecil dari HM Awal', 'error');
+                return;
+            }
+
+            compactLogs.push({
+                id: Date.now(),
+                date,
+                hmAwal,
+                hmAkhir,
+                totalHours: (hmAkhir - hmAwal),
+                fuelVol,
+                fuelPrice,
+                totalCost: (fuelVol * fuelPrice)
+            });
+
+            localStorage.setItem('orecon_mess_compact', JSON.stringify(compactLogs));
+            this.reset();
+            document.getElementById('compactDate').value = new Date().toISOString().split('T')[0];
+            renderCompactTable();
+            showToast('Record Compact disimpan!', 'success');
+        });
+
+        function renderCompactTable() {
+            const tbody = document.getElementById('compactTableBody');
+            tbody.innerHTML = '';
+            let sumHours = 0, sumFuel = 0, sumCost = 0;
+
+            if (compactLogs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-slate-500">Belum ada data log Compact Roller.</td></tr>`;
+            } else {
+                [...compactLogs].sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(log => {
+                    sumHours += log.totalHours;
+                    sumFuel += log.fuelVol;
+                    sumCost += log.totalCost;
+
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-slate-700/40 hover:bg-slate-700/30 transition";
+                    tr.innerHTML = `
+                        <td class="py-2.5 px-4 font-mono text-slate-300">${log.date}</td>
+                        <td class="py-2.5 px-4 text-center font-mono">${log.hmAwal.toFixed(1)}</td>
+                        <td class="py-2.5 px-4 text-center font-mono">${log.hmAkhir.toFixed(1)}</td>
+                        <td class="py-2.5 px-4 text-center font-semibold text-cyan-400 font-mono">${log.totalHours.toFixed(1)} Jam</td>
+                        <td class="py-2.5 px-4 text-center font-mono text-amber-400">${log.fuelVol.toFixed(1)} L</td>
+                        <td class="py-2.5 px-4 text-right font-mono text-emerald-400">${formatIDR(log.totalCost)}</td>
+                        <td class="py-2.5 px-4 text-center">
+                            <button onclick="deleteCompactLog(${log.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('sumCompactHours').innerText = `${sumHours.toFixed(1)} Jam`;
+            document.getElementById('sumCompactFuel').innerText = `${sumFuel.toFixed(1)} Liter`;
+            document.getElementById('sumCompactCost').innerText = formatIDR(sumCost);
+        }
+
+        function deleteCompactLog(id) {
+            if (confirm('Hapus log Compact ini?')) {
+                compactLogs = compactLogs.filter(l => l.id !== id);
+                localStorage.setItem('orecon_mess_compact', JSON.stringify(compactLogs));
+                renderCompactTable();
+                showToast('Log Compact dihapus', 'info');
+            }
+        }
+
+        // Dump Truck Form
+        document.getElementById('dtForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const date = document.getElementById('dtDate').value;
+            const ritase = parseInt(document.getElementById('dtRitase').value) || 0;
+            const price = parseFloat(document.getElementById('dtPrice').value) || 0;
+
+            dtLogs.push({
+                id: Date.now(),
+                date,
+                ritase,
+                price,
+                totalCost: (ritase * price)
+            });
+
+            localStorage.setItem('orecon_mess_dt', JSON.stringify(dtLogs));
+            this.reset();
+            document.getElementById('dtDate').value = new Date().toISOString().split('T')[0];
+            renderDtTable();
+            showToast('Record Ritase Dump Truck disimpan!', 'success');
+        });
+
+        function renderDtTable() {
+            const tbody = document.getElementById('dtTableBody');
+            tbody.innerHTML = '';
+            let sumRitase = 0, sumCost = 0;
+
+            if (dtLogs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-slate-500">Belum ada data log Ritase Dump Truck.</td></tr>`;
+            } else {
+                [...dtLogs].sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(log => {
+                    sumRitase += log.ritase;
+                    sumCost += log.totalCost;
+
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-slate-700/40 hover:bg-slate-700/30 transition";
+                    tr.innerHTML = `
+                        <td class="py-2.5 px-4 font-mono text-slate-300">${log.date}</td>
+                        <td class="py-2.5 px-4 text-center font-bold text-cyan-400 font-mono">${log.ritase} Rit</td>
+                        <td class="py-2.5 px-4 text-right font-mono text-slate-300">${formatIDR(log.price)}</td>
+                        <td class="py-2.5 px-4 text-right font-mono text-emerald-400">${formatIDR(log.totalCost)}</td>
+                        <td class="py-2.5 px-4 text-center">
+                            <button onclick="deleteDtLog(${log.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('sumDtRitase').innerText = `${sumRitase} Rit`;
+            document.getElementById('sumDtCost').innerText = formatIDR(sumCost);
+        }
+
+        function deleteDtLog(id) {
+            if (confirm('Hapus log Ritase DT ini?')) {
+                dtLogs = dtLogs.filter(l => l.id !== id);
+                localStorage.setItem('orecon_mess_dt', JSON.stringify(dtLogs));
+                renderDtTable();
+                showToast('Log Ritase DT dihapus', 'info');
+            }
+        }
+
+        // --- SHARED UTILS ---
         function handleLogoUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -527,26 +1035,6 @@
             } else {
                 imgEl.classList.add('hidden');
                 placeholderEl.classList.remove('hidden');
-            }
-        }
-
-        function switchTab(tabId) {
-            const dashboardTab = document.getElementById('tab-dashboard');
-            const poTab = document.getElementById('tab-po');
-            const navDashboard = document.getElementById('nav-dashboard');
-            const navPo = document.getElementById('nav-po');
-
-            if (tabId === 'dashboard') {
-                dashboardTab.classList.remove('hidden');
-                poTab.classList.add('hidden');
-                navDashboard.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
-                navPo.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white";
-            } else {
-                dashboardTab.classList.add('hidden');
-                poTab.classList.remove('hidden');
-                navPo.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
-                navDashboard.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white";
-                renderPOTable();
             }
         }
 
@@ -695,6 +1183,7 @@
             showToast('Kategori pekerjaan dihapus', 'info');
         }
 
+        // PO Form Submition
         document.getElementById('poForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const date = document.getElementById('poDate').value;
@@ -999,6 +1488,9 @@
                 initialBudgets,
                 transactionTypes,
                 purchaseOrders,
+                excaLogs,
+                compactLogs,
+                dtLogs,
                 savedCompanyLogo
             };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportBundle, null, 2));
@@ -1159,15 +1651,17 @@
         }
 
         window.onload = function() {
-            document.getElementById('trxDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('poDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('pageTitle').innerText = projectsData[currentProjectId].name;
-            document.getElementById('headerContractVal').innerText = formatIDR(currentContractValue);
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('trxDate').value = today;
+            document.getElementById('poDate').value = today;
+            document.getElementById('excaDate').value = today;
+            document.getElementById('compactDate').value = today;
+            document.getElementById('dtDate').value = today;
+
+            switchProject(currentProjectId);
             if (savedCompanyLogo) {
                 applyCompanyLogo(savedCompanyLogo);
             }
-            populateFormDropdowns();
-            updateDashboard();
         };
     </script>
 </body>
