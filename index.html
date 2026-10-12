@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Cost Control & Dokumen Proyek - Indoor Sporthall</title>
+    <title>Dashboard Cost Control & Pre-Order - Indoor Sporthall</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -59,15 +59,15 @@
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20">
                     <i class="fa-solid fa-chart-pie w-4 text-center"></i> Dashboard & Cost Control
                 </button>
-                <button onclick="switchTab('documents')" id="nav-documents" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white">
-                    <i class="fa-solid fa-folder-open w-4 text-center"></i> Upload Dokumen (Pre-Order)
+                <button onclick="switchTab('po')" id="nav-po" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white">
+                    <i class="fa-solid fa-file-invoice-dollar w-4 text-center"></i> Manajemen Pre-Order (PO)
                 </button>
             </nav>
         </div>
 
         <!-- Sidebar Footer / User Info -->
         <div class="p-4 border-t border-slate-700/80 text-xs text-slate-400">
-            <p class="font-medium text-slate-200">Muhammad Tegar T.</p>
+            <p class="font-medium text-slate-200">Muhammad Tegar Tohajudin</p>
             <p class="text-[10px] text-slate-500">Site Engineer / PM</p>
         </div>
     </aside>
@@ -249,62 +249,74 @@
                 </div>
             </section>
 
-            <!-- TAB 2: UPLOAD & MANAJEMEN DOKUMEN (PRE-ORDER / KONTRAK) -->
-            <section id="tab-documents" class="space-y-6 hidden">
+            <!-- TAB 2: MANAJEMEN PRE-ORDER (PO) -->
+            <section id="tab-po" class="space-y-6 hidden">
                 <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
                     <h2 class="text-base font-semibold text-white mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-cloud-arrow-up text-cyan-400"></i> Upload Dokumen Proyek (Pre-Order / Kontrak / Invoice)
+                        <i class="fa-solid fa-cart-plus text-cyan-400"></i> Tambah Data Pre-Order (PO) Baru
                     </h2>
-                    <p class="text-xs text-slate-400 mb-4">Unggah dokumen pendukung proyek untuk disimpan secara lokal di browser Anda.</p>
+                    <p class="text-xs text-slate-400 mb-4">Catat pesanan barang/jasa, spesifikasi, vendor, serta lampirkan dokumen pendukung PO.</p>
                     
-                    <form id="documentForm" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <form id="poForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Nama / Judul Dokumen</label>
-                            <input type="text" id="docName" placeholder="Mis: PO Baja WF Tahap 1" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Tanggal PO</label>
+                            <input type="date" id="poDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-500">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Kategori Dokumen</label>
-                            <select id="docCategory" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-500">
-                                <option value="Pre-Order (PO)">Pre-Order (PO)</option>
-                                <option value="Kontrak / SPK">Kontrak / SPK</option>
-                                <option value="Invoice / Kwitansi">Invoice / Kwitansi</option>
-                                <option value="Berita Acara (BAST)">Berita Acara (BAST)</option>
-                                <option value="Lainnya">Lainnya</option>
-                            </select>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Nama Barang / Jasa</label>
+                            <input type="text" id="poItemName" placeholder="Mis: Baja WF 250 x 125" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Pilih File (PDF / Gambar)</label>
-                            <input type="file" id="docFile" required accept=".pdf,.png,.jpg,.jpeg,.xlsx,.doc,.docx" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-1.5 text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-500">
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Vendor / Supplier</label>
+                            <input type="text" id="poVendor" placeholder="Mis: PT Baja Perkasa" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
                         </div>
-                        <div class="sm:col-span-3 flex justify-end">
-                            <button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 px-5 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-cyan-600/20 flex items-center gap-2">
-                                <i class="fa-solid fa-upload"></i> Upload & Simpan Dokumen
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Spesifikasi</label>
+                            <input type="text" id="poSpecs" placeholder="Mis: Grade SS400, Panjang 12m" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Volume / Jumlah</label>
+                            <input type="text" id="poVolume" placeholder="Mis: 50 Batang / 15 Ton" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Total Harga (IDR)</label>
+                            <input type="number" id="poTotal" placeholder="Mis: 250000000" min="0" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+                        </div>
+                        <div class="sm:col-span-2 lg:col-span-2">
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Lampirkan Dokumen PO (PDF / Gambar)</label>
+                            <input type="file" id="poFile" accept=".pdf,.png,.jpg,.jpeg" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-1.5 text-xs text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-500">
+                        </div>
+                        <div class="flex items-end">
+                            <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-cyan-600/20 flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-floppy-disk"></i> Simpan Data PO
                             </button>
                         </div>
                     </form>
                 </div>
 
-                <!-- Daftar Dokumen Tersimpan -->
+                <!-- Daftar PO Tersimpan -->
                 <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-sm font-semibold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-folder-tree text-amber-400"></i> Arsip Dokumen Proyek Tersimpan
+                            <i class="fa-solid fa-list-check text-amber-400"></i> Daftar Pre-Order (PO) Proyek
                         </h3>
-                        <span id="docCount" class="text-xs font-medium bg-slate-700/80 text-slate-300 px-3 py-1 rounded-full">0 Dokumen</span>
+                        <span id="poCount" class="text-xs font-medium bg-slate-700/80 text-slate-300 px-3 py-1 rounded-full">0 PO</span>
                     </div>
 
                     <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                         <table class="w-full text-left border-collapse text-xs sm:text-sm">
                             <thead>
                                 <tr class="bg-slate-900/80 border-b border-slate-700 text-slate-400 uppercase font-semibold text-[11px]">
-                                    <th class="py-3 px-4">Tanggal Upload</th>
-                                    <th class="py-3 px-4">Nama Dokumen</th>
-                                    <th class="py-3 px-4">Kategori</th>
-                                    <th class="py-3 px-4">Nama File</th>
-                                    <th class="py-3 px-4 text-center">Aksi (Lihat / Unduh / Hapus)</th>
+                                    <th class="py-3 px-4">Tanggal</th>
+                                    <th class="py-3 px-4">Nama Barang / Jasa</th>
+                                    <th class="py-3 px-4">Vendor</th>
+                                    <th class="py-3 px-4">Spesifikasi & Volume</th>
+                                    <th class="py-3 px-4 text-right">Total Harga (IDR)</th>
+                                    <th class="py-3 px-4 text-center">Lampiran PO</th>
+                                    <th class="py-3 px-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="documentTableBody" class="divide-y divide-slate-700/50">
+                            <tbody id="poTableBody" class="divide-y divide-slate-700/50">
                                 <!-- Populated dynamically -->
                             </tbody>
                         </table>
@@ -317,29 +329,6 @@
         <footer class="bg-slate-800 border-t border-slate-700 py-4 text-center text-xs text-slate-500">
             Dashboard Cost Control Proyek Sporthall Indoor &copy; 2026 - All Rights Reserved
         </footer>
-    </div>
-
-    <!-- Modal Pratinjau / Preview Isi Dokumen -->
-    <div id="previewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden p-4">
-        <div class="bg-slate-800 border border-slate-700 w-full max-w-4xl h-[85vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-700 bg-slate-900">
-                <h3 id="previewTitle" class="text-sm sm:text-base font-bold text-white flex items-center gap-2 truncate">
-                    <i class="fa-solid fa-file-lines text-cyan-400"></i> Pratinjau Dokumen
-                </h3>
-                <button onclick="closePreviewModal()" class="text-slate-400 hover:text-white transition p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            <div class="flex-grow p-4 bg-slate-950 flex items-center justify-center overflow-auto relative">
-                <div id="previewContainer" class="w-full h-full flex items-center justify-center">
-                    <!-- Dynamic preview content -->
-                </div>
-            </div>
-            <div class="px-6 py-3 bg-slate-900 border-t border-slate-700 flex justify-between items-center text-xs text-slate-400">
-                <span id="previewInfo">Format file didukung</span>
-                <button onclick="closePreviewModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-medium px-4 py-1.5 rounded-lg transition">Tutup</button>
-            </div>
-        </div>
     </div>
 
     <!-- Toast Notification -->
@@ -419,7 +408,7 @@
         let transactions = JSON.parse(localStorage.getItem('sporthall_v3_transactions')) || defaultTransactions;
         let initialBudgets = JSON.parse(localStorage.getItem('sporthall_v3_budgets')) || defaultBudgets;
         let transactionTypes = JSON.parse(localStorage.getItem('sporthall_v3_types')) || defaultTypes;
-        let documents = JSON.parse(localStorage.getItem('sporthall_v3_documents')) || [];
+        let purchaseOrders = JSON.parse(localStorage.getItem('sporthall_v3_po')) || [];
         
         let costControlChartInstance = null;
         let cashflowChartInstance = null;
@@ -427,24 +416,24 @@
         // Navigation Tab Switching
         function switchTab(tabId) {
             const dashboardTab = document.getElementById('tab-dashboard');
-            const documentsTab = document.getElementById('tab-documents');
+            const poTab = document.getElementById('tab-po');
             const navDashboard = document.getElementById('nav-dashboard');
-            const navDocuments = document.getElementById('nav-documents');
+            const navPo = document.getElementById('nav-po');
             const pageTitle = document.getElementById('pageTitle');
 
             if (tabId === 'dashboard') {
                 dashboardTab.classList.remove('hidden');
-                documentsTab.classList.add('hidden');
+                poTab.classList.add('hidden');
                 navDashboard.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
-                navDocuments.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white";
+                navPo.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white";
                 pageTitle.innerText = "Dashboard Cost Control & Cashflow";
             } else {
                 dashboardTab.classList.add('hidden');
-                documentsTab.classList.remove('hidden');
-                navDocuments.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
+                poTab.classList.remove('hidden');
+                navPo.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
                 navDashboard.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white";
-                pageTitle.innerText = "Manajemen & Upload Dokumen Proyek";
-                renderDocumentsTable();
+                pageTitle.innerText = "Manajemen Pre-Order (PO) Proyek";
+                renderPOTable();
             }
         }
 
@@ -593,128 +582,155 @@
             showToast('Kategori pekerjaan dihapus', 'info');
         }
 
-        // Handle Document Upload Form
-        document.getElementById('documentForm').addEventListener('submit', function(e) {
+        // Handle Purchase Order (PO) Form
+        document.getElementById('poForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const name = document.getElementById('docName').value.trim();
-            const category = document.getElementById('docCategory').value;
-            const fileInput = document.getElementById('docFile');
+            const date = document.getElementById('poDate').value;
+            const itemName = document.getElementById('poItemName').value.trim();
+            const vendor = document.getElementById('poVendor').value.trim();
+            const specs = document.getElementById('poSpecs').value.trim();
+            const volume = document.getElementById('poVolume').value.trim();
+            const total = parseFloat(document.getElementById('poTotal').value) || 0;
+            const fileInput = document.getElementById('poFile');
             const file = fileInput.files[0];
 
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const newDoc = {
-                    id: Date.now(),
-                    date: new Date().toISOString().split('T')[0],
-                    name,
-                    category,
-                    fileName: file.name,
-                    fileType: file.type,
-                    fileData: event.target.result
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    savePOData({
+                        id: Date.now(),
+                        date,
+                        itemName,
+                        vendor,
+                        specs,
+                        volume,
+                        total,
+                        fileName: file.name,
+                        fileType: file.type,
+                        fileData: event.target.result
+                    });
                 };
-
-                documents.push(newDoc);
-                localStorage.setItem('sporthall_v3_documents', JSON.stringify(documents));
-
-                document.getElementById('docName').value = '';
-                fileInput.value = '';
-                renderDocumentsTable();
-                showToast('Dokumen berhasil diupload & disimpan!', 'success');
-            };
-            reader.readAsDataURL(file);
+                reader.readAsDataURL(file);
+            } else {
+                savePOData({
+                    id: Date.now(),
+                    date,
+                    itemName,
+                    vendor,
+                    specs,
+                    volume,
+                    total,
+                    fileName: null,
+                    fileType: null,
+                    fileData: null
+                });
+            }
         });
 
-        function renderDocumentsTable() {
-            const tbody = document.getElementById('documentTableBody');
-            tbody.innerHTML = '';
-            document.getElementById('docCount').innerText = `${documents.length} Dokumen`;
+        function savePOData(poObj) {
+            purchaseOrders.push(poObj);
+            localStorage.setItem('sporthall_v3_po', JSON.stringify(purchaseOrders));
 
-            if (documents.length === 0) {
+            document.getElementById('poForm').reset();
+            document.getElementById('poDate').value = new Date().toISOString().split('T')[0];
+            renderPOTable();
+            showToast('Data Pre-Order (PO) berhasil disimpan!', 'success');
+        }
+
+        function renderPOTable() {
+            const tbody = document.getElementById('poTableBody');
+            tbody.innerHTML = '';
+            document.getElementById('poCount').innerText = `${purchaseOrders.length} PO`;
+
+            if (purchaseOrders.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="5" class="text-center py-6 text-slate-500">
-                            <i class="fa-solid fa-folder-open text-2xl mb-1 block"></i> Belum ada dokumen proyek yang diunggah.
+                        <td colspan="7" class="text-center py-6 text-slate-500">
+                            <i class="fa-solid fa-folder-open text-2xl mb-1 block"></i> Belum ada data Pre-Order (PO) tercatat.
                         </td>
                     </tr>`;
                 return;
             }
 
-            const sortedDocs = [...documents].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const sortedPO = [...purchaseOrders].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-            sortedDocs.forEach(doc => {
+            sortedPO.forEach(po => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-700/30 transition border-b border-slate-700/40 text-xs sm:text-sm";
+                
+                let attachBtn = `<span class="text-slate-500 italic">Tidak ada</span>`;
+                if (po.fileData) {
+                    attachBtn = `
+                        <button onclick="previewPOFile(${po.id})" class="text-cyan-400 hover:text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 px-2.5 py-1 rounded-lg transition text-xs font-medium inline-flex items-center gap-1 border border-cyan-500/30">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat Dokumen
+                        </button>`;
+                }
+
                 tr.innerHTML = `
-                    <td class="py-3 px-4 text-slate-300 font-mono">${doc.date}</td>
-                    <td class="py-3 px-4 text-slate-200 font-medium">${doc.name}</td>
-                    <td class="py-3 px-4">
-                        <span class="px-2.5 py-0.5 text-[11px] font-semibold rounded-full border bg-cyan-500/10 text-cyan-400 border-cyan-500/30">
-                            ${doc.category}
-                        </span>
+                    <td class="py-3 px-4 text-slate-300 font-mono">${po.date}</td>
+                    <td class="py-3 px-4 text-slate-200 font-semibold">${po.itemName}</td>
+                    <td class="py-3 px-4 text-slate-300">${po.vendor}</td>
+                    <td class="py-3 px-4 text-slate-400">
+                        <div><b>Spesifikasi:</b> ${po.specs}</div>
+                        <div><b>Volume:</b> ${po.volume}</div>
                     </td>
-                    <td class="py-3 px-4 text-slate-400 truncate max-w-xs">${doc.fileName}</td>
+                    <td class="py-3 px-4 text-right font-mono font-semibold text-emerald-400">${formatIDR(po.total)}</td>
+                    <td class="py-3 px-4 text-center">${attachBtn}</td>
                     <td class="py-3 px-4 text-center">
-                        <div class="flex items-center justify-center gap-1.5">
-                            <button onclick="previewDocument(${doc.id})" class="text-cyan-400 hover:text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 px-2.5 py-1.5 rounded-lg transition text-xs font-medium flex items-center gap-1 border border-cyan-500/30" title="Lihat Isi Dokumen">
-                                <i class="fa-solid fa-eye"></i> Lihat
-                            </button>
-                            <a href="${doc.fileData}" download="${doc.fileName}" class="text-slate-300 hover:text-white bg-slate-700 hover:bg-slate-600 px-2.5 py-1.5 rounded-lg transition text-xs font-medium flex items-center gap-1" title="Download File">
-                                <i class="fa-solid fa-download"></i>
-                            </a>
-                            <button onclick="deleteDocument(${doc.id})" class="text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 p-1.5 rounded-lg transition" title="Hapus Dokumen">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </div>
+                        <button onclick="deletePO(${po.id})" class="text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 p-1.5 rounded-lg transition" title="Hapus PO">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function previewDocument(id) {
-            const doc = documents.find(d => d.id === id);
-            if (!doc) return;
+        function previewPOFile(id) {
+            const po = purchaseOrders.find(p => p.id === id);
+            if (!po || !po.fileData) return;
 
-            const modal = document.getElementById('previewModal');
-            const titleEl = document.getElementById('previewTitle');
-            const container = document.getElementById('previewContainer');
-            const infoEl = document.getElementById('previewInfo');
-
-            titleEl.innerHTML = `<i class="fa-solid fa-file-lines text-cyan-400"></i> ${doc.name} <span class="text-xs text-slate-400 font-normal">(${doc.fileName})</span>`;
-            infoEl.innerText = `Kategori: ${doc.category} | Diunggah: ${doc.date}`;
-            container.innerHTML = '';
-
-            if (doc.fileType && doc.fileType.startsWith('image/')) {
-                container.innerHTML = `<img src="${doc.fileData}" class="max-h-full max-w-full object-contain rounded-lg border border-slate-700 shadow-lg" alt="${doc.name}">`;
-            } else if (doc.fileType === 'application/pdf' || doc.fileName.toLowerCase().endsWith('.pdf')) {
-                container.innerHTML = `<iframe src="${doc.fileData}" class="w-full h-full rounded-lg border border-slate-700" frameborder="0"></iframe>`;
+            const newWindow = window.open();
+            if (newWindow) {
+                newWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="id">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Dokumen PO - ${po.itemName} (${po.fileName})</title>
+                        <style>
+                            body { margin: 0; background: #0f172a; color: #f8fafc; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; }
+                            .header { padding: 12px 20px; background: #1e293b; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
+                            .content { flex-grow: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; padding: 10px; }
+                            iframe, img { width: 100%; height: 100%; border: none; object-fit: contain; background: white; border-radius: 8px; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <strong>PO: ${po.itemName} (${po.vendor})</strong>
+                            <span>File: ${po.fileName}</span>
+                        </div>
+                        <div class="content">
+                            ${po.fileType && po.fileType.startsWith('image/') 
+                                ? `<img src="${po.fileData}" alt="${po.itemName}">` 
+                                : `<iframe src="${po.fileData}"></iframe>`
+                            }
+                        </div>
+                    </body>
+                    </html>
+                `);
+                newWindow.document.close();
             } else {
-                container.innerHTML = `
-                    <div class="text-center p-6 space-y-3">
-                        <i class="fa-solid fa-file-arrow-down text-5xl text-cyan-400"></i>
-                        <p class="text-slate-300 text-sm">Pratinjau langsung tidak tersedia untuk format file ini.</p>
-                        <a href="${doc.fileData}" download="${doc.fileName}" class="inline-block bg-cyan-600 hover:bg-cyan-500 text-white font-medium px-4 py-2 rounded-xl text-xs transition">
-                            <i class="fa-solid fa-download mr-1.5"></i> Download File untuk Melihat
-                        </a>
-                    </div>`;
+                showToast('Pop-up diblokir oleh browser. Izinkan pop-up untuk melihat dokumen.', 'error');
             }
-
-            modal.classList.remove('hidden');
         }
 
-        function closePreviewModal() {
-            document.getElementById('previewModal').classList.add('hidden');
-            document.getElementById('previewContainer').innerHTML = '';
-        }
-
-        function deleteDocument(id) {
-            if (confirm('Hapus dokumen arsip ini?')) {
-                documents = documents.filter(d => d.id !== id);
-                localStorage.setItem('sporthall_v3_documents', JSON.stringify(documents));
-                renderDocumentsTable();
-                showToast('Dokumen berhasil dihapus', 'info');
+        function deletePO(id) {
+            if (confirm('Hapus data Pre-Order (PO) ini?')) {
+                purchaseOrders = purchaseOrders.filter(p => p.id !== id);
+                localStorage.setItem('sporthall_v3_po', JSON.stringify(purchaseOrders));
+                renderPOTable();
+                showToast('Data PO berhasil dihapus', 'info');
             }
         }
 
@@ -869,7 +885,7 @@
                 transactions,
                 initialBudgets,
                 transactionTypes,
-                documents
+                purchaseOrders
             };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportBundle, null, 2));
             const downloadAnchor = document.createElement('a');
@@ -1030,6 +1046,7 @@
 
         window.onload = function() {
             document.getElementById('trxDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('poDate').value = new Date().toISOString().split('T')[0];
             populateFormDropdowns();
             updateDashboard();
         };
