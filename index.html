@@ -1,154 +1,224 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Cost Control & Cashflow - Indoor Sporthall</title>
-    <!-- Tailwind CSS for Styling -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js for Interactive Charts -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js for data visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- FontAwesome for Icons -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .print-card { border: 1px solid #ccc !important; background: white !important; color: black !important; box-shadow: none !important; }
+        }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between antialiased">
 
-    <!-- Header / Navbar -->
-    <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
-            <div>
-                <h1 class="text-xl font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-building-shield text-cyan-400"></i>
-                    Dashboard Cost Control - Sporthall Indoor
-                </h1>
-                <p class="text-xs text-slate-400">Project Manager: Muhammad Tegar Tohajudin | PT Orecon Putra</p>
+    <!-- Header / Top Navigation -->
+    <header class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700/80 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-cyan-500/10 border border-cyan-500/20 rounded-xl text-cyan-400">
+                    <i class="fa-solid fa-volleyball text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                        Sporthall Cost Control & Cashflow
+                        <span class="text-xs bg-cyan-500/20 text-cyan-300 font-semibold px-2 py-0.5 rounded-full border border-cyan-500/30">PRO</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Project Manager: <span class="text-slate-200 font-medium">Muhammad Tegar Tohajudin</span> | PT Orecon Putra</p>
+                </div>
             </div>
-            <div class="mt-3 md:mt-0 flex items-center gap-3">
-                <button onclick="resetData()" class="px-3 py-1.5 text-xs bg-red-600/80 hover:bg-red-600 text-white rounded-lg transition">
-                    <i class="fa-solid fa-rotate-right mr-1"></i> Reset Data
+            <div class="flex items-center gap-2.5 no-print w-full sm:w-auto justify-end">
+                <button onclick="exportDataJSON()" title="Export JSON Backup" class="px-3 py-2 text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition font-medium flex items-center gap-1.5 border border-slate-600">
+                    <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Export</span>
                 </button>
-                <button onclick="window.print()" class="px-3 py-1.5 text-xs bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition">
-                    <i class="fa-solid fa-print mr-1"></i> Cetak Laporan
+                <button onclick="resetData()" title="Reset to initial state" class="px-3 py-2 text-xs bg-red-600/80 hover:bg-red-600 text-white rounded-lg transition font-medium flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-rotate-right"></i> <span class="hidden sm:inline">Reset</span>
+                </button>
+                <button onclick="window.print()" class="px-3.5 py-2 text-xs bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition font-semibold flex items-center gap-1.5 shadow-md shadow-cyan-600/20">
+                    <i class="fa-solid fa-print"></i> Cetak Laporan
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <!-- Main Dashboard Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6 flex-grow">
 
-        <!-- KPI Cards Summary -->
+        <!-- Executive KPI Cards Grid -->
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl shadow-md">
-                <p class="text-xs text-slate-400 uppercase font-semibold">Total Nilai Kontrak</p>
-                <h3 id="kpiContract" class="text-2xl font-bold text-white mt-1">Rp 9.888.000.000</h3>
-                <span class="text-xs text-cyan-400 mt-2 inline-block">Pendapatan Bruto Proyek</span>
+            <!-- Contract Value Card -->
+            <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card hover:border-slate-600 transition">
+                <div class="flex items-center justify-between">
+                    <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Nilai Kontrak Utama</p>
+                    <span class="p-2 bg-blue-500/10 text-blue-400 rounded-lg text-sm"><i class="fa-solid fa-file-contract"></i></span>
+                </div>
+                <h3 id="kpiContract" class="text-2xl font-bold text-white mt-2 tracking-tight">Rp 12.500.000.000</h3>
+                <div class="mt-2 text-xs text-slate-400 flex items-center gap-1">
+                    <span class="text-emerald-400 font-medium"><i class="fa-solid fa-circle-check"></i> Fixed Price</span> Contract Value
+                </div>
             </div>
-            <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl shadow-md">
-                <p class="text-xs text-slate-400 uppercase font-semibold">Estimasi Total Biaya (RAP)</p>
-                <h3 id="kpiRAP" class="text-2xl font-bold text-amber-400 mt-1">Rp 0</h3>
-                <span id="kpiRAPStatus" class="text-xs text-slate-400 mt-2 inline-block">Akumulasi dari pengeluaran</span>
+
+            <!-- RAP / Cost Card -->
+            <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card hover:border-slate-600 transition">
+                <div class="flex items-center justify-between">
+                    <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Realisasi Biaya (RAP)</p>
+                    <span class="p-2 bg-amber-500/10 text-amber-400 rounded-lg text-sm"><i class="fa-solid fa-calculator"></i></span>
+                </div>
+                <h3 id="kpiRAP" class="text-2xl font-bold text-amber-400 mt-2 tracking-tight">Rp 0</h3>
+                <div id="kpiRAPProgress" class="mt-2 text-xs text-slate-400 flex items-center justify-between">
+                    <span>Pengeluaran Aktual Proyek</span>
+                </div>
             </div>
-            <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl shadow-md">
-                <p class="text-xs text-slate-400 uppercase font-semibold">Proyeksi Net Margin</p>
-                <h3 id="kpiMargin" class="text-2xl font-bold text-emerald-400 mt-1">Rp 0</h3>
-                <span id="kpiMarginPct" class="text-xs text-emerald-400 mt-2 inline-block">0.0% dari kontrak</span>
+
+            <!-- Net Margin Card -->
+            <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card hover:border-slate-600 transition">
+                <div class="flex items-center justify-between">
+                    <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Proyeksi Net Margin</p>
+                    <span class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg text-sm"><i class="fa-solid fa-chart-line"></i></span>
+                </div>
+                <h3 id="kpiMargin" class="text-2xl font-bold text-emerald-400 mt-2 tracking-tight">Rp 0</h3>
+                <div class="mt-2 text-xs">
+                    <span id="kpiMarginPct" class="font-semibold text-emerald-400">0.0% dari nilai kontrak</span>
+                </div>
             </div>
-            <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl shadow-md">
-                <p class="text-xs text-slate-400 uppercase font-semibold">Saldo Kas Kasar (Net Cash)</p>
-                <h3 id="kpiCash" class="text-2xl font-bold text-cyan-400 mt-1">Rp 0</h3>
-                <span class="text-xs text-slate-400 mt-2 inline-block">Total Masuk - Total Keluar</span>
+
+            <!-- Net Cashflow Position Card -->
+            <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card hover:border-slate-600 transition">
+                <div class="flex items-center justify-between">
+                    <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Saldo Kas Proyek</p>
+                    <span class="p-2 bg-cyan-500/10 text-cyan-400 rounded-lg text-sm"><i class="fa-solid fa-wallet"></i></span>
+                </div>
+                <h3 id="kpiCash" class="text-2xl font-bold text-cyan-400 mt-2 tracking-tight">Rp 0</h3>
+                <div class="mt-2 text-xs text-slate-400 flex items-center justify-between">
+                    <span>Kas Masuk - Kas Keluar</span>
+                </div>
             </div>
         </section>
 
-        <!-- Input Section: Transaksi Kas Masuk / Keluar -->
-        <section class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow-md">
-            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <i class="fa-solid fa-file-invoice-dollar text-emerald-400"></i> Input Pemasukan & Pengeluaran Proyek
+        <!-- Transaction Input Section -->
+        <section class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
+            <h2 class="text-base font-semibold text-white mb-4 flex items-center justify-between">
+                <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-square-plus text-cyan-400"></i> Catat Transaksi Keuangan Baru
+                </span>
+                <button type="button" onclick="openCustomSettingsModal()" class="text-xs bg-slate-700 hover:bg-slate-600 text-cyan-300 px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5 border border-slate-600">
+                    <i class="fa-solid fa-gear"></i> Kelola Tipe & Kategori
+                </button>
             </h2>
-            <form id="transactionForm" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <form id="transactionForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Jenis Transaksi</label>
-                    <select id="trxType" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-cyan-500">
-                        <option value="INCOME">Pemasukan (Cash In / Termin)</option>
-                        <option value="EXPENSE">Pengeluaran (Cash Out / Cost)</option>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Tipe Transaksi</label>
+                    <select id="trxType" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-500 transition">
+                        <!-- Populated dynamically -->
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Kategori Pekerjaan / Sumber</label>
-                    <select id="trxCategory" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-cyan-500">
-                        <option value="Termin Pembayaran Owner">Termin Pembayaran Owner</option>
-                        <option value="Pekerjaan Struktur & Atap Baja">Pekerjaan Struktur & Atap Baja</option>
-                        <option value="Pekerjaan Lapangan & Arsitektur">Pekerjaan Lapangan & Arsitektur</option>
-                        <option value="Pekerjaan MEP & Pencahayaan">Pekerjaan MEP & Pencahayaan</option>
-                        <option value="Persiapan, K3 & Overhead">Persiapan, K3 & Overhead</option>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Kategori / Pos Pekerjaan</label>
+                    <select id="trxCategory" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-500 transition">
+                        <!-- Populated dynamically -->
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Nominal (IDR)</label>
-                    <input type="number" id="trxAmount" placeholder="Contoh: 500000000" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-cyan-500">
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Nominal (IDR)</label>
+                    <input type="number" id="trxAmount" placeholder="Contoh: 350000000" required min="1" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Keterangan / Uraian</label>
-                    <input type="text" id="trxDesc" placeholder="Contoh: Pembayaran Termin 1" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-cyan-500">
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Keterangan / Deskripsi</label>
+                    <input type="text" id="trxDesc" placeholder="Uraian item pembayaran" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition">
                 </div>
                 <div class="flex items-end">
-                    <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-medium py-2.5 px-4 rounded-lg text-sm transition shadow-lg">
-                        <i class="fa-solid fa-plus mr-1"></i> Simpan Transaksi
+                    <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 active:bg-cyan-700 text-white font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-lg shadow-cyan-600/20 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Simpan
                     </button>
                 </div>
             </form>
         </section>
 
-        <!-- Visual Charts Section -->
+        <!-- Charts Visual Analytics Grid -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Chart 1: Cost Control (Budget vs Aktual per Kategori) -->
-            <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow-md">
-                <h3 class="text-md font-semibold text-white mb-3 flex items-center justify-between">
-                    <span><i class="fa-solid fa-chart-bar text-cyan-400 mr-2"></i> Cost Control (Realisasi Biaya)</span>
-                    <span class="text-xs text-slate-400">Budget vs Aktual</span>
-                </h3>
-                <div class="relative h-72">
+            <!-- Cost Control Chart -->
+            <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-chart-column text-cyan-400"></i> Cost Control (RAP vs Realisasi)
+                    </h3>
+                    <span class="text-xs text-slate-400">Per Pos Pekerjaan</span>
+                </div>
+                <div class="relative h-64 sm:h-72">
                     <canvas id="costControlChart"></canvas>
                 </div>
             </div>
 
-            <!-- Chart 2: Cashflow Proyek -->
-            <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow-md">
-                <h3 class="text-md font-semibold text-white mb-3 flex items-center justify-between">
-                    <span><i class="fa-solid fa-chart-line text-emerald-400 mr-2"></i> Akumulasi Arus Kas (Cashflow)</span>
-                    <span class="text-xs text-slate-400">Masuk vs Keluar</span>
-                </h3>
-                <div class="relative h-72">
+            <!-- Cashflow Trend Chart -->
+            <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-chart-area text-emerald-400"></i> Akumulasi Cashflow (Masuk vs Keluar)
+                    </h3>
+                    <span class="text-xs text-slate-400">Proyeksi & Realisasi</span>
+                </div>
+                <div class="relative h-64 sm:h-72">
                     <canvas id="cashflowChart"></canvas>
                 </div>
             </div>
         </section>
 
-        <!-- Table Ledger Section -->
-        <section class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow-md">
-            <h2 class="text-lg font-semibold text-white mb-4 flex items-center justify-between">
-                <span><i class="fa-solid fa-list-check text-amber-400 mr-2"></i> Riwayat Transaksi Keuangan</span>
-                <span id="txCount" class="text-xs bg-slate-700 text-slate-300 px-2.5 py-1 rounded-full">0 Transaksi</span>
-            </h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-sm">
+        <!-- Transaction Ledger Table -->
+        <section class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+                <div>
+                    <h2 class="text-base font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-receipt text-amber-400"></i> Jurnal Transaksi Keuangan
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Catatan seluruh pengeluaran dan pembayaran termin</p>
+                </div>
+                <span id="txCount" class="text-xs font-medium bg-slate-700/80 border border-slate-600/80 text-slate-300 px-3 py-1 rounded-full">
+                    0 Transaksi
+                </span>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-700/50">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead>
-                        <tr class="border-b border-slate-700 text-slate-400">
+                        <tr class="bg-slate-900/80 border-b border-slate-700 text-slate-400 uppercase font-semibold tracking-wider text-[11px]">
                             <th class="py-3 px-4">Tanggal</th>
                             <th class="py-3 px-4">Tipe</th>
-                            <th class="py-3 px-4">Kategori</th>
+                            <th class="py-3 px-4">Kategori Pekerjaan</th>
                             <th class="py-3 px-4">Keterangan</th>
                             <th class="py-3 px-4 text-right">Nominal (IDR)</th>
-                            <th class="py-3 px-4 text-center">Aksi</th>
+                            <th class="py-3 px-4 text-center no-print">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="transactionTableBody" class="divide-y divide-slate-700/50">
-                        <!-- Data will be populated by JS -->
+                        <!-- Transaksi populated dynamically -->
                     </tbody>
                 </table>
             </div>
@@ -161,74 +231,300 @@
         Dashboard Cost Control Proyek Sporthall Indoor &copy; 2026 - All Rights Reserved
     </footer>
 
+    <!-- Toast Notification Container -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-800 border border-slate-700 text-slate-200 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+        <i id="toastIcon" class="fa-solid fa-circle-info text-cyan-400"></i>
+        <span id="toastMsg" class="text-xs sm:text-sm font-medium">Notifikasi</span>
+    </div>
+
+    <!-- Modal Kelola Custom Tipe & Kategori -->
+    <div id="customSettingsModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden">
+        <div class="bg-slate-800 border border-slate-700 w-full max-w-lg p-6 rounded-2xl shadow-2xl space-y-6 mx-4">
+            <div class="flex items-center justify-between border-b border-slate-700 pb-4">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-cyan-400"></i> Kelola Tipe & Kategori Custom
+                </h3>
+                <button onclick="closeCustomSettingsModal()" class="text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="space-y-5">
+                <!-- Add Custom Type -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-2">Tambah Tipe Transaksi Baru</label>
+                    <form id="addTypeForm" class="flex gap-2">
+                        <input type="text" id="newTypeName" placeholder="Nama Tipe (Mis: Pendapatan Lain)" required class="flex-grow bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                        <select id="newTypeBehavior" class="bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                            <option value="INCOME">Sebagai Pemasukan</option>
+                            <option value="EXPENSE">Sebagai Pengeluaran</option>
+                        </select>
+                        <button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-medium px-4 py-2.5 rounded-xl text-xs transition">Tambah</button>
+                    </form>
+                    <div id="customTypeList" class="mt-2 flex flex-wrap gap-1.5"></div>
+                </div>
+
+                <!-- Add Custom Category -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-2">Tambah Kategori / Pos Pekerjaan Baru</label>
+                    <form id="addCategoryForm" class="flex gap-2">
+                        <input type="text" id="newCategoryName" placeholder="Nama Pos Pekerjaan Baru" required class="flex-grow bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                        <input type="number" id="newCategoryBudget" placeholder="Target RAP (IDR)" min="0" class="w-32 bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                        <button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-medium px-4 py-2.5 rounded-xl text-xs transition">Tambah</button>
+                    </form>
+                    <div id="customCategoryList" class="mt-2 flex flex-wrap gap-1.5 max-h-36 overflow-y-auto"></div>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-3 border-t border-slate-700">
+                <button onclick="closeCustomSettingsModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-medium px-5 py-2 rounded-xl text-xs transition">Selesai</button>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript Logic & Chart Config -->
     <script>
         const CONTRACT_VALUE = 9888000000; // Rp 9.888.000.000
         
-        const initialBudgets = {
-            "Pekerjaan Struktur & Atap Baja": 3500000000,
-            "Pekerjaan Lapangan & Arsitektur": 2400000000,
-            "Pekerjaan MEP & Pencahayaan": 1500000000,
-            "Persiapan, K3 & Overhead": 1000000000
+        const defaultBudgets = {
+            "Pekerjaan Struktur & Atap Baja": 4200000000,
+            "Pekerjaan Lapangan & Arsitektur": 2800000000,
+            "Pekerjaan MEP & Pencahayaan": 1700000000,
+            "Persiapan, K3 & Overhead": 1250000000
         };
 
-        let transactions = JSON.parse(localStorage.getItem('sporthall_transactions')) || [
-            { id: 1, date: '2026-03-01', type: 'INCOME', category: 'Termin Pembayaran Owner', desc: 'Uang Muka / Termin 1', amount: 2000000000 },
-            { id: 2, date: '2026-03-15', type: 'EXPENSE', category: 'Pekerjaan Struktur & Atap Baja', desc: 'DP Material Baja WF', amount: 1000000000 },
-            { id: 3, date: '2026-04-10', type: 'EXPENSE', category: 'Persiapan, K3 & Overhead', desc: 'Sewa Alat Berat & Direksi Keet', amount: 300000000 }
+        const defaultTypes = [
+            { id: 'INCOME', name: 'Pemasukan (Termin / Cash In)', behavior: 'INCOME' },
+            { id: 'EXPENSE', name: 'Pengeluaran (Biaya / Cash Out)', behavior: 'EXPENSE' }
         ];
 
+        // Default Initial Sample Data
+        const defaultTransactions = [
+            { id: 101, date: '2026-03-01', type: 'INCOME', category: 'Termin Pembayaran Owner', desc: 'Uang Muka / Termin 1 Project (20%)', amount: 2500000000 },
+            { id: 102, date: '2026-03-12', type: 'EXPENSE', category: 'Pekerjaan Struktur & Atap Baja', desc: 'DP Material Baja WF & Anchor Bolt', amount: 1450000000 },
+            { id: 103, date: '2026-03-25', type: 'EXPENSE', category: 'Persiapan, K3 & Overhead', desc: 'Sewa Alat Berat, Direksi Keet & APK K3', amount: 320000000 },
+            { id: 104, date: '2026-04-05', type: 'EXPENSE', category: 'Pekerjaan Lapangan & Arsitektur', desc: 'Pekerjaan Sub-Base Lantai Sporthall', amount: 540000000 },
+            { id: 105, date: '2026-04-20', type: 'EXPENSE', category: 'Pekerjaan MEP & Pencahayaan', desc: 'DP Lampu Highbay LED & Panel Listrik', amount: 380000000 }
+        ];
+
+        // State Management
+        let transactions = JSON.parse(localStorage.getItem('sporthall_v3_transactions')) || defaultTransactions;
+        let initialBudgets = JSON.parse(localStorage.getItem('sporthall_v3_budgets')) || defaultBudgets;
+        let transactionTypes = JSON.parse(localStorage.getItem('sporthall_v3_types')) || defaultTypes;
+        
         let costControlChartInstance = null;
         let cashflowChartInstance = null;
 
-        function formatIDR(number) {
-            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(number);
+        // Formatter Helper
+        function formatIDR(val) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
         }
 
-        function initDashboard() {
+        // Show Toast Notification
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.innerText = message;
+            if (type === 'success') {
+                toastIcon.className = 'fa-solid fa-circle-check text-emerald-400';
+            } else if (type === 'error') {
+                toastIcon.className = 'fa-solid fa-triangle-exclamation text-red-400';
+            } else {
+                toastIcon.className = 'fa-solid fa-circle-info text-cyan-400';
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Modal Controls
+        function openCustomSettingsModal() {
+            document.getElementById('customSettingsModal').classList.remove('hidden');
+            renderCustomLists();
+        }
+
+        function closeCustomSettingsModal() {
+            document.getElementById('customSettingsModal').classList.add('hidden');
+            populateFormDropdowns();
+        }
+
+        // Populate Select Options in Form
+        function populateFormDropdowns() {
+            const typeSelect = document.getElementById('trxType');
+            const categorySelect = document.getElementById('trxCategory');
+            
+            const currentTypeVal = typeSelect.value;
+            const currentCatVal = categorySelect.value;
+
+            typeSelect.innerHTML = '';
+            transactionTypes.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.id;
+                opt.textContent = t.name;
+                typeSelect.appendChild(opt);
+            });
+            if (currentTypeVal) typeSelect.value = currentTypeVal;
+
+            categorySelect.innerHTML = '';
+            // Selalu sediakan opsi termin utama jika belum ada
+            if (!initialBudgets["Termin Pembayaran Owner"]) {
+                initialBudgets["Termin Pembayaran Owner"] = 0;
+            }
+
+            Object.keys(initialBudgets).forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                categorySelect.appendChild(opt);
+            });
+            if (currentCatVal) categorySelect.value = currentCatVal;
+        }
+
+        // Render Management Lists in Modal
+        function renderCustomLists() {
+            // Types List
+            const typeListEl = document.getElementById('customTypeList');
+            typeListEl.innerHTML = '';
+            transactionTypes.forEach(t => {
+                const tag = document.createElement('div');
+                tag.className = "flex items-center gap-1.5 bg-slate-900 border border-slate-700 px-2.5 py-1 rounded-lg text-xs text-slate-300";
+                tag.innerHTML = `<span>${t.name}</span>`;
+                if (!['INCOME', 'EXPENSE'].includes(t.id)) {
+                    tag.innerHTML += `<button onclick="deleteCustomType('${t.id}')" class="text-red-400 hover:text-red-300 ml-1"><i class="fa-solid fa-xmark"></i></button>`;
+                }
+                typeListEl.appendChild(tag);
+            });
+
+            // Categories List
+            const catListEl = document.getElementById('customCategoryList');
+            catListEl.innerHTML = '';
+            Object.keys(initialBudgets).forEach(cat => {
+                const tag = document.createElement('div');
+                tag.className = "flex items-center justify-between w-full bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-xs text-slate-300";
+                tag.innerHTML = `<span><b>${cat}</b> (RAP: ${formatIDR(initialBudgets[cat])})</span>`;
+                if (cat !== "Termin Pembayaran Owner") {
+                    tag.innerHTML += `<button onclick="deleteCustomCategory('${cat}')" class="text-red-400 hover:text-red-300 ml-2"><i class="fa-solid fa-trash-can"></i></button>`;
+                }
+                catListEl.appendChild(tag);
+            });
+        }
+
+        // Add Custom Type Submit
+        document.getElementById('addTypeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('newTypeName').value.trim();
+            const behavior = document.getElementById('newTypeBehavior').value;
+            const id = 'TYPE_' + Date.now();
+
+            if (!name) return;
+            transactionTypes.push({ id, name, behavior });
+            localStorage.setItem('sporthall_v3_types', JSON.stringify(transactionTypes));
+            
+            document.getElementById('newTypeName').value = '';
+            renderCustomLists();
+            populateFormDropdowns();
+            showToast('Tipe transaksi baru ditambahkan!', 'success');
+        });
+
+        // Add Custom Category Submit
+        document.getElementById('addCategoryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('newCategoryName').value.trim();
+            const budget = parseFloat(document.getElementById('newCategoryBudget').value) || 0;
+
+            if (!name) return;
+            if (initialBudgets[name] !== undefined) {
+                showToast('Kategori tersebut sudah ada', 'error');
+                return;
+            }
+
+            initialBudgets[name] = budget;
+            localStorage.setItem('sporthall_v3_budgets', JSON.stringify(initialBudgets));
+            
+            document.getElementById('newCategoryName').value = '';
+            document.getElementById('newCategoryBudget').value = '';
+            renderCustomLists();
+            populateFormDropdowns();
+            updateDashboard();
+            showToast('Kategori pekerjaan baru ditambahkan!', 'success');
+        });
+
+        // Delete Custom Type
+        function deleteCustomType(id) {
+            transactionTypes = transactionTypes.filter(t => t.id !== id);
+            localStorage.setItem('sporthall_v3_types', JSON.stringify(transactionTypes));
+            renderCustomLists();
+            populateFormDropdowns();
+            showToast('Tipe transaksi dihapus', 'info');
+        }
+
+        // Delete Custom Category
+        function deleteCustomCategory(cat) {
+            delete initialBudgets[cat];
+            localStorage.setItem('sporthall_v3_budgets', JSON.stringify(initialBudgets));
+            renderCustomLists();
+            populateFormDropdowns();
+            updateDashboard();
+            showToast('Kategori pekerjaan dihapus', 'info');
+        }
+
+        // Main Dashboard Render Controller
+        function updateDashboard() {
             renderKPIs();
             renderTable();
             renderCharts();
         }
 
+        // Render Executive Metrics
         function renderKPIs() {
             let totalIncome = 0;
             let totalExpense = 0;
-            let actualCosts = {
-                "Pekerjaan Struktur & Atap Baja": 0,
-                "Pekerjaan Lapangan & Arsitektur": 0,
-                "Pekerjaan MEP & Pencahayaan": 0,
-                "Persiapan, K3 & Overhead": 0
-            };
 
             transactions.forEach(t => {
-                if (t.type === 'INCOME') {
+                // Cari apakah tipe ini berprilaku sebagai INCOME atau EXPENSE
+                const typeObj = transactionTypes.find(tp => tp.id === t.type);
+                const behavior = typeObj ? typeObj.behavior : 'EXPENSE';
+
+                if (behavior === 'INCOME' || t.type === 'INCOME') {
                     totalIncome += Number(t.amount);
                 } else {
                     totalExpense += Number(t.amount);
-                    if (actualCosts[t.category] !== undefined) {
-                        actualCosts[t.category] += Number(t.amount);
-                    }
                 }
             });
 
-            let netMargin = CONTRACT_VALUE - totalExpense;
-            let marginPct = (netMargin / CONTRACT_VALUE) * 100;
-            let netCash = totalIncome - totalExpense;
+            const netMargin = CONTRACT_VALUE - totalExpense;
+            const marginPct = (netMargin / CONTRACT_VALUE) * 100;
+            const netCash = totalIncome - totalExpense;
 
             document.getElementById('kpiContract').innerText = formatIDR(CONTRACT_VALUE);
             document.getElementById('kpiRAP').innerText = formatIDR(totalExpense);
-            document.getElementById('kpiMargin').innerText = formatIDR(netMargin);
             
-            const marginEl = document.getElementById('kpiMarginPct');
-            marginEl.innerText = `${marginPct.toFixed(1)}% dari nilai kontrak`;
-            marginEl.className = netMargin >= 0 ? 'text-xs text-emerald-400 mt-2 inline-block' : 'text-xs text-red-400 mt-2 inline-block';
+            const marginEl = document.getElementById('kpiMargin');
+            const marginPctEl = document.getElementById('kpiMarginPct');
+            marginEl.innerText = formatIDR(netMargin);
+            
+            if (netMargin >= 0) {
+                marginEl.className = 'text-2xl font-bold text-emerald-400 mt-2 tracking-tight';
+                marginPctEl.innerText = `${marginPct.toFixed(1)}% Profit Margin dari Kontrak`;
+                marginPctEl.className = 'font-semibold text-emerald-400';
+            } else {
+                marginEl.className = 'text-2xl font-bold text-red-400 mt-2 tracking-tight';
+                marginPctEl.innerText = `${marginPct.toFixed(1)}% Over Budget (Defisit)`;
+                marginPctEl.className = 'font-semibold text-red-400';
+            }
 
             const cashEl = document.getElementById('kpiCash');
             cashEl.innerText = formatIDR(netCash);
-            cashEl.className = netCash >= 0 ? 'text-2xl font-bold text-cyan-400 mt-1' : 'text-2xl font-bold text-red-400 mt-1';
+            cashEl.className = netCash >= 0 
+                ? 'text-2xl font-bold text-cyan-400 mt-2 tracking-tight' 
+                : 'text-2xl font-bold text-red-400 mt-2 tracking-tight';
         }
 
+        // Render Transactions Table
         function renderTable() {
             const tbody = document.getElementById('transactionTableBody');
             tbody.innerHTML = '';
@@ -236,29 +532,44 @@
             document.getElementById('txCount').innerText = `${transactions.length} Transaksi`;
 
             if (transactions.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">Belum ada data transaksi tercatat.</td></tr>`;
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-6 text-slate-500">
+                            <i class="fa-solid fa-inbox text-2xl mb-1 block"></i> Belum ada data transaksi keuangan tercatat.
+                        </td>
+                    </tr>`;
                 return;
             }
 
-            const sortedTx = [...transactions].reverse();
+            // Display newest first
+            const sortedTx = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
 
             sortedTx.forEach((t) => {
-                let tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-700/30 transition";
+                const typeObj = transactionTypes.find(tp => tp.id === t.type);
+                const typeName = typeObj ? typeObj.name : t.type;
+                const behavior = typeObj ? typeObj.behavior : 'EXPENSE';
+                const isIncome = (behavior === 'INCOME' || t.type === 'INCOME');
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-700/30 transition border-b border-slate-700/40 text-xs sm:text-sm";
                 tr.innerHTML = `
-                    <td class="py-3 px-4 text-slate-300">${t.date || '2026-10-12'}</td>
+                    <td class="py-3 px-4 text-slate-300 font-mono text-xs">${t.date}</td>
                     <td class="py-3 px-4">
-                        <span class="px-2 py-0.5 text-xs rounded-full font-medium ${t.type === 'INCOME' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}">
-                            ${t.type === 'INCOME' ? 'Pemasukan' : 'Pengeluaran'}
+                        <span class="px-2.5 py-0.5 text-[11px] font-semibold rounded-full border ${
+                            isIncome 
+                                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' 
+                                : 'bg-red-500/10 text-red-400 border-red-500/30'
+                        }">
+                            ${typeName}
                         </span>
                     </td>
-                    <td class="py-3 px-4 text-slate-300 font-medium">${t.category}</td>
+                    <td class="py-3 px-4 text-slate-200 font-medium">${t.category}</td>
                     <td class="py-3 px-4 text-slate-400">${t.desc}</td>
-                    <td class="py-3 px-4 text-right font-semibold ${t.type === 'INCOME' ? 'text-emerald-400' : 'text-slate-200'}">
-                        ${t.type === 'INCOME' ? '+' : '-'} ${formatIDR(t.amount)}
+                    <td class="py-3 px-4 text-right font-semibold font-mono ${isIncome ? 'text-emerald-400' : 'text-slate-200'}">
+                        ${isIncome ? '+' : '-'} ${formatIDR(t.amount)}
                     </td>
-                    <td class="py-3 px-4 text-center">
-                        <button onclick="deleteTransaction(${t.id})" class="text-slate-500 hover:text-red-400 transition p-1" title="Hapus">
+                    <td class="py-3 px-4 text-center no-print">
+                        <button onclick="deleteTransaction(${t.id})" class="text-slate-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-slate-700 transition" title="Hapus Transaksi">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </td>
@@ -267,6 +578,7 @@
             });
         }
 
+        // Form Submit Handler
         document.getElementById('transactionForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -275,7 +587,10 @@
             const amount = parseFloat(document.getElementById('trxAmount').value);
             const desc = document.getElementById('trxDesc').value;
 
-            if (!amount || amount <= 0) return alert('Masukkan nominal yang valid!');
+            if (!amount || amount <= 0) {
+                showToast('Nominal transaksi harus lebih besar dari 0', 'error');
+                return;
+            }
 
             const newTx = {
                 id: Date.now(),
@@ -287,54 +602,100 @@
             };
 
             transactions.push(newTx);
-            localStorage.setItem('sporthall_transactions', JSON.stringify(transactions));
+            saveAndRefresh();
 
             document.getElementById('trxAmount').value = '';
             document.getElementById('trxDesc').value = '';
-
-            initDashboard();
+            showToast('Transaksi berhasil ditambahkan!', 'success');
         });
 
+        // Delete Individual Transaction
         function deleteTransaction(id) {
-            if (confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
+            if (confirm('Hapus pencatatan transaksi ini?')) {
                 transactions = transactions.filter(t => t.id !== id);
-                localStorage.setItem('sporthall_transactions', JSON.stringify(transactions));
-                initDashboard();
+                saveAndRefresh();
+                showToast('Transaksi telah dihapus', 'info');
             }
         }
 
+        // Save State & Refresh UI
+        function saveAndRefresh() {
+            localStorage.setItem('sporthall_v3_transactions', JSON.stringify(transactions));
+            updateDashboard();
+        }
+
+        // Reset Data
         function resetData() {
-            if (confirm('Reset semua data kembali ke pengaturan awal?')) {
-                localStorage.removeItem('sporthall_transactions');
-                location.reload();
+            if (confirm('Sistem akan mereset seluruh data kembali ke transaksi awal bawaan. Lanjutkan?')) {
+                transactions = defaultTransactions;
+                initialBudgets = defaultBudgets;
+                transactionTypes = defaultTypes;
+                localStorage.setItem('sporthall_v3_transactions', JSON.stringify(transactions));
+                localStorage.setItem('sporthall_v3_budgets', JSON.stringify(initialBudgets));
+                localStorage.setItem('sporthall_v3_types', JSON.stringify(transactionTypes));
+                populateFormDropdowns();
+                updateDashboard();
+                showToast('Data berhasil di-reset', 'info');
             }
         }
 
-        function renderCharts() {
-            let actuals = {
-                "Pekerjaan Struktur & Atap Baja": 0,
-                "Pekerjaan Lapangan & Arsitektur": 0,
-                "Pekerjaan MEP & Pencahayaan": 0,
-                "Persiapan, K3 & Overhead": 0
+        // Export Data as JSON
+        function exportDataJSON() {
+            const exportBundle = {
+                transactions,
+                initialBudgets,
+                transactionTypes
             };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportBundle, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `sporthall_cost_control_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
 
-            let totalIncomeCum = 0;
-            let totalExpenseCum = 0;
-
-            transactions.forEach(t => {
-                if (t.type === 'EXPENSE' && actuals[t.category] !== undefined) {
-                    actuals[t.category] += Number(t.amount);
-                }
-                if (t.type === 'INCOME') totalIncomeCum += Number(t.amount);
-                if (t.type === 'EXPENSE') totalExpenseCum += Number(t.amount);
+        // Render Interactive Charts
+        function renderCharts() {
+            // Aggregate Actual Expense Amounts per Category
+            const actuals = {};
+            Object.keys(initialBudgets).forEach(cat => {
+                actuals[cat] = 0;
             });
 
+            let cumulativeIncome = 0;
+            let cumulativeExpense = 0;
+
+            transactions.forEach(t => {
+                const typeObj = transactionTypes.find(tp => tp.id === t.type);
+                const behavior = typeObj ? typeObj.behavior : 'EXPENSE';
+
+                if (behavior === 'EXPENSE' && t.type !== 'INCOME') {
+                    if (actuals[t.category] !== undefined) {
+                        actuals[t.category] += Number(t.amount);
+                    } else {
+                        // Jika kategori kustom baru tidak masuk initialBudgets, masukkan otomatis
+                        actuals[t.category] = Number(t.amount);
+                    }
+                }
+
+                if (behavior === 'INCOME' || t.type === 'INCOME') {
+                    cumulativeIncome += Number(t.amount);
+                } else {
+                    cumulativeExpense += Number(t.amount);
+                }
+            });
+
+            // --- Chart 1: Cost Control Bar Chart ---
             const ctxCost = document.getElementById('costControlChart').getContext('2d');
             if (costControlChartInstance) costControlChartInstance.destroy();
 
-            const categories = Object.keys(initialBudgets);
-            const budgetData = categories.map(cat => initialBudgets[cat]);
-            const actualData = categories.map(cat => actuals[cat]);
+            // Filter out Termin Pembayaran Owner from cost control comparison if desired, or keep all
+            const categories = Object.keys(initialBudgets).filter(c => c !== 'Termin Pembayaran Owner');
+            if (categories.length === 0) categories.push(...Object.keys(initialBudgets));
+
+            const budgetData = categories.map(cat => initialBudgets[cat] || 0);
+            const actualData = categories.map(cat => actuals[cat] || 0);
 
             costControlChartInstance = new Chart(ctxCost, {
                 type: 'bar',
@@ -342,20 +703,20 @@
                     labels: categories.map(c => c.replace('Pekerjaan ', '')),
                     datasets: [
                         {
-                            label: 'Budget (RAP)',
+                            label: 'Budget (RAP Target)',
                             data: budgetData,
-                            backgroundColor: 'rgba(56, 189, 248, 0.6)',
-                            borderColor: 'rgba(56, 189, 248, 1)',
-                            borderWidth: 1,
-                            borderRadius: 4
+                            backgroundColor: 'rgba(14, 165, 233, 0.5)',
+                            borderColor: 'rgba(14, 165, 233, 1)',
+                            borderWidth: 1.5,
+                            borderRadius: 6
                         },
                         {
                             label: 'Realisasi Aktual',
                             data: actualData,
                             backgroundColor: 'rgba(244, 63, 94, 0.6)',
                             borderColor: 'rgba(244, 63, 94, 1)',
-                            borderWidth: 1,
-                            borderRadius: 4
+                            borderWidth: 1.5,
+                            borderRadius: 6
                         }
                     ]
                 },
@@ -363,38 +724,58 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { labels: { color: '#cbd5e1', font: { size: 11 } } }
+                        legend: { labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${formatIDR(context.raw)}`;
+                                }
+                            }
+                        }
                     },
                     scales: {
-                        x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(51, 65, 85, 0.4)' } },
-                        y: { ticks: { color: '#94a3b8', callback: (val) => val / 1000000 + 'Jt' }, grid: { color: 'rgba(51, 65, 85, 0.4)' } }
+                        x: { 
+                            ticks: { color: '#94a3b8', font: { family: 'Inter', size: 10 } }, 
+                            grid: { color: 'rgba(51, 65, 85, 0.3)' } 
+                        },
+                        y: { 
+                            ticks: { 
+                                color: '#94a3b8', 
+                                font: { family: 'Inter', size: 10 },
+                                callback: (val) => (val / 1000000000).toFixed(1) + 'M' 
+                            }, 
+                            grid: { color: 'rgba(51, 65, 85, 0.3)' } 
+                        }
                     }
                 }
             });
 
+            // --- Chart 2: Cashflow Trend Chart ---
             const ctxCash = document.getElementById('cashflowChart').getContext('2d');
             if (cashflowChartInstance) cashflowChartInstance.destroy();
 
             cashflowChartInstance = new Chart(ctxCash, {
                 type: 'line',
                 data: {
-                    labels: ['Akumulasi Awal', 'Posisi Saat Ini'],
+                    labels: ['Awal Kontrak', 'Posisi Akumulasi Saat Ini'],
                     datasets: [
                         {
-                            label: 'Total Kas Masuk (Cash In)',
-                            data: [0, totalIncomeCum],
-                            borderColor: '#34d399',
-                            backgroundColor: '#34d399',
-                            tension: 0.1,
-                            fill: false
+                            label: 'Total Kas Masuk',
+                            data: [0, cumulativeIncome],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            fill: true,
+                            tension: 0.2,
+                            pointRadius: 5
                         },
                         {
-                            label: 'Total Kas Keluar (Cash Out)',
-                            data: [0, totalExpenseCum],
-                            borderColor: '#f87171',
-                            backgroundColor: '#f87171',
-                            tension: 0.1,
-                            fill: false
+                            label: 'Total Kas Keluar',
+                            data: [0, cumulativeExpense],
+                            borderColor: '#f43f5e',
+                            backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                            fill: true,
+                            tension: 0.2,
+                            pointRadius: 5
                         }
                     ]
                 },
@@ -402,17 +783,35 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { labels: { color: '#cbd5e1', font: { size: 11 } } }
+                        legend: { labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${formatIDR(context.raw)}`;
+                                }
+                            }
+                        }
                     },
                     scales: {
-                        x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(51, 65, 85, 0.4)' } },
-                        y: { ticks: { color: '#94a3b8', callback: (val) => val / 1000000 + 'Jt' }, grid: { color: 'rgba(51, 65, 85, 0.4)' } }
+                        x: { ticks: { color: '#94a3b8', font: { family: 'Inter', size: 10 } }, grid: { color: 'rgba(51, 65, 85, 0.3)' } },
+                        y: { 
+                            ticks: { 
+                                color: '#94a3b8', 
+                                font: { family: 'Inter', size: 10 },
+                                callback: (val) => (val / 1000000000).toFixed(1) + 'M' 
+                            }, 
+                            grid: { color: 'rgba(51, 65, 85, 0.3)' } 
+                        }
                     }
                 }
             });
         }
 
-        window.onload = initDashboard;
+        // Initialize dashboard on window load
+        window.onload = function() {
+            populateFormDropdowns();
+            updateDashboard();
+        };
     </script>
 </body>
 </html>
