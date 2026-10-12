@@ -1,0 +1,11 @@
+{
+  "contractValue": 3500000000,
+  "totalCashIn": 2100000000,
+  "budgetData": [
+    { "category": "Pekerjaan Sipil & Pondasi", "rap": 500000000, "spent": 480000000 },
+    { "category": "Struktur Baja & Atap", "rap": 1200000000, "spent": 650000000 },
+    { "category": "Lantai Sporthall", "rap": 450000000, "spent": 100000000 },
+    { "category": "MEP & Lighting", "rap": 350000000, "spent": 120000000 },
+    { "category": "Upah & Subkon", "rap": 300000000, "spent": 100000000 }
+  ]
+}
