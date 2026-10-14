@@ -160,7 +160,7 @@
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Total HPP Alat Berat</p>
                         <h3 id="messKpiHpp" class="text-2xl font-bold text-amber-400 mt-2">Rp 0</h3>
-                        <p class="text-xs text-slate-400 mt-1">Exca/Compact (excl) + Fuel + DT</p>
+                        <p class="text-xs text-slate-400 mt-1">Min 200 Jam/Bulan + Fuel + DT</p>
                     </div>
                 </div>
 
@@ -169,7 +169,7 @@
                     <h2 class="text-base font-semibold text-white mb-2 flex items-center gap-2">
                         <i class="fa-solid fa-scale-balanced text-cyan-400"></i> Analisa Finansial: Pendapatan Kontrak vs HPP Alat Berat
                     </h2>
-                    <p class="text-xs text-slate-400 mb-4">Perbandingan tarif kontrak alat berat dengan perhitungan HPP operasional aktual.</p>
+                    <p class="text-xs text-slate-400 mb-4">Perbandingan tarif kontrak alat berat dengan perhitungan HPP operasional aktual (termasuk aturan minimum 200 jam/bulan).</p>
                     <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                         <table class="w-full text-left border-collapse text-xs sm:text-sm">
                             <thead>
@@ -787,6 +787,40 @@
             }
         }
 
+        // Fungsi Helper untuk mengelompokkan jam alat berdasarkan Bulan Bulanan (Siklus Tgl 26 s.d. 25 atau Kalender Bulanan)
+        function calculateMonthlyHpp(logs, ratePerHour) {
+            // Mengelompokkan total jam per bulan (format "YYYY-MM")
+            const monthlyHours = {};
+            logs.forEach(l => {
+                if (!l.date) return;
+                const d = new Date(l.date);
+                let year = d.getFullYear();
+                let month = d.getMonth() + 1;
+                // Jika tanggal >= 26, masuk hitungan bulan berikutnya atau periode bulanan tersebut
+                if (d.getDate() >= 26) {
+                    month += 1;
+                    if (month > 12) { month = 1; year += 1; }
+                }
+                const periodKey = `${year}-${String(month).padStart(2, '0')}`;
+                monthlyHours[periodKey] = (monthlyHours[periodKey] || 0) + (Number(l.totalHours) || 0);
+            });
+
+            // Hitung HPP dengan aturan minimum 200 jam per bulan
+            let totalHppAlat = 0;
+            Object.values(monthlyHours).forEach(hours => {
+                const billableHours = hours < 200 ? 200 : hours;
+                totalHppAlat += billableHours * ratePerHour;
+            });
+
+            // Jika belum ada log sama sekali tapi ada data, default aman
+            if (Object.keys(monthlyHours).length === 0 && logs.length > 0) {
+                let totalH = logs.reduce((acc, l) => acc + (Number(l.totalHours) || 0), 0);
+                totalHppAlat = (totalH < 200 ? 200 : totalH) * ratePerHour;
+            }
+
+            return totalHppAlat;
+        }
+
         function renderMessDashboard() {
             let totalExcaHours = 0, totalExcaFuelVol = 0, totalExcaFuelCost = 0;
             excaLogs.forEach(l => {
@@ -820,8 +854,12 @@
             const dtRevenue = totalDtRit * (572000 / 10);
             const totalRevenue = excaRevenue + compactRevenue + dtRevenue;
 
-            const excaHpp = (totalExcaHours * 250000) + totalExcaFuelCost;
-            const compactHpp = (totalCompactHours * 210000) + totalCompactFuelCost;
+            // Perhitungan HPP dengan aturan minimum 200 jam/bulan per alat + Biaya Fuel Aktual + DT HPP
+            const excaHppAlat = calculateMonthlyHpp(excaLogs, 250000);
+            const compactHppAlat = calculateMonthlyHpp(compactLogs, 210000);
+
+            const excaHpp = excaHppAlat + totalExcaFuelCost;
+            const compactHpp = compactHppAlat + totalCompactFuelCost;
             const dtHpp = totalDtRit * 50000;
             const totalHpp = excaHpp + compactHpp + dtHpp;
 
@@ -832,8 +870,8 @@
             tbody.innerHTML = '';
 
             const items = [
-                { name: 'Excavator', vol: totalExcaHours.toFixed(1) + ' Jam', rev: excaRevenue, hpp: excaHpp },
-                { name: 'Compact Roller', vol: totalCompactHours.toFixed(1) + ' Jam', rev: compactRevenue, hpp: compactHpp },
+                { name: 'Excavator (HPP Alat Min 200j/bln + Fuel)', vol: totalExcaHours.toFixed(1) + ' Jam', rev: excaRevenue, hpp: excaHpp },
+                { name: 'Compact Roller (HPP Alat Min 200j/bln + Fuel)', vol: totalCompactHours.toFixed(1) + ' Jam', rev: compactRevenue, hpp: compactHpp },
                 { name: 'Dump Truck', vol: totalDtRit + ' Rit', rev: dtRevenue, hpp: dtHpp }
             ];
 
