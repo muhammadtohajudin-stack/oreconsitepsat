@@ -269,14 +269,15 @@
                             <h3 class="text-sm font-semibold text-white">Log Operasional Excavator</h3>
                             <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">HM Awal</th><th class="py-2.5 px-4 text-center">HM Akhir</th><th class="py-2.5 px-4 text-center">Total Jam</th><th class="py-2.5 px-4 text-center">Fuel</th><th class="py-2.5 px-4 text-right">Total Biaya</th><th class="py-2.5 px-4 text-center">Aksi</th></tr></thead>
+                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">HM Awal</th><th class="py-2.5 px-4 text-center">HM Akhir</th><th class="py-2.5 px-4 text-center">Total Jam</th><th class="py-2.5 px-4 text-center">Fuel (L)</th><th class="py-2.5 px-4 text-center">Konsumsi (L/Jam)</th><th class="py-2.5 px-4 text-right">Total Biaya</th><th class="py-2.5 px-4 text-center">Aksi</th></tr></thead>
                                     <tbody id="excaTableBody" class="divide-y divide-slate-700/50"></tbody>
                                 </table>
                             </div>
-                            <div class="grid grid-cols-3 gap-3 bg-slate-900 p-4 rounded-xl text-xs font-mono">
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900 p-4 rounded-xl text-xs font-mono">
                                 <div>Total Jam: <span id="sumExcaHours" class="text-cyan-400 font-bold">0.0 Jam</span></div>
                                 <div>Total Fuel: <span id="sumExcaFuel" class="text-amber-400 font-bold">0.0 Liter</span></div>
                                 <div>Total Biaya: <span id="sumExcaCost" class="text-emerald-400 font-bold">Rp 0</span></div>
+                                <div>Rata-rata Konsumsi: <span id="avgExcaCons" class="text-purple-400 font-bold">0.00 L/Jam</span></div>
                             </div>
                         </div>
                     </div>
@@ -298,14 +299,15 @@
                             <h3 class="text-sm font-semibold text-white">Log Operasional Compact Roller</h3>
                             <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">HM Awal</th><th class="py-2.5 px-4 text-center">HM Akhir</th><th class="py-2.5 px-4 text-center">Total Jam</th><th class="py-2.5 px-4 text-center">Fuel</th><th class="py-2.5 px-4 text-right">Total Biaya</th><th class="py-2.5 px-4 text-center">Aksi</th></tr></thead>
+                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">HM Awal</th><th class="py-2.5 px-4 text-center">HM Akhir</th><th class="py-2.5 px-4 text-center">Total Jam</th><th class="py-2.5 px-4 text-center">Fuel (L)</th><th class="py-2.5 px-4 text-center">Konsumsi (L/Jam)</th><th class="py-2.5 px-4 text-right">Total Biaya</th><th class="py-2.5 px-4 text-center">Aksi</th></tr></thead>
                                     <tbody id="compactTableBody" class="divide-y divide-slate-700/50"></tbody>
                                 </table>
                             </div>
-                            <div class="grid grid-cols-3 gap-3 bg-slate-900 p-4 rounded-xl text-xs font-mono">
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900 p-4 rounded-xl text-xs font-mono">
                                 <div>Total Jam: <span id="sumCompactHours" class="text-cyan-400 font-bold">0.0 Jam</span></div>
                                 <div>Total Fuel: <span id="sumCompactFuel" class="text-amber-400 font-bold">0.0 Liter</span></div>
                                 <div>Total Biaya: <span id="sumCompactCost" class="text-emerald-400 font-bold">Rp 0</span></div>
+                                <div>Rata-rata Konsumsi: <span id="avgCompactCons" class="text-purple-400 font-bold">0.00 L/Jam</span></div>
                             </div>
                         </div>
                     </div>
@@ -547,7 +549,7 @@
             document.getElementById(`subnav-${sub}`).className = "px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-600 text-white transition";
         }
 
-        // Form Submission Handlers (TETAP MENJAGA TANGGAL PILIHAN USER)
+        // Form Submission Handlers
         document.getElementById('transactionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const selectedDate = document.getElementById('trxDate').value;
@@ -562,7 +564,7 @@
             transactions.push(newTx);
             updateDashboard();
             this.reset();
-            document.getElementById('trxDate').value = selectedDate; // Tetap menjaga tanggal yang dipilih
+            document.getElementById('trxDate').value = selectedDate;
             await saveCloudData('transactions', newTx);
         });
 
@@ -581,7 +583,7 @@
             purchaseOrders.push(newPO);
             renderPOTable();
             this.reset();
-            document.getElementById('poDate').value = selectedDate; // Tetap menjaga tanggal yang dipilih
+            document.getElementById('poDate').value = selectedDate;
             await saveCloudData('po', newPO);
         });
 
@@ -592,12 +594,13 @@
             const hmAkhir = parseFloat(document.getElementById('excaHmAkhir').value) || 0;
             const fuelVol = parseFloat(document.getElementById('excaFuelVol').value) || 0;
             const fuelPrice = parseFloat(document.getElementById('excaFuelPrice').value) || 0;
+            const totalHours = hmAkhir - hmAwal;
 
             const log = {
                 id: Date.now(),
                 date: selectedDate,
                 hmAwal, hmAkhir,
-                totalHours: (hmAkhir - hmAwal),
+                totalHours: totalHours,
                 fuelVol, fuelPrice,
                 totalCost: (fuelVol * fuelPrice)
             };
@@ -605,7 +608,7 @@
             renderExcaTable();
             updateDashboard();
             this.reset();
-            document.getElementById('excaDate').value = selectedDate; // Tetap menjaga tanggal yang dipilih
+            document.getElementById('excaDate').value = selectedDate;
             await saveCloudData('exca', log);
         });
 
@@ -616,12 +619,13 @@
             const hmAkhir = parseFloat(document.getElementById('compactHmAkhir').value) || 0;
             const fuelVol = parseFloat(document.getElementById('compactFuelVol').value) || 0;
             const fuelPrice = parseFloat(document.getElementById('compactFuelPrice').value) || 0;
+            const totalHours = hmAkhir - hmAwal;
 
             const log = {
                 id: Date.now(),
                 date: selectedDate,
                 hmAwal, hmAkhir,
-                totalHours: (hmAkhir - hmAwal),
+                totalHours: totalHours,
                 fuelVol, fuelPrice,
                 totalCost: (fuelVol * fuelPrice)
             };
@@ -629,7 +633,7 @@
             renderCompactTable();
             updateDashboard();
             this.reset();
-            document.getElementById('compactDate').value = selectedDate; // Tetap menjaga tanggal yang dipilih
+            document.getElementById('compactDate').value = selectedDate;
             await saveCloudData('compact', log);
         });
 
@@ -647,7 +651,7 @@
             renderDtTable();
             updateDashboard();
             this.reset();
-            document.getElementById('dtDate').value = selectedDate; // Tetap menjaga tanggal yang dipilih
+            document.getElementById('dtDate').value = selectedDate;
             await saveCloudData('dt', log);
         });
 
@@ -691,18 +695,36 @@
             }
         }
 
-        // Render Functions
+        // Render Functions with Fuel Consumption per Hour
         function renderExcaTable() {
             const tbody = document.getElementById('excaTableBody');
             tbody.innerHTML = '';
             let sumH = 0, sumF = 0, sumC = 0;
             excaLogs.forEach(l => {
-                sumH += Number(l.totalHours); sumF += Number(l.fuelVol); sumC += Number(l.totalCost);
-                tbody.innerHTML += `<tr class="border-b border-slate-700/40"><td class="py-2.5 px-4 font-mono text-slate-300">${l.date}</td><td class="py-2.5 px-4 text-center font-mono">${Number(l.hmAwal).toFixed(1)}</td><td class="py-2.5 px-4 text-center font-mono">${Number(l.hmAkhir).toFixed(1)}</td><td class="py-2.5 px-4 text-center font-semibold text-cyan-400 font-mono">${Number(l.totalHours).toFixed(1)} Jam</td><td class="py-2.5 px-4 text-center font-mono text-amber-400">${Number(l.fuelVol).toFixed(1)} L</td><td class="py-2.5 px-4 text-right font-mono text-emerald-400">${formatIDR(l.totalCost)}</td><td class="py-2.5 px-4 text-center"><button onclick="deleteExcaLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+                const hours = Number(l.totalHours) || 0;
+                const fuel = Number(l.fuelVol) || 0;
+                const cost = Number(l.totalCost) || 0;
+                const cons = hours > 0 ? (fuel / hours) : 0;
+
+                sumH += hours; sumF += fuel; sumC += cost;
+
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-700/40">
+                        <td class="py-2.5 px-4 font-mono text-slate-300">${l.date}</td>
+                        <td class="py-2.5 px-4 text-center font-mono">${Number(l.hmAwal).toFixed(1)}</td>
+                        <td class="py-2.5 px-4 text-center font-mono">${Number(l.hmAkhir).toFixed(1)}</td>
+                        <td class="py-2.5 px-4 text-center font-semibold text-cyan-400 font-mono">${hours.toFixed(1)} Jam</td>
+                        <td class="py-2.5 px-4 text-center font-mono text-amber-400">${fuel.toFixed(1)} L</td>
+                        <td class="py-2.5 px-4 text-center font-mono text-purple-300">${cons > 0 ? cons.toFixed(2) + ' L/J' : '-'}</td>
+                        <td class="py-2.5 px-4 text-right font-mono text-emerald-400">${formatIDR(cost)}</td>
+                        <td class="py-2.5 px-4 text-center"><button onclick="deleteExcaLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
+                    </tr>`;
             });
+            const avgCons = sumH > 0 ? (sumF / sumH) : 0;
             document.getElementById('sumExcaHours').innerText = sumH.toFixed(1) + ' Jam';
-            document.getElementById('sumExcaFuel').innerText = sumF.toFixed(1) + ' L';
+            document.getElementById('sumExcaFuel').innerText = sumF.toFixed(1) + ' Liter';
             document.getElementById('sumExcaCost').innerText = formatIDR(sumC);
+            document.getElementById('avgExcaCons').innerText = avgCons.toFixed(2) + ' L/Jam';
         }
 
         function renderCompactTable() {
@@ -710,12 +732,30 @@
             tbody.innerHTML = '';
             let sumH = 0, sumF = 0, sumC = 0;
             compactLogs.forEach(l => {
-                sumH += Number(l.totalHours); sumF += Number(l.fuelVol); sumC += Number(l.totalCost);
-                tbody.innerHTML += `<tr class="border-b border-slate-700/40"><td class="py-2.5 px-4 font-mono text-slate-300">${l.date}</td><td class="py-2.5 px-4 text-center font-mono">${Number(l.hmAwal).toFixed(1)}</td><td class="py-2.5 px-4 text-center font-mono">${Number(l.hmAkhir).toFixed(1)}</td><td class="py-2.5 px-4 text-center font-semibold text-cyan-400 font-mono">${Number(l.totalHours).toFixed(1)} Jam</td><td class="py-2.5 px-4 text-center font-mono text-amber-400">${Number(l.fuelVol).toFixed(1)} L</td><td class="py-2.5 px-4 text-right font-mono text-emerald-400">${formatIDR(l.totalCost)}</td><td class="py-2.5 px-4 text-center"><button onclick="deleteCompactLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+                const hours = Number(l.totalHours) || 0;
+                const fuel = Number(l.fuelVol) || 0;
+                const cost = Number(l.totalCost) || 0;
+                const cons = hours > 0 ? (fuel / hours) : 0;
+
+                sumH += hours; sumF += fuel; sumC += cost;
+
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-700/40">
+                        <td class="py-2.5 px-4 font-mono text-slate-300">${l.date}</td>
+                        <td class="py-2.5 px-4 text-center font-mono">${Number(l.hmAwal).toFixed(1)}</td>
+                        <td class="py-2.5 px-4 text-center font-mono">${Number(l.hmAkhir).toFixed(1)}</td>
+                        <td class="py-2.5 px-4 text-center font-semibold text-cyan-400 font-mono">${hours.toFixed(1)} Jam</td>
+                        <td class="py-2.5 px-4 text-center font-mono text-amber-400">${fuel.toFixed(1)} L</td>
+                        <td class="py-2.5 px-4 text-center font-mono text-purple-300">${cons > 0 ? cons.toFixed(2) + ' L/J' : '-'}</td>
+                        <td class="py-2.5 px-4 text-right font-mono text-emerald-400">${formatIDR(cost)}</td>
+                        <td class="py-2.5 px-4 text-center"><button onclick="deleteCompactLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
+                    </tr>`;
             });
+            const avgCons = sumH > 0 ? (sumF / sumH) : 0;
             document.getElementById('sumCompactHours').innerText = sumH.toFixed(1) + ' Jam';
-            document.getElementById('sumCompactFuel').innerText = sumF.toFixed(1) + ' L';
+            document.getElementById('sumCompactFuel').innerText = sumF.toFixed(1) + ' Liter';
             document.getElementById('sumCompactCost').innerText = formatIDR(sumC);
+            document.getElementById('avgCompactCons').innerText = avgCons.toFixed(2) + ' L/Jam';
         }
 
         function renderDtTable() {
@@ -775,19 +815,11 @@
             document.getElementById('messKpiTotalHours').innerText = combinedHours.toFixed(1) + ' Jam';
             document.getElementById('messKpiFuelSummary').innerText = `Fuel: ${combinedFuelVol.toFixed(1)} L (${formatIDR(combinedFuelCost)})`;
 
-            // Pendapatan Kontrak Alat Berat:
-            // Exca: 576.000 / jam
-            // Compact: 675.000 / jam
-            // DT: 572.000 per 10 rit (57.200 per rit)
             const excaRevenue = totalExcaHours * 576000;
             const compactRevenue = totalCompactHours * 675000;
             const dtRevenue = totalDtRit * (572000 / 10);
             const totalRevenue = excaRevenue + compactRevenue + dtRevenue;
 
-            // HPP Aktual Alat Berat:
-            // Exca HPP: (250.000 * hours) + fuel cost aktual
-            // Compact HPP: (210.000 * hours) + fuel cost aktual
-            // DT HPP: 50.000 * ritase
             const excaHpp = (totalExcaHours * 250000) + totalExcaFuelCost;
             const compactHpp = (totalCompactHours * 210000) + totalCompactFuelCost;
             const dtHpp = totalDtRit * 50000;
@@ -796,7 +828,6 @@
             document.getElementById('messKpiRevenue').innerText = formatIDR(totalRevenue);
             document.getElementById('messKpiHpp').innerText = formatIDR(totalHpp);
 
-            // Render Comparison Table
             const tbody = document.getElementById('messComparisonTableBody');
             tbody.innerHTML = '';
 
