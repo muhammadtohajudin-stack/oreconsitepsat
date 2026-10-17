@@ -232,14 +232,22 @@
             <section id="tab-po" class="space-y-6 hidden">
                 <!-- MODUL PRE-ORDER MULTI-ITEM -->
                 <div id="module-po" class="space-y-6">
-                    <!-- Form Pembuatan PO Baru -->
+                    <!-- Form Pembuatan / Edit PO -->
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4">
-                        <h2 class="text-base font-semibold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-file-circle-plus text-cyan-400"></i> Buat Pre-Order (PO) Baru
-                        </h2>
+                        <div class="flex justify-between items-center">
+                            <h2 id="poFormTitle" class="text-base font-semibold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-file-circle-plus text-cyan-400"></i> Buat Pre-Order (PO) Baru
+                            </h2>
+                            <button type="button" id="cancelEditPoBtn" onclick="resetPoForm()" class="hidden text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">
+                                <i class="fa-solid fa-xmark"></i> Batal Edit
+                            </button>
+                        </div>
                         <form id="poForm" class="space-y-4">
-                            <!-- Header PO (No PO, Tanggal, Vendor) -->
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-900/60 p-4 rounded-xl border border-slate-700/50">
+                            <!-- Hidden ID untuk Edit PO -->
+                            <input type="hidden" id="editingPoId" value="">
+
+                            <!-- Header PO (No PO, Tanggal) -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-900/60 p-4 rounded-xl border border-slate-700/50">
                                 <div>
                                     <label class="block text-xs font-medium text-slate-300 mb-1">Nomor PO</label>
                                     <input type="text" id="poNumber" placeholder="PO/2026/001" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
@@ -248,13 +256,9 @@
                                     <label class="block text-xs font-medium text-slate-300 mb-1">Pilih Tanggal PO</label>
                                     <input type="date" id="poDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer focus:outline-none focus:border-cyan-500">
                                 </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-300 mb-1">Vendor / Supplier</label>
-                                    <input type="text" id="poVendor" placeholder="PT Vendor Utama" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
-                                </div>
                             </div>
 
-                            <!-- Dynamic Multi-Item List -->
+                            <!-- Dynamic Multi-Item List (Dengan Vendor & Status per Item) -->
                             <div class="space-y-2">
                                 <div class="flex justify-between items-center">
                                     <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Rincian Item Barang / Material</label>
@@ -266,12 +270,13 @@
                                     <table class="w-full text-left border-collapse text-xs">
                                         <thead>
                                             <tr class="bg-slate-900 border-b border-slate-700 text-slate-400">
-                                                <th class="py-2.5 px-3">Nama Barang / Material</th>
-                                                <th class="py-2.5 px-3">Spesifikasi</th>
-                                                <th class="py-2.5 px-3 w-28">Volume / Qty</th>
-                                                <th class="py-2.5 px-3 w-36 text-right">Harga Satuan (IDR)</th>
-                                                <th class="py-2.5 px-3 w-36 text-right">Subtotal (IDR)</th>
-                                                <th class="py-2.5 px-3 w-12 text-center">Aksi</th>
+                                                <th class="py-2.5 px-3 min-w-[150px]">Nama Barang / Material</th>
+                                                <th class="py-2.5 px-3 min-w-[130px]">Spesifikasi</th>
+                                                <th class="py-2.5 px-3 min-w-[150px]">Vendor / Supplier</th>
+                                                <th class="py-2.5 px-3 w-24">Volume/Qty</th>
+                                                <th class="py-2.5 px-3 w-32 text-right">Harga Total (IDR)</th>
+                                                <th class="py-2.5 px-3 min-w-[140px]">Status Item</th>
+                                                <th class="py-2.5 px-3 w-10 text-center">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody id="poItemsContainer" class="divide-y divide-slate-700/50">
@@ -284,14 +289,14 @@
                             <!-- PO Total Footer -->
                             <div class="flex flex-col sm:flex-row justify-between items-center bg-slate-900/80 p-4 rounded-xl border border-slate-700/50 gap-4">
                                 <div class="text-xs text-slate-400">
-                                    Total Item: <span id="poTotalItemsCount" class="font-bold text-white">0 Item</span>
+                                    Total Item Material: <span id="poTotalItemsCount" class="font-bold text-white">0 Item</span>
                                 </div>
                                 <div class="flex items-center gap-4">
                                     <div class="text-right">
                                         <p class="text-[10px] text-slate-400 uppercase">Total Keseluruhan PO</p>
                                         <p id="poGrandTotalDisplay" class="text-lg font-bold text-emerald-400 font-mono">Rp 0</p>
                                     </div>
-                                    <button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs shadow-md shadow-cyan-600/20 transition">
+                                    <button type="submit" id="poSubmitBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs shadow-md shadow-cyan-600/20 transition">
                                         Simpan PO Baru
                                     </button>
                                 </div>
@@ -299,12 +304,24 @@
                         </form>
                     </div>
 
-                    <!-- Tabel Ringkasan PO & Rincian Expandable -->
+                    <!-- Tabel Ringkasan PO & Filter Status Item -->
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4">
-                        <div class="flex justify-between items-center">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                             <h3 class="text-sm font-semibold text-white">Daftar Pre-Order (PO) Proyek</h3>
-                            <span id="poCount" class="text-xs bg-slate-700 text-slate-300 px-3 py-1 rounded-full">0 Dokumen PO</span>
+                            
+                            <!-- Filter Status -->
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-slate-400">Filter Status Item:</span>
+                                <select id="filterPoStatus" onchange="renderPOTable()" class="bg-slate-900 border border-slate-700 rounded-lg py-1 px-2.5 text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
+                                    <option value="ALL">Semua Status</option>
+                                    <option value="BELUM_PROSES">🟡 Ada Item Belum Diproses</option>
+                                    <option value="DALAM_PROSES">🔵 Ada Item Dalam Proses</option>
+                                    <option value="SELESAI">🟢 Semua Item Selesai</option>
+                                </select>
+                                <span id="poCount" class="text-xs bg-slate-700 text-slate-300 px-3 py-1 rounded-full">0 Dokumen PO</span>
+                            </div>
                         </div>
+
                         <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                             <table class="w-full text-left border-collapse text-xs sm:text-sm">
                                 <thead>
@@ -312,8 +329,8 @@
                                         <th class="py-3 px-4 w-10 text-center"></th>
                                         <th class="py-3 px-4">Nomor PO</th>
                                         <th class="py-3 px-4">Tanggal</th>
-                                        <th class="py-3 px-4">Vendor / Supplier</th>
                                         <th class="py-3 px-4 text-center">Jumlah Item</th>
+                                        <th class="py-3 px-4 text-center">Progres Status Item</th>
                                         <th class="py-3 px-4 text-right">Total Nilai PO</th>
                                         <th class="py-3 px-4 text-center">Aksi</th>
                                     </tr>
@@ -654,7 +671,7 @@
             }
         }
 
-        // ================= PO DYNAMIC MULTI-ITEM LOGIC =================
+        // ================= PO MULTI-ITEM (VENDOR & STATUS PER ITEM) =================
         function addPoItemRow(itemData = null) {
             const container = document.getElementById('poItemsContainer');
             const rowId = 'po-item-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
@@ -665,15 +682,24 @@
             
             const name = itemData ? itemData.itemName : '';
             const specs = itemData ? itemData.specs : '';
+            const vendor = itemData ? itemData.vendor : '';
             const volume = itemData ? itemData.volume : '';
             const price = itemData ? itemData.price : '';
+            const status = itemData ? itemData.status : 'BELUM_PROSES';
 
             tr.innerHTML = `
                 <td class="p-2"><input type="text" value="${name}" placeholder="Baja WF / Semen" required class="po-item-name w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
-                <td class="p-2"><input type="text" value="${specs}" placeholder="WF 250x125 / Tipe PCC" required class="po-item-specs w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
+                <td class="p-2"><input type="text" value="${specs}" placeholder="WF 250x125 / PCC" required class="po-item-specs w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
+                <td class="p-2"><input type="text" value="${vendor}" placeholder="PT. Vendor Utama" required class="po-item-vendor w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
                 <td class="p-2"><input type="text" value="${volume}" placeholder="10 Ton / 50 Sak" required class="po-item-volume w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
                 <td class="p-2"><input type="number" value="${price}" placeholder="15000000" min="0" required oninput="calculatePoTotals()" class="po-item-price w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white text-right font-mono focus:outline-none focus:border-cyan-500"></td>
-                <td class="p-2 text-right font-mono font-semibold text-emerald-400 po-item-subtotal">Rp 0</td>
+                <td class="p-2">
+                    <select class="po-item-status w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+                        <option value="BELUM_PROSES" ${status === 'BELUM_PROSES' ? 'selected' : ''}>🟡 Belum Diproses</option>
+                        <option value="DALAM_PROSES" ${status === 'DALAM_PROSES' ? 'selected' : ''}>🔵 Dalam Proses</option>
+                        <option value="SELESAI" ${status === 'SELESAI' ? 'selected' : ''}>🟢 Selesai</option>
+                    </select>
+                </td>
                 <td class="p-2 text-center">
                     <button type="button" onclick="removePoItemRow('${rowId}')" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
                 </td>
@@ -700,7 +726,6 @@
 
             rows.forEach(row => {
                 const price = parseFloat(row.querySelector('.po-item-price').value) || 0;
-                row.querySelector('.po-item-subtotal').innerText = formatIDR(price);
                 grandTotal += price;
             });
 
@@ -708,72 +733,154 @@
             document.getElementById('poGrandTotalDisplay').innerText = formatIDR(grandTotal);
         }
 
-        // Form Submit PO (Multi Item) + Otomatisasi Masuk ke Transaksi Pengeluaran
+        // Edit PO Handler
+        function editPO(poId) {
+            const po = purchaseOrders.find(p => p.id === poId);
+            if (!po) return;
+
+            document.getElementById('editingPoId').value = po.id;
+            document.getElementById('poNumber').value = po.poNumber || '';
+            document.getElementById('poDate').value = po.date || '';
+
+            // Ubah UI Form
+            document.getElementById('poFormTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Pre-Order (PO): ${po.poNumber || po.id}`;
+            document.getElementById('poSubmitBtn').innerText = "Perbarui Data PO";
+            document.getElementById('poSubmitBtn').className = "bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs shadow-md transition";
+            document.getElementById('cancelEditPoBtn').classList.remove('hidden');
+
+            // Render Item Rows
+            const container = document.getElementById('poItemsContainer');
+            container.innerHTML = '';
+            
+            const itemsArray = po.items || [{ itemName: po.itemName || '', specs: po.specs || '', vendor: po.vendor || '', volume: po.volume || '', price: po.total || 0, status: po.status || 'BELUM_PROSES' }];
+            itemsArray.forEach(item => addPoItemRow(item));
+
+            // Scroll ke Form Edit
+            document.getElementById('poForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetPoForm() {
+            document.getElementById('editingPoId').value = '';
+            document.getElementById('poForm').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('poDate').value = today;
+
+            document.getElementById('poFormTitle').innerHTML = `<i class="fa-solid fa-file-circle-plus text-cyan-400"></i> Buat Pre-Order (PO) Baru`;
+            document.getElementById('poSubmitBtn').innerText = "Simpan PO Baru";
+            document.getElementById('poSubmitBtn').className = "bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs shadow-md transition";
+            document.getElementById('cancelEditPoBtn').classList.add('hidden');
+
+            document.getElementById('poItemsContainer').innerHTML = '';
+            addPoItemRow();
+        }
+
+        // Form Submit PO (Simpan Baru / Update Edit) + Transaksi Otomatis
         document.getElementById('poForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            const editingId = document.getElementById('editingPoId').value;
             const selectedDate = document.getElementById('poDate').value;
             const poNum = document.getElementById('poNumber').value.trim();
-            const vendor = document.getElementById('poVendor').value.trim();
 
             const rows = document.querySelectorAll('#poItemsContainer tr');
             const itemsList = [];
             let totalAmount = 0;
+            const vendorSet = new Set();
 
             rows.forEach(row => {
                 const price = parseFloat(row.querySelector('.po-item-price').value) || 0;
+                const vendorName = row.querySelector('.po-item-vendor').value.trim();
+                vendorSet.add(vendorName);
+
                 itemsList.push({
                     itemName: row.querySelector('.po-item-name').value.trim(),
                     specs: row.querySelector('.po-item-specs').value.trim(),
+                    vendor: vendorName,
                     volume: row.querySelector('.po-item-volume').value.trim(),
-                    price: price
+                    price: price,
+                    status: row.querySelector('.po-item-status').value
                 });
                 totalAmount += price;
             });
 
-            const newPO = {
-                id: Date.now(),
-                poNumber: poNum,
-                date: selectedDate,
-                vendor: vendor,
-                items: itemsList,
-                total: totalAmount
-            };
+            const vendorsSummary = Array.from(vendorSet).join(', ');
 
-            purchaseOrders.push(newPO);
-            renderPOTable();
-            
-            // --- OTOMATISASI: Masukkan ke Catatan Transaksi Keuangan Dashboard ---
             const poCategoryName = "Pengadaan PO";
             if (!customCategoriesList.includes(poCategoryName)) {
                 customCategoriesList.push(poCategoryName);
                 localStorage.setItem(`orecon_custom_cats_${currentProjectId}`, JSON.stringify(customCategoriesList));
             }
 
-            const autoTx = {
-                id: Date.now() + 1, // Unique ID
-                date: selectedDate,
-                type: 'EXPENSE',
-                category: poCategoryName,
-                amount: totalAmount,
-                desc: `Pengadaan ${poNum} - ${vendor}`,
-                poRefId: newPO.id // Referensi ID PO
-            };
+            if (editingId) {
+                // EDIT / UPDATE EXISTING PO
+                const numericId = Number(editingId);
+                const index = purchaseOrders.findIndex(p => p.id === numericId);
+                if (index !== -1) {
+                    purchaseOrders[index] = {
+                        ...purchaseOrders[index],
+                        poNumber: poNum,
+                        date: selectedDate,
+                        items: itemsList,
+                        total: totalAmount
+                    };
 
-            transactions.push(autoTx);
+                    // Update Transaksi Pengeluaran Otomatis
+                    const txIndex = transactions.findIndex(t => t.poRefId === numericId);
+                    if (txIndex !== -1) {
+                        transactions[txIndex].amount = totalAmount;
+                        transactions[txIndex].date = selectedDate;
+                        transactions[txIndex].desc = `Pengadaan ${poNum} (${vendorsSummary})`;
+                        await saveCloudData('transactions', transactions[txIndex]);
+                    }
+
+                    await saveCloudData('po', purchaseOrders[index]);
+                    showToast(`PO ${poNum} berhasil diperbarui!`, 'success');
+                }
+            } else {
+                // SIMPAN PO BARU
+                const newPoId = Date.now();
+                const newPO = {
+                    id: newPoId,
+                    poNumber: poNum,
+                    date: selectedDate,
+                    items: itemsList,
+                    total: totalAmount
+                };
+
+                purchaseOrders.push(newPO);
+
+                const autoTx = {
+                    id: newPoId + 1,
+                    date: selectedDate,
+                    type: 'EXPENSE',
+                    category: poCategoryName,
+                    amount: totalAmount,
+                    desc: `Pengadaan ${poNum} (${vendorsSummary})`,
+                    poRefId: newPoId
+                };
+
+                transactions.push(autoTx);
+                await saveCloudData('po', newPO);
+                await saveCloudData('transactions', autoTx);
+                showToast(`PO ${poNum} berhasil dibuat & dicatat di Pengeluaran!`, 'success');
+            }
+
             populateFormDropdowns();
+            renderPOTable();
             updateDashboard();
-
-            // Reset Form & Kembalikan ke 1 row kosong
-            this.reset();
-            document.getElementById('poDate').value = selectedDate;
-            document.getElementById('poItemsContainer').innerHTML = '';
-            addPoItemRow();
-            
-            // Simpan PO dan Transaksi Otomatis ke Cloud Google Sheets
-            await saveCloudData('po', newPO);
-            await saveCloudData('transactions', autoTx);
-            showToast(`PO ${poNum} berhasil disimpan & dicatat di Pengeluaran!`, 'success');
+            resetPoForm();
         });
+
+        // Helper Status Badge
+        function getStatusBadge(status) {
+            switch(status) {
+                case 'SELESAI':
+                    return `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🟢 Selesai</span>`;
+                case 'DALAM_PROSES':
+                    return `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🔵 Dalam Proses</span>`;
+                default:
+                    return `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🟡 Belum Diproses</span>`;
+            }
+        }
 
         // Toggle Accordion Detail PO
         function togglePoDetail(poId) {
@@ -791,17 +898,41 @@
         function renderPOTable() {
             const tbody = document.getElementById('poTableBody');
             tbody.innerHTML = '';
-            document.getElementById('poCount').innerText = purchaseOrders.length + ' Dokumen PO';
+            
+            const filterVal = document.getElementById('filterPoStatus') ? document.getElementById('filterPoStatus').value : 'ALL';
+            
+            // Filter PO jika ada salah satu/seluruh item yang sesuai filter status
+            const filteredPOs = purchaseOrders.filter(p => {
+                if (filterVal === 'ALL') return true;
+                const itemsArray = p.items || [{ status: p.status || 'BELUM_PROSES' }];
+                if (filterVal === 'SELESAI') {
+                    return itemsArray.every(it => (it.status || 'BELUM_PROSES') === 'SELESAI');
+                }
+                return itemsArray.some(it => (it.status || 'BELUM_PROSES') === filterVal);
+            });
 
-            if (purchaseOrders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-500 italic">Belum ada dokumen Pre-Order (PO) yang tersimpan.</td></tr>`;
+            document.getElementById('poCount').innerText = filteredPOs.length + ' Dokumen PO';
+
+            if (filteredPOs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-500 italic">Belum ada dokumen Pre-Order (PO) yang sesuai filter.</td></tr>`;
                 return;
             }
 
-            purchaseOrders.forEach(po => {
-                const itemsCount = po.items ? po.items.length : 1;
-                const itemsArray = po.items || [{ itemName: po.itemName || '-', specs: po.specs || '-', volume: po.volume || '-', price: po.total || 0 }];
-                
+            filteredPOs.forEach(po => {
+                const itemsArray = po.items || [{ itemName: po.itemName || '-', specs: po.specs || '-', vendor: po.vendor || '-', volume: po.volume || '-', price: po.total || 0, status: po.status || 'BELUM_PROSES' }];
+                const itemsCount = itemsArray.length;
+
+                // Hitung Rincian Status Item
+                const finishedCount = itemsArray.filter(it => (it.status || 'BELUM_PROSES') === 'SELESAI').length;
+                let progressBadge = '';
+                if (finishedCount === itemsCount) {
+                    progressBadge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟢 Semua Selesai (${finishedCount}/${itemsCount})</span>`;
+                } else if (finishedCount > 0) {
+                    progressBadge = `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔵 ${finishedCount}/${itemsCount} Selesai</span>`;
+                } else {
+                    progressBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟡 Dalam Proses / Belum</span>`;
+                }
+
                 tbody.innerHTML += `
                     <!-- Row Ringkasan PO -->
                     <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition cursor-pointer" onclick="togglePoDetail(${po.id})">
@@ -810,15 +941,16 @@
                         </td>
                         <td class="py-3.5 px-4 font-bold text-cyan-400 font-mono">${po.poNumber || 'PO-' + po.id.toString().slice(-4)}</td>
                         <td class="py-3.5 px-4 font-mono text-slate-300 text-xs">${po.date}</td>
-                        <td class="py-3.5 px-4 font-medium text-white">${po.vendor}</td>
-                        <td class="py-3.5 px-4 text-center"><span class="bg-slate-700 text-cyan-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold">${itemsCount} Item</span></td>
+                        <td class="py-3.5 px-4 text-center"><span class="bg-slate-700 text-cyan-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold">${itemsCount} Item Material</span></td>
+                        <td class="py-3.5 px-4 text-center">${progressBadge}</td>
                         <td class="py-3.5 px-4 text-right text-emerald-400 font-mono font-bold">${formatIDR(po.total)}</td>
                         <td class="py-3.5 px-4 text-center" onclick="event.stopPropagation()">
-                            <button onclick="deletePO(${po.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                            <button onclick="editPO(${po.id})" title="Edit PO" class="text-amber-400 hover:text-amber-300 p-1 mr-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deletePO(${po.id})" title="Hapus PO" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
                         </td>
                     </tr>
                     
-                    <!-- Row Detail Expandable Rincian Barang -->
+                    <!-- Row Detail Expandable Rincian Barang per Item (Lengkap Vendor & Status) -->
                     <tr id="po-detail-${po.id}" class="hidden bg-slate-900/90 border-b border-slate-700/80">
                         <td colspan="7" class="p-4">
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
@@ -826,7 +958,7 @@
                                     <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                                         <i class="fa-solid fa-list-check text-cyan-400"></i> Rincian Barang / Material - ${po.poNumber || 'PO-' + po.id}
                                     </h4>
-                                    <span class="text-xs text-slate-400">Vendor: <strong class="text-slate-200">${po.vendor}</strong></span>
+                                    <span class="text-xs text-slate-400">Tanggal PO: <strong class="text-slate-200">${po.date}</strong></span>
                                 </div>
                                 <div class="overflow-x-auto">
                                     <table class="w-full text-left text-xs border-collapse">
@@ -835,8 +967,10 @@
                                                 <th class="py-1.5 px-2">No</th>
                                                 <th class="py-1.5 px-2">Nama Barang / Material</th>
                                                 <th class="py-1.5 px-2">Spesifikasi</th>
+                                                <th class="py-1.5 px-2">Vendor / Supplier</th>
                                                 <th class="py-1.5 px-2 text-center">Volume / Qty</th>
                                                 <th class="py-1.5 px-2 text-right">Harga Total Item</th>
+                                                <th class="py-1.5 px-2 text-center">Status Item</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-slate-800/60 text-slate-300">
@@ -845,8 +979,10 @@
                                                     <td class="py-2 px-2 text-slate-500 font-mono">${idx + 1}</td>
                                                     <td class="py-2 px-2 font-semibold text-white">${it.itemName}</td>
                                                     <td class="py-2 px-2 text-slate-400">${it.specs}</td>
-                                                    <td class="py-2 px-2 text-center font-mono text-cyan-300">${it.volume}</td>
+                                                    <td class="py-2 px-2 text-cyan-300 font-medium">${it.vendor || '-'}</td>
+                                                    <td class="py-2 px-2 text-center font-mono text-slate-200">${it.volume}</td>
                                                     <td class="py-2 px-2 text-right font-mono text-emerald-400">${formatIDR(it.price)}</td>
+                                                    <td class="py-2 px-2 text-center">${getStatusBadge(it.status || 'BELUM_PROSES')}</td>
                                                 </tr>
                                             `).join('')}
                                         </tbody>
@@ -966,7 +1102,7 @@
             await saveCloudData('dt', log);
         });
 
-        // Delete Handlers (Hapus PO juga otomatis menghapus transaksi terkait di Dashboard)
+        // Delete Handlers
         async function deleteTransaction(id) {
             if (confirm('Hapus transaksi ini?')) {
                 transactions = transactions.filter(t => t.id !== id);
@@ -976,7 +1112,6 @@
         }
         async function deletePO(id) {
             if (confirm('Hapus PO ini beserta catatan pengeluarannya di Dashboard?')) {
-                // Hapus transaksi otomatis terkait PO jika ada
                 const relatedTx = transactions.find(t => t.poRefId === id);
                 if (relatedTx) {
                     transactions = transactions.filter(t => t.poRefId !== id);
