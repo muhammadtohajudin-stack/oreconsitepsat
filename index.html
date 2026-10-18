@@ -186,15 +186,20 @@
                     </div>
                 </div>
 
-                <!-- Form Transaksi Keuangan (Sporthall) dengan Fitur Edit -->
+                <!-- Form Transaksi Keuangan (Sporthall) dengan Manajemen Kategori Kustom -->
                 <div id="sporthallTxFormWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
-                    <div class="flex justify-between items-center mb-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
                         <h2 id="trxFormTitle" class="text-base font-semibold text-white flex items-center gap-2">
                             <i class="fa-solid fa-square-plus text-cyan-400"></i> Catat Transaksi Keuangan Baru
                         </h2>
-                        <button type="button" id="cancelEditTxBtn" onclick="resetTxForm()" class="hidden text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">
-                            <i class="fa-solid fa-xmark"></i> Batal Edit
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="openCategoryManagerModal()" class="text-xs bg-slate-700 hover:bg-slate-600 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5">
+                                <i class="fa-solid fa-layer-group"></i> Kelola Kategori
+                            </button>
+                            <button type="button" id="cancelEditTxBtn" onclick="resetTxForm()" class="hidden text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">
+                                <i class="fa-solid fa-xmark"></i> Batal Edit
+                            </button>
+                        </div>
                     </div>
                     <form id="transactionForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                         <input type="hidden" id="editingTxId" value="">
@@ -448,6 +453,43 @@
             </section>
         </main>
 
+        <!-- MODAL KELOLA KATEGORI (TAMBAH & HAPUS KATEGORI) -->
+        <div id="categoryModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+                <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group text-cyan-400"></i> Kelola Kategori / Pos Pekerjaan
+                    </h3>
+                    <button onclick="closeCategoryManagerModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+
+                <!-- Form Tambah Kategori Baru -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-medium text-slate-300">Tambah Kategori Kustom Baru:</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="newCategoryInput" placeholder="Misal: Biaya Operasional Kendaraan" class="flex-grow bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                        <button onclick="addNewCategoryFromModal()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold px-4 py-2.5 rounded-xl text-xs transition flex-shrink-0">
+                            <i class="fa-solid fa-plus"></i> Tambah
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Daftar Kategori Yang Ada -->
+                <div class="space-y-2 pt-2">
+                    <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider">Daftar Kategori Terdaftar:</label>
+                    <div id="categoryListContainer" class="max-h-60 overflow-y-auto space-y-1.5 pr-1">
+                        <!-- Items rendered by JS -->
+                    </div>
+                </div>
+
+                <div class="pt-2 border-t border-slate-700 flex justify-end">
+                    <button onclick="closeCategoryManagerModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold px-4 py-2 rounded-xl text-xs transition">
+                        Selesai
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Footer -->
         <footer class="bg-slate-800 border-t border-slate-700 py-4 text-center text-xs text-slate-500">
             Dashboard Cost Control Proyek &copy; 2026 PT. Orecon Putra Perkasa - All Rights Reserved
@@ -679,6 +721,80 @@
             }
         }
 
+        // ================= KELOLA KATEGORI MODAL LOGIC =================
+        function openCategoryManagerModal() {
+            renderModalCategoryList();
+            document.getElementById('categoryModal').classList.remove('hidden');
+        }
+
+        function closeCategoryManagerModal() {
+            document.getElementById('categoryModal').classList.add('hidden');
+            document.getElementById('newCategoryInput').value = '';
+        }
+
+        function renderModalCategoryList() {
+            const container = document.getElementById('categoryListContainer');
+            container.innerHTML = '';
+
+            // Render Default RAP Categories
+            Object.keys(initialBudgets).forEach(cat => {
+                container.innerHTML += `
+                    <div class="flex justify-between items-center bg-slate-900/80 p-2.5 rounded-xl border border-slate-700/60 text-xs">
+                        <span class="text-white font-medium">${cat}</span>
+                        <span class="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full font-semibold">Standar RAP</span>
+                    </div>
+                `;
+            });
+
+            // Render Custom Categories
+            customCategoriesList.forEach((cat, idx) => {
+                container.innerHTML += `
+                    <div class="flex justify-between items-center bg-slate-900/80 p-2.5 rounded-xl border border-slate-700/60 text-xs">
+                        <span class="text-amber-300 font-medium">${cat}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full font-semibold">Kustom</span>
+                            <button onclick="deleteCustomCategory(${idx})" class="text-red-400 hover:text-red-300 p-1" title="Hapus Kategori"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addNewCategoryFromModal() {
+            const input = document.getElementById('newCategoryInput');
+            const catName = input.value.trim();
+            if (!catName) {
+                alert('Nama kategori tidak boleh kosong!');
+                return;
+            }
+            if (initialBudgets[catName] || customCategoriesList.includes(catName)) {
+                alert('Kategori ini sudah ada!');
+                return;
+            }
+
+            customCategoriesList.push(catName);
+            localStorage.setItem(`orecon_custom_cats_${currentProjectId}`, JSON.stringify(customCategoriesList));
+            input.value = '';
+
+            populateFormDropdowns();
+            renderModalCategoryList();
+            updateDashboard();
+            showToast(`Kategori "${catName}" berhasil ditambahkan!`, 'success');
+        }
+
+        function deleteCustomCategory(idx) {
+            const catName = customCategoriesList[idx];
+            if (confirm(`Apakah Anda yakin ingin menghapus kategori kustom "${catName}"?`)) {
+                customCategoriesList.splice(idx, 1);
+                localStorage.setItem(`orecon_custom_cats_${currentProjectId}`, JSON.stringify(customCategoriesList));
+
+                populateFormDropdowns();
+                renderModalCategoryList();
+                updateDashboard();
+                showToast(`Kategori "${catName}" dihapus!`, 'info');
+            }
+        }
+
         // ================= EDIT TRANSAKSI KEUANGAN LOGIC =================
         function editTransaction(txId) {
             const tx = transactions.find(t => t.id === txId);
@@ -690,7 +806,6 @@
             document.getElementById('trxAmount').value = tx.amount || '';
             document.getElementById('trxDesc').value = tx.desc || '';
 
-            // Handle Kategori
             const catSelect = document.getElementById('trxCategory');
             const customInput = document.getElementById('trxCustomCategory');
             
@@ -705,7 +820,6 @@
                 customInput.required = true;
             }
 
-            // Update UI Form
             document.getElementById('trxFormTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Transaksi Keuangan`;
             document.getElementById('trxSubmitBtn').innerText = "Perbarui Transaksi";
             document.getElementById('trxSubmitBtn').className = "w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-md";
@@ -750,7 +864,6 @@
             }
 
             if (editingId) {
-                // EDIT / UPDATE TRANSAKSI
                 const numericId = Number(editingId);
                 const index = transactions.findIndex(t => t.id === numericId);
                 if (index !== -1) {
@@ -766,7 +879,6 @@
                     showToast('Transaksi berhasil diperbarui!', 'success');
                 }
             } else {
-                // SIMPAN TRANSAKSI BARU
                 const newTx = {
                     id: Date.now(),
                     date: selectedDate,
@@ -1214,7 +1326,7 @@
             }
         }
 
-        // Render Functions with Fuel Consumption per Hour
+        // Render Functions
         function renderExcaTable() {
             const tbody = document.getElementById('excaTableBody');
             tbody.innerHTML = '';
@@ -1414,7 +1526,6 @@
             renderCharts();
         }
 
-        // Render Table dengan Tombol Edit Transaksi
         function renderTable() {
             const tbody = document.getElementById('transactionTableBody');
             if (!tbody) return;
