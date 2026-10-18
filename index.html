@@ -102,7 +102,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center gap-4">
                 <div>
                     <h2 id="pageTitle" class="text-base sm:text-lg font-bold text-white tracking-tight">Proyek Sporthall Indoor</h2>
-                    <p class="text-xs text-slate-400">Nilai Kontrak Proyek: <span id="headerContractVal" class="text-cyan-400 font-semibold">Rp 10.802.640.000</span></p>
+                    <p id="headerContractWrapper" class="text-xs text-slate-400">Nilai Kontrak Proyek: <span id="headerContractVal" class="text-cyan-400 font-semibold">Rp 10.802.640.000</span></p>
                 </div>
                 <div class="flex items-center gap-2.5">
                     <button onclick="syncDataFromCloud()" title="Sinkronisasi Data" class="px-3 py-2 text-xs bg-slate-700 hover:bg-slate-600 text-cyan-300 rounded-lg transition font-medium flex items-center gap-1.5 border border-slate-600">
@@ -141,12 +141,8 @@
                     </div>
                 </div>
 
-                <!-- Executive Summary Cards Grid (Penataan Lahan Mess) -->
+                <!-- Executive Summary Cards Grid (Penataan Lahan Mess) - 4 Kartu KPI Ringkasan -->
                 <div id="kpi-grid-mess" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 hidden">
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Nilai Kontrak Utama</p>
-                        <h3 id="messKpiContract" class="text-2xl font-bold text-white mt-2">Rp 0</h3>
-                    </div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Total Jam Exca & Compact</p>
                         <h3 id="messKpiTotalHours" class="text-2xl font-bold text-cyan-400 mt-2">0.0 Jam</h3>
@@ -155,12 +151,17 @@
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Total Pendapatan Kontrak</p>
                         <h3 id="messKpiRevenue" class="text-2xl font-bold text-emerald-400 mt-2">Rp 0</h3>
-                        <p class="text-xs text-slate-400 mt-1">Berdasarkan tarif alat berat</p>
+                        <p class="text-xs text-slate-400 mt-1">Berdasarkan tarif satuan jam/rit</p>
                     </div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Total HPP Alat Berat</p>
                         <h3 id="messKpiHpp" class="text-2xl font-bold text-amber-400 mt-2">Rp 0</h3>
                         <p class="text-xs text-slate-400 mt-1">Min 200 Jam/Bulan + Fuel + DT</p>
+                    </div>
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Total Proyeksi Margin (Net)</p>
+                        <h3 id="messKpiMargin" class="text-2xl font-bold text-cyan-400 mt-2">Rp 0</h3>
+                        <p id="messKpiMarginPct" class="text-xs text-cyan-400 mt-1">0.0% Margin</p>
                     </div>
                 </div>
 
@@ -445,7 +446,7 @@
                             <h3 class="text-sm font-semibold text-white">Log Operasional Excavator</h3>
                             <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">HM Awal</th><th class="py-2.5 px-4 text-center">HM Akhir</th><th class="py-2.5 px-4 text-center">Total Jam</th><th class="py-2.5 px-4 text-center">Fuel (L)</th><th class="py-2.5 px-4 text-center">Konsumsi (L/Jam)</th><th class="py-2.5 px-4 text-right">Total Biaya</th><th class="py-2.5 px-4 text-center">Aksi</th></tr></thead>
+                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">HM Awal</th><th class="py-2.5 px-4 text-center">HM Akhir</th><th class="py-2.5 px-4 text-center">Total Jam</th><th class="py-2.5 px-4 text-center">Fuel (L)</th><th class="py-2.5 px-4 text-center">Konsumsi (L/Jam)</th><th class="py-2.5 px-4 text-right">Total Biaya Fuel</th><th class="py-2.5 px-4 text-center">Aksi</th></tr></thead>
                                     <tbody id="excaTableBody" class="divide-y divide-slate-700/50"></tbody>
                                 </table>
                             </div>
@@ -475,7 +476,7 @@
                             <h3 class="text-sm font-semibold text-white">Log Operasional Compact Roller</h3>
                             <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">HM Awal</th><th class="py-2.5 px-4 text-center">HM Akhir</th><th class="py-2.5 px-4 text-center">Total Jam</th><th class="py-2.5 px-4 text-center">Fuel (L)</th><th class="py-2.5 px-4 text-center">Konsumsi (L/Jam)</th><th class="py-2.5 px-4 text-right">Total Biaya</th><th class="py-2.5 px-4 text-center">Aksi</th></tr></thead>
+                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">HM Awal</th><th class="py-2.5 px-4 text-center">HM Akhir</th><th class="py-2.5 px-4 text-center">Total Jam</th><th class="py-2.5 px-4 text-center">Fuel (L)</th><th class="py-2.5 px-4 text-center">Konsumsi (L/Jam)</th><th class="py-2.5 px-4 text-right">Total Biaya Fuel</th><th class="py-2.5 px-4 text-center">Aksi</th></tr></thead>
                                     <tbody id="compactTableBody" class="divide-y divide-slate-700/50"></tbody>
                                 </table>
                             </div>
@@ -495,7 +496,7 @@
                             <form id="dtForm" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div><label class="block text-xs text-slate-300 mb-1">Pilih Tanggal</label><input type="date" id="dtDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">Jumlah Ritase (Rit)</label><input type="number" id="dtRitase" required min="1" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div><label class="block text-xs text-slate-300 mb-1">Harga / Rit (IDR)</label><input type="number" id="dtPrice" required min="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                                <div><label class="block text-xs text-slate-300 mb-1">HPP / Rit Vendor (IDR)</label><input type="number" id="dtPrice" placeholder="50000" required min="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div class="sm:col-span-3 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs">Simpan Record Ritase</button></div>
                             </form>
                         </div>
@@ -503,13 +504,14 @@
                             <h3 class="text-sm font-semibold text-white">Log Ritase Dump Truck</h3>
                             <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">Jumlah Rit</th><th class="py-2.5 px-4 text-right">Harga/Rit</th><th class="py-2.5 px-4 text-right">Total Biaya</th><th class="py-2.5 px-4 text-center">Aksi</th></tr></thead>
+                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">Jumlah Rit</th><th class="py-2.5 px-4 text-center">Konversi Jam (8 Rit/J)</th><th class="py-2.5 px-4 text-right">HPP Vendor</th><th class="py-2.5 px-4 text-center">Aksi</th></tr></thead>
                                     <tbody id="dtTableBody" class="divide-y divide-slate-700/50"></tbody>
                                 </table>
                             </div>
-                            <div class="grid grid-cols-2 gap-3 bg-slate-900 p-4 rounded-xl text-xs font-mono">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-slate-900 p-4 rounded-xl text-xs font-mono">
                                 <div>Total Ritase: <span id="sumDtRitase" class="text-cyan-400 font-bold">0 Rit</span></div>
-                                <div>Total Biaya: <span id="sumDtCost" class="text-emerald-400 font-bold">Rp 0</span></div>
+                                <div>Total Jam DT: <span id="sumDtHours" class="text-cyan-400 font-bold">0.00 Jam</span></div>
+                                <div>Total HPP DT: <span id="sumDtCost" class="text-amber-400 font-bold">Rp 0</span></div>
                             </div>
                         </div>
                     </div>
@@ -577,7 +579,7 @@
             },
             mess: {
                 name: "Penataan Lahan Mess",
-                contractValue: 270000000
+                contractValue: 0
             }
         };
 
@@ -670,6 +672,7 @@
             const sporthallTx = document.getElementById('sporthallTxFormWrapper');
             const sporthallCharts = document.getElementById('sporthallChartsWrapper');
             const sporthallLedger = document.getElementById('sporthallLedgerWrapper');
+            const headerContractWrapper = document.getElementById('headerContractWrapper');
 
             if (projId === 'mess') {
                 navPoText.innerText = "Alat Berat & Ritase DT";
@@ -680,6 +683,7 @@
                 sporthallTx.classList.add('hidden');
                 sporthallCharts.classList.add('hidden');
                 sporthallLedger.classList.add('hidden');
+                headerContractWrapper.classList.add('hidden');
             } else {
                 navPoText.innerText = "Manajemen Pre-Order (PO)";
                 navPoIcon.className = "fa-solid fa-file-invoice-dollar w-4 text-center";
@@ -689,10 +693,11 @@
                 sporthallTx.classList.remove('hidden');
                 sporthallCharts.classList.remove('hidden');
                 sporthallLedger.classList.remove('hidden');
+                headerContractWrapper.classList.remove('hidden');
+                document.getElementById('headerContractVal').innerText = formatIDR(currentContractValue);
             }
 
             document.getElementById('pageTitle').innerText = projectsData[projId].name;
-            document.getElementById('headerContractVal').innerText = formatIDR(currentContractValue);
             
             await syncDataFromCloud();
         }
@@ -1445,12 +1450,25 @@
         function renderDtTable() {
             const tbody = document.getElementById('dtTableBody');
             tbody.innerHTML = '';
-            let sumR = 0, sumC = 0;
+            let sumR = 0, sumC = 0, sumH = 0;
             dtLogs.forEach(l => {
-                sumR += Number(l.ritase); sumC += Number(l.totalCost);
-                tbody.innerHTML += `<tr class="border-b border-slate-700/40"><td class="py-2.5 px-4 font-mono text-slate-300">${l.date}</td><td class="py-2.5 px-4 text-center font-bold text-cyan-400 font-mono">${l.ritase} Rit</td><td class="py-2.5 px-4 text-right font-mono text-slate-300">${formatIDR(l.price)}</td><td class="py-2.5 px-4 text-right font-mono text-emerald-400">${formatIDR(l.totalCost)}</td><td class="py-2.5 px-4 text-center"><button onclick="deleteDtLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+                const rit = Number(l.ritase) || 0;
+                const hours = rit / 8;
+                sumR += rit;
+                sumH += hours;
+                sumC += Number(l.totalCost) || 0;
+                
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-700/40">
+                        <td class="py-2.5 px-4 font-mono text-slate-300">${l.date}</td>
+                        <td class="py-2.5 px-4 text-center font-bold text-cyan-400 font-mono">${rit} Rit</td>
+                        <td class="py-2.5 px-4 text-center font-mono text-slate-300">${hours.toFixed(2)} Jam</td>
+                        <td class="py-2.5 px-4 text-right font-mono text-amber-400">${formatIDR(l.totalCost)}</td>
+                        <td class="py-2.5 px-4 text-center"><button onclick="deleteDtLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
+                    </tr>`;
             });
             document.getElementById('sumDtRitase').innerText = sumR + ' Rit';
+            document.getElementById('sumDtHours').innerText = sumH.toFixed(2) + ' Jam';
             document.getElementById('sumDtCost').innerText = formatIDR(sumC);
         }
 
@@ -1506,42 +1524,63 @@
                 totalCompactFuelCost += Number(l.totalCost) || 0;
             });
 
-            let totalDtRit = 0;
+            let totalDtRit = 0, totalDtVendorHpp = 0;
             dtLogs.forEach(l => {
                 totalDtRit += Number(l.ritase) || 0;
+                totalDtVendorHpp += Number(l.totalCost) || 0;
             });
 
+            const totalDtHours = totalDtRit / 8;
             const combinedHours = totalExcaHours + totalCompactHours;
             const combinedFuelVol = totalExcaFuelVol + totalCompactFuelVol;
             const combinedFuelCost = totalExcaFuelCost + totalCompactFuelCost;
 
-            document.getElementById('messKpiContract').innerText = formatIDR(currentContractValue);
             document.getElementById('messKpiTotalHours').innerText = combinedHours.toFixed(1) + ' Jam';
             document.getElementById('messKpiFuelSummary').innerText = `Fuel: ${combinedFuelVol.toFixed(1)} L (${formatIDR(combinedFuelCost)})`;
 
-            const excaRevenue = totalExcaHours * 576000;
-            const compactRevenue = totalCompactHours * 675000;
-            const dtRevenue = totalDtRit * (572000 / 10);
+            // TARIF SATUAN KONTRAK:
+            const excaRevenue = totalExcaHours * 669500;
+            const compactRevenue = totalCompactHours * 571000;
+            const dtRevenue = totalDtHours * 566300;
             const totalRevenue = excaRevenue + compactRevenue + dtRevenue;
 
+            // HPP Operasional Aktual:
             const excaHppAlat = calculateMonthlyHpp(excaLogs, 250000);
             const compactHppAlat = calculateMonthlyHpp(compactLogs, 210000);
 
             const excaHpp = excaHppAlat + totalExcaFuelCost;
             const compactHpp = compactHppAlat + totalCompactFuelCost;
-            const dtHpp = totalDtRit * 50000;
+            const dtHpp = totalDtVendorHpp;
             const totalHpp = excaHpp + compactHpp + dtHpp;
+
+            // PENAMBAHAN KALKULASI MARGIN
+            const totalMargin = totalRevenue - totalHpp;
+            const marginPct = totalRevenue > 0 ? (totalMargin / totalRevenue) * 100 : 0;
 
             document.getElementById('messKpiRevenue').innerText = formatIDR(totalRevenue);
             document.getElementById('messKpiHpp').innerText = formatIDR(totalHpp);
+            
+            // UPDATE KARTU KPI TOTAL MARGIN
+            const marginEl = document.getElementById('messKpiMargin');
+            const marginPctEl = document.getElementById('messKpiMarginPct');
+            marginEl.innerText = formatIDR(totalMargin);
+            marginPctEl.innerText = `${marginPct.toFixed(1)}% dari Pendapatan`;
+
+            if (totalMargin >= 0) {
+                marginEl.className = "text-2xl font-bold text-cyan-400 mt-2";
+                marginPctEl.className = "text-xs text-cyan-400 mt-1";
+            } else {
+                marginEl.className = "text-2xl font-bold text-red-400 mt-2";
+                marginPctEl.className = "text-xs text-red-400 mt-1";
+            }
 
             const tbody = document.getElementById('messComparisonTableBody');
             tbody.innerHTML = '';
 
             const items = [
-                { name: 'Excavator (HPP Alat Min 200j/bln + Fuel)', vol: totalExcaHours.toFixed(1) + ' Jam', rev: excaRevenue, hpp: excaHpp },
-                { name: 'Compact Roller (HPP Alat Min 200j/bln + Fuel)', vol: totalCompactHours.toFixed(1) + ' Jam', rev: compactRevenue, hpp: compactHpp },
-                { name: 'Dump Truck', vol: totalDtRit + ' Rit', rev: dtRevenue, hpp: dtHpp }
+                { name: 'Excavator (Rp 669.500/Jam Inc. Fuel)', vol: totalExcaHours.toFixed(1) + ' Jam', rev: excaRevenue, hpp: excaHpp },
+                { name: 'Compact Roller (Rp 571.000/Jam Inc. Fuel)', vol: totalCompactHours.toFixed(1) + ' Jam', rev: compactRevenue, hpp: compactHpp },
+                { name: 'Dump Truck (Rp 566.300/Jam @ 8 Rit/Jam)', vol: `${totalDtRit} Rit (${totalDtHours.toFixed(2)} Jam)`, rev: dtRevenue, hpp: dtHpp }
             ];
 
             items.forEach(item => {
