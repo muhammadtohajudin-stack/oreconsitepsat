@@ -186,7 +186,7 @@
                     </div>
                 </div>
 
-                <!-- Form Transaksi Keuangan (Sporthall) dengan Manajemen Kategori Kustom -->
+                <!-- Form Transaksi Keuangan (Sporthall) dengan Kelola Kategori Penuh -->
                 <div id="sporthallTxFormWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
                         <h2 id="trxFormTitle" class="text-base font-semibold text-white flex items-center gap-2">
@@ -225,11 +225,11 @@
 
                 <!-- Charts Grid (Sporthall) -->
                 <div id="sporthallChartsWrapper" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card"><h3 class="text-sm font-semibold text-white mb-4">Cost Control (RAP vs Realisasi)</h3><div class="relative h-64"><canvas id="costControlChart"></canvas></div></div>
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card"><h3 class="text-sm font-semibold text-white mb-4">Cost Control (Realisasi per Kategori)</h3><div class="relative h-64"><canvas id="costControlChart"></canvas></div></div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card"><h3 class="text-sm font-semibold text-white mb-4">Akumulasi Cashflow</h3><div class="relative h-64"><canvas id="cashflowChart"></canvas></div></div>
                 </div>
 
-                <!-- Ledger Table (Sporthall) dengan Fitur Edit -->
+                <!-- Ledger Table (Sporthall) -->
                 <div id="sporthallLedgerWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                     <div class="flex justify-between items-center mb-4"><h2 class="text-base font-semibold text-white">Jurnal Transaksi Keuangan</h2><span id="txCount" class="text-xs bg-slate-700 text-slate-300 px-3 py-1 rounded-full">0 Transaksi</span></div>
                     <div class="overflow-x-auto rounded-xl border border-slate-700/50">
@@ -256,10 +256,9 @@
                             </button>
                         </div>
                         <form id="poForm" class="space-y-4">
-                            <!-- Hidden ID untuk Edit PO -->
                             <input type="hidden" id="editingPoId" value="">
 
-                            <!-- Header PO (No PO, Tanggal) -->
+                            <!-- Header PO -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-900/60 p-4 rounded-xl border border-slate-700/50">
                                 <div>
                                     <label class="block text-xs font-medium text-slate-300 mb-1">Nomor PO</label>
@@ -271,7 +270,7 @@
                                 </div>
                             </div>
 
-                            <!-- Dynamic Multi-Item List (Dengan Vendor & Status per Item) -->
+                            <!-- Dynamic Multi-Item List -->
                             <div class="space-y-2">
                                 <div class="flex justify-between items-center">
                                     <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Rincian Item Barang / Material</label>
@@ -292,9 +291,7 @@
                                                 <th class="py-2.5 px-3 w-10 text-center">Aksi</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="poItemsContainer" class="divide-y divide-slate-700/50">
-                                            <!-- Row akan di-generate via JavaScript -->
-                                        </tbody>
+                                        <tbody id="poItemsContainer" class="divide-y divide-slate-700/50"></tbody>
                                     </table>
                                 </div>
                             </div>
@@ -317,12 +314,10 @@
                         </form>
                     </div>
 
-                    <!-- Tabel Ringkasan PO & Filter Status Item -->
+                    <!-- Tabel Ringkasan PO -->
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                             <h3 class="text-sm font-semibold text-white">Daftar Pre-Order (PO) Proyek</h3>
-                            
-                            <!-- Filter Status -->
                             <div class="flex items-center gap-2">
                                 <span class="text-xs text-slate-400">Filter Status Item:</span>
                                 <select id="filterPoStatus" onchange="renderPOTable()" class="bg-slate-900 border border-slate-700 rounded-lg py-1 px-2.5 text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
@@ -348,9 +343,7 @@
                                         <th class="py-3 px-4 text-center">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="poTableBody" class="divide-y divide-slate-700/50">
-                                    <!-- Ringkasan & Detail PO Rendered Here -->
-                                </tbody>
+                                <tbody id="poTableBody" class="divide-y divide-slate-700/50"></tbody>
                             </table>
                         </div>
                     </div>
@@ -453,7 +446,7 @@
             </section>
         </main>
 
-        <!-- MODAL KELOLA KATEGORI (TAMBAH & HAPUS KATEGORI) -->
+        <!-- MODAL KELOLA KATEGORI (SEPENUHNYA FLEKSIBEL - TANPA KATEGORI BAWAAN KAKU) -->
         <div id="categoryModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
             <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -465,9 +458,9 @@
 
                 <!-- Form Tambah Kategori Baru -->
                 <div class="space-y-2">
-                    <label class="block text-xs font-medium text-slate-300">Tambah Kategori Kustom Baru:</label>
+                    <label class="block text-xs font-medium text-slate-300">Tambah Kategori Pekerjaan Baru:</label>
                     <div class="flex gap-2">
-                        <input type="text" id="newCategoryInput" placeholder="Misal: Biaya Operasional Kendaraan" class="flex-grow bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                        <input type="text" id="newCategoryInput" placeholder="Misal: Pekerjaan Struktur / Overhead" class="flex-grow bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
                         <button onclick="addNewCategoryFromModal()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold px-4 py-2.5 rounded-xl text-xs transition flex-shrink-0">
                             <i class="fa-solid fa-plus"></i> Tambah
                         </button>
@@ -509,18 +502,11 @@
         const projectsData = {
             sporthall: {
                 name: "Proyek Sporthall Indoor",
-                contractValue: 9888000000,
-                budgets: {
-                    "Pekerjaan Struktur & Atap Baja": 3500000000,
-                    "Pekerjaan Lapangan & Arsitektur": 2400000000,
-                    "Pekerjaan MEP & Pencahayaan": 1400000000,
-                    "Persiapan, K3 & Overhead": 900000000
-                }
+                contractValue: 9888000000
             },
             mess: {
                 name: "Penataan Lahan Mess",
-                contractValue: 270000000,
-                budgets: {}
+                contractValue: 270000000
             }
         };
 
@@ -536,7 +522,7 @@
         let savedCompanyLogo = localStorage.getItem('orecon_v3_logo') || '';
 
         let transactions = [];
-        let initialBudgets = projectsData[currentProjectId].budgets;
+        // Semua Kategori Murni dari Dynamic List Tersimpan
         let customCategoriesList = JSON.parse(localStorage.getItem(`orecon_custom_cats_${currentProjectId}`)) || [];
         
         let purchaseOrders = [];
@@ -603,7 +589,6 @@
             currentProjectId = projId;
             localStorage.setItem('orecon_active_project', projId);
             currentContractValue = projectsData[projId].contractValue;
-            initialBudgets = projectsData[projId].budgets;
             customCategoriesList = JSON.parse(localStorage.getItem(`orecon_custom_cats_${currentProjectId}`)) || [];
 
             const navPoText = document.getElementById('nav-po-text');
@@ -651,7 +636,7 @@
             dtLogs = await fetchCloudData('dt');
 
             transactions.forEach(t => {
-                if (t.category && !initialBudgets[t.category] && !customCategoriesList.includes(t.category)) {
+                if (t.category && !customCategoriesList.includes(t.category)) {
                     customCategoriesList.push(t.category);
                 }
             });
@@ -736,25 +721,16 @@
             const container = document.getElementById('categoryListContainer');
             container.innerHTML = '';
 
-            // Render Default RAP Categories
-            Object.keys(initialBudgets).forEach(cat => {
-                container.innerHTML += `
-                    <div class="flex justify-between items-center bg-slate-900/80 p-2.5 rounded-xl border border-slate-700/60 text-xs">
-                        <span class="text-white font-medium">${cat}</span>
-                        <span class="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full font-semibold">Standar RAP</span>
-                    </div>
-                `;
-            });
+            if (customCategoriesList.length === 0) {
+                container.innerHTML = `<div class="text-xs text-slate-500 italic p-3 text-center">Belum ada kategori tersimpan. Silakan tambah kategori baru di atas.</div>`;
+                return;
+            }
 
-            // Render Custom Categories
             customCategoriesList.forEach((cat, idx) => {
                 container.innerHTML += `
                     <div class="flex justify-between items-center bg-slate-900/80 p-2.5 rounded-xl border border-slate-700/60 text-xs">
-                        <span class="text-amber-300 font-medium">${cat}</span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full font-semibold">Kustom</span>
-                            <button onclick="deleteCustomCategory(${idx})" class="text-red-400 hover:text-red-300 p-1" title="Hapus Kategori"><i class="fa-solid fa-trash-can"></i></button>
-                        </div>
+                        <span class="text-white font-medium">${cat}</span>
+                        <button onclick="deleteCategoryFromModal(${idx})" class="text-red-400 hover:text-red-300 p-1" title="Hapus Kategori"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 `;
             });
@@ -767,7 +743,7 @@
                 alert('Nama kategori tidak boleh kosong!');
                 return;
             }
-            if (initialBudgets[catName] || customCategoriesList.includes(catName)) {
+            if (customCategoriesList.includes(catName)) {
                 alert('Kategori ini sudah ada!');
                 return;
             }
@@ -782,9 +758,9 @@
             showToast(`Kategori "${catName}" berhasil ditambahkan!`, 'success');
         }
 
-        function deleteCustomCategory(idx) {
+        function deleteCategoryFromModal(idx) {
             const catName = customCategoriesList[idx];
-            if (confirm(`Apakah Anda yakin ingin menghapus kategori kustom "${catName}"?`)) {
+            if (confirm(`Apakah Anda yakin ingin menghapus kategori "${catName}"?`)) {
                 customCategoriesList.splice(idx, 1);
                 localStorage.setItem(`orecon_custom_cats_${currentProjectId}`, JSON.stringify(customCategoriesList));
 
@@ -809,7 +785,7 @@
             const catSelect = document.getElementById('trxCategory');
             const customInput = document.getElementById('trxCustomCategory');
             
-            if (initialBudgets[tx.category] || customCategoriesList.includes(tx.category)) {
+            if (customCategoriesList.includes(tx.category)) {
                 catSelect.value = tx.category;
                 customInput.classList.add('hidden');
                 customInput.required = false;
@@ -842,7 +818,7 @@
             document.getElementById('cancelEditTxBtn').classList.add('hidden');
         }
 
-        // Transactions Form Submit (Simpan Baru / Update Edit)
+        // Transactions Form Submit
         document.getElementById('transactionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const editingId = document.getElementById('editingTxId').value;
@@ -897,7 +873,7 @@
             resetTxForm();
         });
 
-        // ================= PO MULTI-ITEM (VENDOR & STATUS PER ITEM) =================
+        // ================= PO MULTI-ITEM =================
         function addPoItemRow(itemData = null) {
             const container = document.getElementById('poItemsContainer');
             const rowId = 'po-item-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
@@ -1551,8 +1527,7 @@
 
         function renderCharts() {
             const actuals = {};
-            const allCats = [...Object.keys(initialBudgets), ...customCategoriesList];
-            allCats.forEach(cat => actuals[cat] = 0);
+            customCategoriesList.forEach(cat => actuals[cat] = 0);
 
             let cInc = 0, cExp = 0;
 
@@ -1571,10 +1546,9 @@
                 costControlChartInstance = new Chart(ctxCost, {
                     type: 'bar',
                     data: {
-                        labels: allCats,
+                        labels: customCategoriesList,
                         datasets: [
-                            { label: 'Budget RAP', data: allCats.map(c => initialBudgets[c] || 0), backgroundColor: 'rgba(14, 165, 233, 0.5)' },
-                            { label: 'Realisasi', data: allCats.map(c => actuals[c] || 0), backgroundColor: 'rgba(244, 63, 94, 0.6)' }
+                            { label: 'Realisasi Pengeluaran', data: customCategoriesList.map(c => actuals[c] || 0), backgroundColor: 'rgba(14, 165, 233, 0.7)' }
                         ]
                     },
                     options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#94a3b8', font: { size: 9 } } }, y: { ticks: { color: '#94a3b8' } } } }
@@ -1608,17 +1582,13 @@
             transactionTypes.forEach(t => typeSelect.innerHTML += `<option value="${t.id}">${t.name}</option>`);
             
             categorySelect.innerHTML = '';
-            Object.keys(initialBudgets).forEach(cat => categorySelect.innerHTML += `<option value="${cat}">${cat}</option>`);
             
             if (customCategoriesList.length > 0) {
-                const optGroup = document.createElement('optgroup');
-                optGroup.label = "Kategori Kustom";
                 customCategoriesList.forEach(cat => {
-                    if (!initialBudgets[cat]) {
-                        optGroup.innerHTML += `<option value="${cat}">${cat}</option>`;
-                    }
+                    categorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
                 });
-                categorySelect.appendChild(optGroup);
+            } else {
+                categorySelect.innerHTML += `<option value="" disabled selected>Belum ada kategori (Buat Baru...)</option>`;
             }
 
             categorySelect.innerHTML += `<option value="__ADD_NEW__" class="text-cyan-400 font-bold">+ Tambah Kategori Baru...</option>`;
