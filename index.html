@@ -186,12 +186,18 @@
                     </div>
                 </div>
 
-                <!-- Form Transaksi Keuangan (Sporthall) dengan Custom Kategori -->
+                <!-- Form Transaksi Keuangan (Sporthall) dengan Fitur Edit -->
                 <div id="sporthallTxFormWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
-                    <h2 class="text-base font-semibold text-white mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-square-plus text-cyan-400"></i> Catat Transaksi Keuangan Baru
-                    </h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 id="trxFormTitle" class="text-base font-semibold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-square-plus text-cyan-400"></i> Catat Transaksi Keuangan Baru
+                        </h2>
+                        <button type="button" id="cancelEditTxBtn" onclick="resetTxForm()" class="hidden text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">
+                            <i class="fa-solid fa-xmark"></i> Batal Edit
+                        </button>
+                    </div>
                     <form id="transactionForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+                        <input type="hidden" id="editingTxId" value="">
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Pilih Tanggal Transaksi</label>
                             <input type="date" id="trxDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 cursor-pointer">
@@ -206,7 +212,9 @@
 
                         <div><label class="block text-xs font-medium text-slate-300 mb-1">Nominal (IDR)</label><input type="number" id="trxAmount" placeholder="350000000" required min="1" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                         <div><label class="block text-xs font-medium text-slate-300 mb-1">Keterangan</label><input type="text" id="trxDesc" placeholder="Uraian" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                        <div class="flex items-end"><button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 rounded-xl text-xs transition">Simpan</button></div>
+                        <div class="flex items-end">
+                            <button type="submit" id="trxSubmitBtn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 rounded-xl text-xs transition">Simpan Transaksi</button>
+                        </div>
                     </form>
                 </div>
 
@@ -216,7 +224,7 @@
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card"><h3 class="text-sm font-semibold text-white mb-4">Akumulasi Cashflow</h3><div class="relative h-64"><canvas id="cashflowChart"></canvas></div></div>
                 </div>
 
-                <!-- Ledger Table (Sporthall) -->
+                <!-- Ledger Table (Sporthall) dengan Fitur Edit -->
                 <div id="sporthallLedgerWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                     <div class="flex justify-between items-center mb-4"><h2 class="text-base font-semibold text-white">Jurnal Transaksi Keuangan</h2><span id="txCount" class="text-xs bg-slate-700 text-slate-300 px-3 py-1 rounded-full">0 Transaksi</span></div>
                     <div class="overflow-x-auto rounded-xl border border-slate-700/50">
@@ -671,6 +679,112 @@
             }
         }
 
+        // ================= EDIT TRANSAKSI KEUANGAN LOGIC =================
+        function editTransaction(txId) {
+            const tx = transactions.find(t => t.id === txId);
+            if (!tx) return;
+
+            document.getElementById('editingTxId').value = tx.id;
+            document.getElementById('trxDate').value = tx.date || '';
+            document.getElementById('trxType').value = tx.type || 'EXPENSE';
+            document.getElementById('trxAmount').value = tx.amount || '';
+            document.getElementById('trxDesc').value = tx.desc || '';
+
+            // Handle Kategori
+            const catSelect = document.getElementById('trxCategory');
+            const customInput = document.getElementById('trxCustomCategory');
+            
+            if (initialBudgets[tx.category] || customCategoriesList.includes(tx.category)) {
+                catSelect.value = tx.category;
+                customInput.classList.add('hidden');
+                customInput.required = false;
+            } else {
+                catSelect.value = '__ADD_NEW__';
+                customInput.value = tx.category;
+                customInput.classList.remove('hidden');
+                customInput.required = true;
+            }
+
+            // Update UI Form
+            document.getElementById('trxFormTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Transaksi Keuangan`;
+            document.getElementById('trxSubmitBtn').innerText = "Perbarui Transaksi";
+            document.getElementById('trxSubmitBtn').className = "w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-md";
+            document.getElementById('cancelEditTxBtn').classList.remove('hidden');
+
+            document.getElementById('sporthallTxFormWrapper').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetTxForm() {
+            document.getElementById('editingTxId').value = '';
+            document.getElementById('transactionForm').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('trxDate').value = today;
+            document.getElementById('trxCustomCategory').classList.add('hidden');
+            document.getElementById('trxCustomCategory').required = false;
+
+            document.getElementById('trxFormTitle').innerHTML = `<i class="fa-solid fa-square-plus text-cyan-400"></i> Catat Transaksi Keuangan Baru`;
+            document.getElementById('trxSubmitBtn').innerText = "Simpan Transaksi";
+            document.getElementById('trxSubmitBtn').className = "w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 rounded-xl text-xs transition";
+            document.getElementById('cancelEditTxBtn').classList.add('hidden');
+        }
+
+        // Transactions Form Submit (Simpan Baru / Update Edit)
+        document.getElementById('transactionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const editingId = document.getElementById('editingTxId').value;
+            const selectedDate = document.getElementById('trxDate').value;
+            const categorySelectVal = document.getElementById('trxCategory').value;
+            const customCatVal = document.getElementById('trxCustomCategory').value.trim();
+
+            let finalCategory = categorySelectVal;
+            if (categorySelectVal === '__ADD_NEW__') {
+                if (!customCatVal) {
+                    alert('Harap isi nama kategori kustom!');
+                    return;
+                }
+                finalCategory = customCatVal;
+                if (!customCategoriesList.includes(finalCategory)) {
+                    customCategoriesList.push(finalCategory);
+                    localStorage.setItem(`orecon_custom_cats_${currentProjectId}`, JSON.stringify(customCategoriesList));
+                }
+            }
+
+            if (editingId) {
+                // EDIT / UPDATE TRANSAKSI
+                const numericId = Number(editingId);
+                const index = transactions.findIndex(t => t.id === numericId);
+                if (index !== -1) {
+                    transactions[index] = {
+                        ...transactions[index],
+                        date: selectedDate,
+                        type: document.getElementById('trxType').value,
+                        category: finalCategory,
+                        amount: parseFloat(document.getElementById('trxAmount').value),
+                        desc: document.getElementById('trxDesc').value
+                    };
+                    await saveCloudData('transactions', transactions[index]);
+                    showToast('Transaksi berhasil diperbarui!', 'success');
+                }
+            } else {
+                // SIMPAN TRANSAKSI BARU
+                const newTx = {
+                    id: Date.now(),
+                    date: selectedDate,
+                    type: document.getElementById('trxType').value,
+                    category: finalCategory,
+                    amount: parseFloat(document.getElementById('trxAmount').value),
+                    desc: document.getElementById('trxDesc').value
+                };
+                transactions.push(newTx);
+                await saveCloudData('transactions', newTx);
+                showToast('Transaksi baru tersimpan!', 'success');
+            }
+
+            populateFormDropdowns();
+            updateDashboard();
+            resetTxForm();
+        });
+
         // ================= PO MULTI-ITEM (VENDOR & STATUS PER ITEM) =================
         function addPoItemRow(itemData = null) {
             const container = document.getElementById('poItemsContainer');
@@ -742,20 +856,17 @@
             document.getElementById('poNumber').value = po.poNumber || '';
             document.getElementById('poDate').value = po.date || '';
 
-            // Ubah UI Form
             document.getElementById('poFormTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Pre-Order (PO): ${po.poNumber || po.id}`;
             document.getElementById('poSubmitBtn').innerText = "Perbarui Data PO";
             document.getElementById('poSubmitBtn').className = "bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs shadow-md transition";
             document.getElementById('cancelEditPoBtn').classList.remove('hidden');
 
-            // Render Item Rows
             const container = document.getElementById('poItemsContainer');
             container.innerHTML = '';
             
             const itemsArray = po.items || [{ itemName: po.itemName || '', specs: po.specs || '', vendor: po.vendor || '', volume: po.volume || '', price: po.total || 0, status: po.status || 'BELUM_PROSES' }];
             itemsArray.forEach(item => addPoItemRow(item));
 
-            // Scroll ke Form Edit
             document.getElementById('poForm').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -774,7 +885,7 @@
             addPoItemRow();
         }
 
-        // Form Submit PO (Simpan Baru / Update Edit) + Transaksi Otomatis
+        // Form Submit PO
         document.getElementById('poForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const editingId = document.getElementById('editingPoId').value;
@@ -811,7 +922,6 @@
             }
 
             if (editingId) {
-                // EDIT / UPDATE EXISTING PO
                 const numericId = Number(editingId);
                 const index = purchaseOrders.findIndex(p => p.id === numericId);
                 if (index !== -1) {
@@ -823,7 +933,6 @@
                         total: totalAmount
                     };
 
-                    // Update Transaksi Pengeluaran Otomatis
                     const txIndex = transactions.findIndex(t => t.poRefId === numericId);
                     if (txIndex !== -1) {
                         transactions[txIndex].amount = totalAmount;
@@ -836,7 +945,6 @@
                     showToast(`PO ${poNum} berhasil diperbarui!`, 'success');
                 }
             } else {
-                // SIMPAN PO BARU
                 const newPoId = Date.now();
                 const newPO = {
                     id: newPoId,
@@ -901,7 +1009,6 @@
             
             const filterVal = document.getElementById('filterPoStatus') ? document.getElementById('filterPoStatus').value : 'ALL';
             
-            // Filter PO jika ada salah satu/seluruh item yang sesuai filter status
             const filteredPOs = purchaseOrders.filter(p => {
                 if (filterVal === 'ALL') return true;
                 const itemsArray = p.items || [{ status: p.status || 'BELUM_PROSES' }];
@@ -922,7 +1029,6 @@
                 const itemsArray = po.items || [{ itemName: po.itemName || '-', specs: po.specs || '-', vendor: po.vendor || '-', volume: po.volume || '-', price: po.total || 0, status: po.status || 'BELUM_PROSES' }];
                 const itemsCount = itemsArray.length;
 
-                // Hitung Rincian Status Item
                 const finishedCount = itemsArray.filter(it => (it.status || 'BELUM_PROSES') === 'SELESAI').length;
                 let progressBadge = '';
                 if (finishedCount === itemsCount) {
@@ -934,7 +1040,6 @@
                 }
 
                 tbody.innerHTML += `
-                    <!-- Row Ringkasan PO -->
                     <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition cursor-pointer" onclick="togglePoDetail(${po.id})">
                         <td class="py-3.5 px-4 text-center">
                             <i id="po-icon-${po.id}" class="fa-solid fa-chevron-right text-slate-400 text-xs"></i>
@@ -950,7 +1055,6 @@
                         </td>
                     </tr>
                     
-                    <!-- Row Detail Expandable Rincian Barang per Item (Lengkap Vendor & Status) -->
                     <tr id="po-detail-${po.id}" class="hidden bg-slate-900/90 border-b border-slate-700/80">
                         <td colspan="7" class="p-4">
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
@@ -994,45 +1098,6 @@
                 `;
             });
         }
-
-        // Transactions Form Submit
-        document.getElementById('transactionForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const selectedDate = document.getElementById('trxDate').value;
-            const categorySelectVal = document.getElementById('trxCategory').value;
-            const customCatVal = document.getElementById('trxCustomCategory').value.trim();
-
-            let finalCategory = categorySelectVal;
-            if (categorySelectVal === '__ADD_NEW__') {
-                if (!customCatVal) {
-                    alert('Harap isi nama kategori kustom!');
-                    return;
-                }
-                finalCategory = customCatVal;
-                if (!customCategoriesList.includes(finalCategory)) {
-                    customCategoriesList.push(finalCategory);
-                    localStorage.setItem(`orecon_custom_cats_${currentProjectId}`, JSON.stringify(customCategoriesList));
-                }
-            }
-
-            const newTx = {
-                id: Date.now(),
-                date: selectedDate,
-                type: document.getElementById('trxType').value,
-                category: finalCategory,
-                amount: parseFloat(document.getElementById('trxAmount').value),
-                desc: document.getElementById('trxDesc').value
-            };
-
-            transactions.push(newTx);
-            populateFormDropdowns();
-            updateDashboard();
-
-            this.reset();
-            document.getElementById('trxDate').value = selectedDate;
-            document.getElementById('trxCustomCategory').classList.add('hidden');
-            await saveCloudData('transactions', newTx);
-        });
 
         document.getElementById('excaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -1349,6 +1414,7 @@
             renderCharts();
         }
 
+        // Render Table dengan Tombol Edit Transaksi
         function renderTable() {
             const tbody = document.getElementById('transactionTableBody');
             if (!tbody) return;
@@ -1356,7 +1422,19 @@
             document.getElementById('txCount').innerText = transactions.length + ' Transaksi';
             transactions.forEach(t => {
                 const isIncome = t.type === 'INCOME';
-                tbody.innerHTML += `<tr class="border-b border-slate-700/40"><td class="py-3 px-4 font-mono text-xs">${t.date}</td><td class="py-3 px-4"><span class="px-2 py-0.5 text-[11px] rounded-full border ${isIncome ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30'}">${isIncome ? 'Pemasukan' : 'Pengeluaran'}</span></td><td class="py-3 px-4 font-medium text-cyan-300">${t.category}</td><td class="py-3 px-4 text-slate-400">${t.desc}</td><td class="py-3 px-4 text-right font-mono font-semibold ${isIncome ? 'text-emerald-400' : 'text-slate-200'}">${isIncome ? '+' : '-'} ${formatIDR(t.amount)}</td><td class="py-3 px-4 text-center"><button onclick="deleteTransaction(${t.id})" class="text-red-400"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-700/40 hover:bg-slate-700/30 transition">
+                        <td class="py-3 px-4 font-mono text-xs">${t.date}</td>
+                        <td class="py-3 px-4"><span class="px-2 py-0.5 text-[11px] rounded-full border ${isIncome ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30'}">${isIncome ? 'Pemasukan' : 'Pengeluaran'}</span></td>
+                        <td class="py-3 px-4 font-medium text-cyan-300">${t.category}</td>
+                        <td class="py-3 px-4 text-slate-400">${t.desc}</td>
+                        <td class="py-3 px-4 text-right font-mono font-semibold ${isIncome ? 'text-emerald-400' : 'text-slate-200'}">${isIncome ? '+' : '-'} ${formatIDR(t.amount)}</td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="editTransaction(${t.id})" title="Edit Transaksi" class="text-amber-400 hover:text-amber-300 p-1 mr-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteTransaction(${t.id})" title="Hapus Transaksi" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    </tr>
+                `;
             });
         }
 
