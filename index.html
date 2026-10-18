@@ -215,7 +215,7 @@
                             <input type="text" id="trxCustomCategory" placeholder="Ketik Kategori Baru..." class="w-full bg-slate-900 border border-cyan-500 rounded-xl p-2.5 text-xs text-white mt-2 hidden focus:outline-none">
                         </div>
 
-                        <div><label class="block text-xs font-medium text-slate-300 mb-1">Nominal (IDR)</label><input type="number" id="trxAmount" placeholder="350000000" required min="1" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
+                        <div><label class="block text-xs font-medium text-slate-300 mb-1">Nominal (IDR)</label><input type="number" id="trxAmount" placeholder="350000000" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                         <div><label class="block text-xs font-medium text-slate-300 mb-1">Keterangan</label><input type="text" id="trxDesc" placeholder="Uraian" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                         <div class="flex items-end">
                             <button type="submit" id="trxSubmitBtn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 rounded-xl text-xs transition">Simpan Transaksi</button>
@@ -229,7 +229,7 @@
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card"><h3 class="text-sm font-semibold text-white mb-4">Akumulasi Cashflow</h3><div class="relative h-64"><canvas id="cashflowChart"></canvas></div></div>
                 </div>
 
-                <!-- Ledger Table (Sporthall) - DENGAN URUTAN TANGGAL KRONOLOGIS -->
+                <!-- Ledger Table (Sporthall) -->
                 <div id="sporthallLedgerWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card space-y-4">
                     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                         <div>
@@ -341,20 +341,23 @@
                             <!-- Dynamic Multi-Item List -->
                             <div class="space-y-2">
                                 <div class="flex justify-between items-center">
-                                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Rincian Item Barang / Material</label>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Rincian Item Barang / Material / Pajak / Diskon</label>
+                                        <p class="text-[10px] text-slate-400">* Gunakan tanda minus (-) untuk Pajak Potongan / Diskon (misal: -500000)</p>
+                                    </div>
                                     <button type="button" onclick="addPoItemRow()" class="text-xs bg-cyan-600/20 text-cyan-400 hover:bg-cyan-600/30 border border-cyan-500/30 px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5">
-                                        <i class="fa-solid fa-plus"></i> Tambah Item Barang
+                                        <i class="fa-solid fa-plus"></i> Tambah Item
                                     </button>
                                 </div>
                                 <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                                     <table class="w-full text-left border-collapse text-xs">
                                         <thead>
                                             <tr class="bg-slate-900 border-b border-slate-700 text-slate-400">
-                                                <th class="py-2.5 px-3 min-w-[150px]">Nama Barang / Material</th>
+                                                <th class="py-2.5 px-3 min-w-[150px]">Nama Barang / Pajak / Diskon</th>
                                                 <th class="py-2.5 px-3 min-w-[130px]">Spesifikasi</th>
                                                 <th class="py-2.5 px-3 min-w-[150px]">Vendor / Supplier</th>
                                                 <th class="py-2.5 px-3 w-24">Volume/Qty</th>
-                                                <th class="py-2.5 px-3 w-32 text-right">Harga Total (IDR)</th>
+                                                <th class="py-2.5 px-3 w-36 text-right">Harga Total (IDR)</th>
                                                 <th class="py-2.5 px-3 min-w-[140px]">Status Item</th>
                                                 <th class="py-2.5 px-3 w-10 text-center">Aksi</th>
                                             </tr>
@@ -940,7 +943,7 @@
             resetTxForm();
         });
 
-        // ================= PO MULTI-ITEM =================
+        // ================= PO MULTI-ITEM (BISA DENGAN NOMINAL MINUS) =================
         function addPoItemRow(itemData = null) {
             const container = document.getElementById('poItemsContainer');
             const rowId = 'po-item-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
@@ -957,11 +960,11 @@
             const status = itemData ? itemData.status : 'BELUM_PROSES';
 
             tr.innerHTML = `
-                <td class="p-2"><input type="text" value="${name}" placeholder="Baja WF / Semen" required class="po-item-name w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
-                <td class="p-2"><input type="text" value="${specs}" placeholder="WF 250x125 / PCC" required class="po-item-specs w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
-                <td class="p-2"><input type="text" value="${vendor}" placeholder="PT. Vendor Utama" required class="po-item-vendor w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
-                <td class="p-2"><input type="text" value="${volume}" placeholder="10 Ton / 50 Sak" required class="po-item-volume w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
-                <td class="p-2"><input type="number" value="${price}" placeholder="15000000" min="0" required oninput="calculatePoTotals()" class="po-item-price w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white text-right font-mono focus:outline-none focus:border-cyan-500"></td>
+                <td class="p-2"><input type="text" value="${name}" placeholder="Material / Diskon / Pajak PPh" required class="po-item-name w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
+                <td class="p-2"><input type="text" value="${specs}" placeholder="WF 250 / PPh 22 (1.5%)" class="po-item-specs w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
+                <td class="p-2"><input type="text" value="${vendor}" placeholder="PT. Vendor / KPP Pratama" class="po-item-vendor w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
+                <td class="p-2"><input type="text" value="${volume}" placeholder="10 Ton / 1 Ls" class="po-item-volume w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
+                <td class="p-2"><input type="number" step="any" value="${price}" placeholder="15000000 / -500000" required oninput="calculatePoTotals()" class="po-item-price w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white text-right font-mono focus:outline-none focus:border-cyan-500"></td>
                 <td class="p-2">
                     <select class="po-item-status w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500">
                         <option value="BELUM_PROSES" ${status === 'BELUM_PROSES' ? 'selected' : ''}>🟡 Belum Diproses</option>
@@ -980,7 +983,7 @@
         function removePoItemRow(rowId) {
             const container = document.getElementById('poItemsContainer');
             if (container.children.length <= 1) {
-                alert('Minimal harus ada 1 item barang di dalam PO!');
+                alert('Minimal harus ada 1 item di dalam PO!');
                 return;
             }
             const row = document.getElementById(rowId);
@@ -999,7 +1002,14 @@
             });
 
             document.getElementById('poTotalItemsCount').innerText = totalItems + ' Item';
-            document.getElementById('poGrandTotalDisplay').innerText = formatIDR(grandTotal);
+            
+            const displayEl = document.getElementById('poGrandTotalDisplay');
+            displayEl.innerText = formatIDR(grandTotal);
+            if (grandTotal < 0) {
+                displayEl.className = "text-lg font-bold text-amber-400 font-mono";
+            } else {
+                displayEl.className = "text-lg font-bold text-emerald-400 font-mono";
+            }
         }
 
         // Edit PO Handler
@@ -1055,7 +1065,7 @@
             rows.forEach(row => {
                 const price = parseFloat(row.querySelector('.po-item-price').value) || 0;
                 const vendorName = row.querySelector('.po-item-vendor').value.trim();
-                vendorSet.add(vendorName);
+                if (vendorName) vendorSet.add(vendorName);
 
                 itemsList.push({
                     itemName: row.querySelector('.po-item-name').value.trim(),
@@ -1068,7 +1078,7 @@
                 totalAmount += price;
             });
 
-            const vendorsSummary = Array.from(vendorSet).join(', ');
+            const vendorsSummary = Array.from(vendorSet).join(', ') || '-';
 
             const poCategoryName = "Pengadaan PO";
             if (!customCategoriesList.includes(poCategoryName)) {
@@ -1201,9 +1211,9 @@
                         </td>
                         <td class="py-3.5 px-4 font-bold text-cyan-400 font-mono">${po.poNumber || 'PO-' + po.id.toString().slice(-4)}</td>
                         <td class="py-3.5 px-4 font-mono text-slate-300 text-xs">${po.date}</td>
-                        <td class="py-3.5 px-4 text-center"><span class="bg-slate-700 text-cyan-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold">${itemsCount} Item Material</span></td>
+                        <td class="py-3.5 px-4 text-center"><span class="bg-slate-700 text-cyan-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold">${itemsCount} Item</span></td>
                         <td class="py-3.5 px-4 text-center">${progressBadge}</td>
-                        <td class="py-3.5 px-4 text-right text-emerald-400 font-mono font-bold">${formatIDR(po.total)}</td>
+                        <td class="py-3.5 px-4 text-right font-mono font-bold ${po.total < 0 ? 'text-amber-400' : 'text-emerald-400'}">${formatIDR(po.total)}</td>
                         <td class="py-3.5 px-4 text-center" onclick="event.stopPropagation()">
                             <button onclick="editPO(${po.id})" title="Edit PO" class="text-amber-400 hover:text-amber-300 p-1 mr-1"><i class="fa-solid fa-pen-to-square"></i></button>
                             <button onclick="deletePO(${po.id})" title="Hapus PO" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
@@ -1215,7 +1225,7 @@
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                                 <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                                     <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                                        <i class="fa-solid fa-list-check text-cyan-400"></i> Rincian Barang / Material - ${po.poNumber || 'PO-' + po.id}
+                                        <i class="fa-solid fa-list-check text-cyan-400"></i> Rincian Barang / Material / Potongan - ${po.poNumber || 'PO-' + po.id}
                                     </h4>
                                     <span class="text-xs text-slate-400">Tanggal PO: <strong class="text-slate-200">${po.date}</strong></span>
                                 </div>
@@ -1224,7 +1234,7 @@
                                         <thead>
                                             <tr class="text-slate-500 border-b border-slate-800">
                                                 <th class="py-1.5 px-2">No</th>
-                                                <th class="py-1.5 px-2">Nama Barang / Material</th>
+                                                <th class="py-1.5 px-2">Nama Barang / Uraian</th>
                                                 <th class="py-1.5 px-2">Spesifikasi</th>
                                                 <th class="py-1.5 px-2">Vendor / Supplier</th>
                                                 <th class="py-1.5 px-2 text-center">Volume / Qty</th>
@@ -1237,10 +1247,10 @@
                                                 <tr>
                                                     <td class="py-2 px-2 text-slate-500 font-mono">${idx + 1}</td>
                                                     <td class="py-2 px-2 font-semibold text-white">${it.itemName}</td>
-                                                    <td class="py-2 px-2 text-slate-400">${it.specs}</td>
+                                                    <td class="py-2 px-2 text-slate-400">${it.specs || '-'}</td>
                                                     <td class="py-2 px-2 text-cyan-300 font-medium">${it.vendor || '-'}</td>
-                                                    <td class="py-2 px-2 text-center font-mono text-slate-200">${it.volume}</td>
-                                                    <td class="py-2 px-2 text-right font-mono text-emerald-400">${formatIDR(it.price)}</td>
+                                                    <td class="py-2 px-2 text-center font-mono text-slate-200">${it.volume || '-'}</td>
+                                                    <td class="py-2 px-2 text-right font-mono ${it.price < 0 ? 'text-amber-400 font-bold' : 'text-emerald-400'}">${formatIDR(it.price)}</td>
                                                     <td class="py-2 px-2 text-center">${getStatusBadge(it.status || 'BELUM_PROSES')}</td>
                                                 </tr>
                                             `).join('')}
