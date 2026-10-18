@@ -186,7 +186,7 @@
                     </div>
                 </div>
 
-                <!-- Form Transaksi Keuangan (Sporthall) dengan Kelola Kategori Penuh -->
+                <!-- Form Transaksi Keuangan (Sporthall) -->
                 <div id="sporthallTxFormWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
                         <h2 id="trxFormTitle" class="text-base font-semibold text-white flex items-center gap-2">
@@ -229,25 +229,34 @@
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card"><h3 class="text-sm font-semibold text-white mb-4">Akumulasi Cashflow</h3><div class="relative h-64"><canvas id="cashflowChart"></canvas></div></div>
                 </div>
 
-                <!-- Ledger Table (Sporthall) DENGAN FILTER KATEGORI & REKAP SUBTOTAL -->
+                <!-- Ledger Table (Sporthall) - DENGAN URUTAN TANGGAL KRONOLOGIS -->
                 <div id="sporthallLedgerWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card space-y-4">
                     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                         <div>
                             <h2 class="text-base font-semibold text-white flex items-center gap-2">
                                 <i class="fa-solid fa-receipt text-cyan-400"></i> Jurnal Transaksi Keuangan
                             </h2>
-                            <p class="text-xs text-slate-400">Filter transaksi berdasarkan kategori & tipe untuk melihat total akumulasi biaya.</p>
+                            <p class="text-xs text-slate-400">Transaksi diurutkan otomatis berdasarkan tanggal (terlama ke terbaru).</p>
                         </div>
 
-                        <!-- Bar Filter Transaksi -->
+                        <!-- Bar Filter & Sort Transaksi -->
                         <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                            <!-- Urutan Tanggal -->
+                            <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl">
+                                <i class="fa-solid fa-arrow-down-short-wide text-slate-400 text-xs"></i>
+                                <span class="text-xs text-slate-400 font-medium">Urutan:</span>
+                                <select id="sortOrderSelect" onchange="renderTable()" class="bg-transparent text-xs text-cyan-300 font-semibold focus:outline-none cursor-pointer">
+                                    <option value="ASC">📅 Tanggal: Terlama → Terbaru</option>
+                                    <option value="DESC">📅 Tanggal: Terbaru → Terlama</option>
+                                </select>
+                            </div>
+
                             <!-- Filter Kategori -->
                             <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl">
                                 <i class="fa-solid fa-filter text-slate-400 text-xs"></i>
                                 <span class="text-xs text-slate-400 font-medium">Kategori:</span>
                                 <select id="filterCategorySelect" onchange="renderTable()" class="bg-transparent text-xs text-cyan-300 font-semibold focus:outline-none cursor-pointer">
                                     <option value="ALL">Semua Kategori</option>
-                                    <!-- Option kategori di-populate via JavaScript -->
                                 </select>
                             </div>
 
@@ -1560,7 +1569,7 @@
             renderCharts();
         }
 
-        // RENDER TABEL JURNAL DENGAN FILTER KATEGORI & SUBTOTAL AUTO-CALCULATE
+        // RENDER TABEL JURNAL DENGAN SORTING TANGGAL KRONOLOGIS & FILTER
         function renderTable() {
             const tbody = document.getElementById('transactionTableBody');
             if (!tbody) return;
@@ -1568,11 +1577,20 @@
 
             const categoryFilter = document.getElementById('filterCategorySelect') ? document.getElementById('filterCategorySelect').value : 'ALL';
             const typeFilter = document.getElementById('filterTypeSelect') ? document.getElementById('filterTypeSelect').value : 'ALL';
+            const sortOrder = document.getElementById('sortOrderSelect') ? document.getElementById('sortOrderSelect').value : 'ASC';
 
+            // Filter Transaksi
             let filteredTx = transactions.filter(t => {
                 const matchCat = (categoryFilter === 'ALL') || (t.category === categoryFilter);
                 const matchType = (typeFilter === 'ALL') || (t.type === typeFilter);
                 return matchCat && matchType;
+            });
+
+            // Urutkan Transaksi berdasarkan Tanggal
+            filteredTx.sort((a, b) => {
+                const dateA = new Date(a.date || '1970-01-01');
+                const dateB = new Date(b.date || '1970-01-01');
+                return sortOrder === 'ASC' ? dateA - dateB : dateB - dateA;
             });
 
             document.getElementById('txCount').innerText = filteredTx.length + ' Transaksi';
@@ -1592,9 +1610,9 @@
 
                     tbody.innerHTML += `
                         <tr class="border-b border-slate-700/40 hover:bg-slate-700/30 transition">
-                            <td class="py-3 px-4 font-mono text-xs">${t.date}</td>
+                            <td class="py-3 px-4 font-mono text-xs text-cyan-300 font-semibold">${t.date}</td>
                             <td class="py-3 px-4"><span class="px-2 py-0.5 text-[11px] rounded-full border ${isIncome ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30'}">${isIncome ? 'Pemasukan' : 'Pengeluaran'}</span></td>
-                            <td class="py-3 px-4 font-medium text-cyan-300">${t.category}</td>
+                            <td class="py-3 px-4 font-medium text-slate-200">${t.category}</td>
                             <td class="py-3 px-4 text-slate-400">${t.desc}</td>
                             <td class="py-3 px-4 text-right font-mono font-semibold ${isIncome ? 'text-emerald-400' : 'text-slate-200'}">${isIncome ? '+' : '-'} ${formatIDR(amt)}</td>
                             <td class="py-3 px-4 text-center">
