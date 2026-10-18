@@ -229,12 +229,71 @@
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card"><h3 class="text-sm font-semibold text-white mb-4">Akumulasi Cashflow</h3><div class="relative h-64"><canvas id="cashflowChart"></canvas></div></div>
                 </div>
 
-                <!-- Ledger Table (Sporthall) -->
-                <div id="sporthallLedgerWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                    <div class="flex justify-between items-center mb-4"><h2 class="text-base font-semibold text-white">Jurnal Transaksi Keuangan</h2><span id="txCount" class="text-xs bg-slate-700 text-slate-300 px-3 py-1 rounded-full">0 Transaksi</span></div>
+                <!-- Ledger Table (Sporthall) DENGAN FILTER KATEGORI & REKAP SUBTOTAL -->
+                <div id="sporthallLedgerWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card space-y-4">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                        <div>
+                            <h2 class="text-base font-semibold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-receipt text-cyan-400"></i> Jurnal Transaksi Keuangan
+                            </h2>
+                            <p class="text-xs text-slate-400">Filter transaksi berdasarkan kategori & tipe untuk melihat total akumulasi biaya.</p>
+                        </div>
+
+                        <!-- Bar Filter Transaksi -->
+                        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                            <!-- Filter Kategori -->
+                            <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl">
+                                <i class="fa-solid fa-filter text-slate-400 text-xs"></i>
+                                <span class="text-xs text-slate-400 font-medium">Kategori:</span>
+                                <select id="filterCategorySelect" onchange="renderTable()" class="bg-transparent text-xs text-cyan-300 font-semibold focus:outline-none cursor-pointer">
+                                    <option value="ALL">Semua Kategori</option>
+                                    <!-- Option kategori di-populate via JavaScript -->
+                                </select>
+                            </div>
+
+                            <!-- Filter Tipe Transaksi -->
+                            <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl">
+                                <span class="text-xs text-slate-400 font-medium">Tipe:</span>
+                                <select id="filterTypeSelect" onchange="renderTable()" class="bg-transparent text-xs text-cyan-300 font-semibold focus:outline-none cursor-pointer">
+                                    <option value="ALL">Semua Tipe</option>
+                                    <option value="INCOME">Pemasukan (Cash In)</option>
+                                    <option value="EXPENSE">Pengeluaran (Cash Out)</option>
+                                </select>
+                            </div>
+
+                            <span id="txCount" class="text-xs bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl font-medium">0 Transaksi</span>
+                        </div>
+                    </div>
+
+                    <!-- Ringkasan Subtotal Hasil Filter -->
+                    <div id="filterSummaryBar" class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-900/90 p-3.5 rounded-xl border border-slate-700/60 text-xs">
+                        <div class="flex justify-between items-center px-2 border-b sm:border-b-0 sm:border-r border-slate-800 pb-2 sm:pb-0">
+                            <span class="text-slate-400">Total Pemasukan Filter:</span>
+                            <span id="filterSubtotalIncome" class="font-bold font-mono text-emerald-400 text-sm">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center px-2 border-b sm:border-b-0 sm:border-r border-slate-800 pb-2 sm:pb-0">
+                            <span class="text-slate-400">Total Pengeluaran Filter:</span>
+                            <span id="filterSubtotalExpense" class="font-bold font-mono text-red-400 text-sm">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center px-2">
+                            <span class="text-slate-400">Saldo Bersih (Net):</span>
+                            <span id="filterSubtotalNet" class="font-bold font-mono text-cyan-400 text-sm">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <!-- Tabel Jurnal -->
                     <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                         <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                            <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 font-semibold text-[11px]"><th class="py-3 px-4">Tanggal</th><th class="py-3 px-4">Tipe</th><th class="py-3 px-4">Kategori Pekerjaan</th><th class="py-3 px-4">Keterangan</th><th class="py-3 px-4 text-right">Nominal (IDR)</th><th class="py-3 px-4 text-center no-print">Aksi</th></tr></thead>
+                            <thead>
+                                <tr class="bg-slate-900 border-b border-slate-700 text-slate-400 font-semibold text-[11px]">
+                                    <th class="py-3 px-4">Tanggal</th>
+                                    <th class="py-3 px-4">Tipe</th>
+                                    <th class="py-3 px-4">Kategori Pekerjaan</th>
+                                    <th class="py-3 px-4">Keterangan</th>
+                                    <th class="py-3 px-4 text-right">Nominal (IDR)</th>
+                                    <th class="py-3 px-4 text-center no-print">Aksi</th>
+                                </tr>
+                            </thead>
                             <tbody id="transactionTableBody" class="divide-y divide-slate-700/50"></tbody>
                         </table>
                     </div>
@@ -446,7 +505,7 @@
             </section>
         </main>
 
-        <!-- MODAL KELOLA KATEGORI (SEPENUHNYA FLEKSIBEL - TANPA KATEGORI BAWAAN KAKU) -->
+        <!-- MODAL KELOLA KATEGORI -->
         <div id="categoryModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
             <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -522,7 +581,6 @@
         let savedCompanyLogo = localStorage.getItem('orecon_v3_logo') || '';
 
         let transactions = [];
-        // Semua Kategori Murni dari Dynamic List Tersimpan
         let customCategoriesList = JSON.parse(localStorage.getItem(`orecon_custom_cats_${currentProjectId}`)) || [];
         
         let purchaseOrders = [];
@@ -1502,27 +1560,60 @@
             renderCharts();
         }
 
+        // RENDER TABEL JURNAL DENGAN FILTER KATEGORI & SUBTOTAL AUTO-CALCULATE
         function renderTable() {
             const tbody = document.getElementById('transactionTableBody');
             if (!tbody) return;
             tbody.innerHTML = '';
-            document.getElementById('txCount').innerText = transactions.length + ' Transaksi';
-            transactions.forEach(t => {
-                const isIncome = t.type === 'INCOME';
-                tbody.innerHTML += `
-                    <tr class="border-b border-slate-700/40 hover:bg-slate-700/30 transition">
-                        <td class="py-3 px-4 font-mono text-xs">${t.date}</td>
-                        <td class="py-3 px-4"><span class="px-2 py-0.5 text-[11px] rounded-full border ${isIncome ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30'}">${isIncome ? 'Pemasukan' : 'Pengeluaran'}</span></td>
-                        <td class="py-3 px-4 font-medium text-cyan-300">${t.category}</td>
-                        <td class="py-3 px-4 text-slate-400">${t.desc}</td>
-                        <td class="py-3 px-4 text-right font-mono font-semibold ${isIncome ? 'text-emerald-400' : 'text-slate-200'}">${isIncome ? '+' : '-'} ${formatIDR(t.amount)}</td>
-                        <td class="py-3 px-4 text-center">
-                            <button onclick="editTransaction(${t.id})" title="Edit Transaksi" class="text-amber-400 hover:text-amber-300 p-1 mr-1"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button onclick="deleteTransaction(${t.id})" title="Hapus Transaksi" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
-                        </td>
-                    </tr>
-                `;
+
+            const categoryFilter = document.getElementById('filterCategorySelect') ? document.getElementById('filterCategorySelect').value : 'ALL';
+            const typeFilter = document.getElementById('filterTypeSelect') ? document.getElementById('filterTypeSelect').value : 'ALL';
+
+            let filteredTx = transactions.filter(t => {
+                const matchCat = (categoryFilter === 'ALL') || (t.category === categoryFilter);
+                const matchType = (typeFilter === 'ALL') || (t.type === typeFilter);
+                return matchCat && matchType;
             });
+
+            document.getElementById('txCount').innerText = filteredTx.length + ' Transaksi';
+
+            let subtotalIncome = 0;
+            let subtotalExpense = 0;
+
+            if (filteredTx.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 italic">Tidak ada data transaksi yang cocok dengan filter.</td></tr>`;
+            } else {
+                filteredTx.forEach(t => {
+                    const isIncome = t.type === 'INCOME';
+                    const amt = Number(t.amount) || 0;
+
+                    if (isIncome) subtotalIncome += amt;
+                    else subtotalExpense += amt;
+
+                    tbody.innerHTML += `
+                        <tr class="border-b border-slate-700/40 hover:bg-slate-700/30 transition">
+                            <td class="py-3 px-4 font-mono text-xs">${t.date}</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 text-[11px] rounded-full border ${isIncome ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30'}">${isIncome ? 'Pemasukan' : 'Pengeluaran'}</span></td>
+                            <td class="py-3 px-4 font-medium text-cyan-300">${t.category}</td>
+                            <td class="py-3 px-4 text-slate-400">${t.desc}</td>
+                            <td class="py-3 px-4 text-right font-mono font-semibold ${isIncome ? 'text-emerald-400' : 'text-slate-200'}">${isIncome ? '+' : '-'} ${formatIDR(amt)}</td>
+                            <td class="py-3 px-4 text-center">
+                                <button onclick="editTransaction(${t.id})" title="Edit Transaksi" class="text-amber-400 hover:text-amber-300 p-1 mr-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button onclick="deleteTransaction(${t.id})" title="Hapus Transaksi" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // Update Rekap Subtotal Kartu
+            const netFiltered = subtotalIncome - subtotalExpense;
+            document.getElementById('filterSubtotalIncome').innerText = formatIDR(subtotalIncome);
+            document.getElementById('filterSubtotalExpense').innerText = formatIDR(subtotalExpense);
+            
+            const netEl = document.getElementById('filterSubtotalNet');
+            netEl.innerText = formatIDR(netFiltered);
+            netEl.className = `font-bold font-mono text-sm ${netFiltered >= 0 ? 'text-cyan-400' : 'text-amber-400'}`;
         }
 
         function renderCharts() {
@@ -1576,6 +1667,7 @@
         function populateFormDropdowns() {
             const typeSelect = document.getElementById('trxType');
             const categorySelect = document.getElementById('trxCategory');
+            const filterCategorySelect = document.getElementById('filterCategorySelect');
             if (!typeSelect || !categorySelect) return;
             
             typeSelect.innerHTML = '';
@@ -1583,6 +1675,15 @@
             
             categorySelect.innerHTML = '';
             
+            if (filterCategorySelect) {
+                const curFilterVal = filterCategorySelect.value;
+                filterCategorySelect.innerHTML = `<option value="ALL">Semua Kategori</option>`;
+                customCategoriesList.forEach(cat => {
+                    filterCategorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+                });
+                filterCategorySelect.value = customCategoriesList.includes(curFilterVal) ? curFilterVal : 'ALL';
+            }
+
             if (customCategoriesList.length > 0) {
                 customCategoriesList.forEach(cat => {
                     categorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
