@@ -314,8 +314,8 @@
             <section id="tab-po" class="space-y-6 hidden">
                 <!-- MODUL PRE-ORDER MULTI-ITEM -->
                 <div id="module-po" class="space-y-6">
-                    <!-- Form Pembuatan / Edit PO -->
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4">
+                    <!-- Form Pembuatan / Edit PO (Ditambahkan class no-print agar tidak ikut ter-print) -->
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 no-print">
                         <div class="flex justify-between items-center">
                             <h2 id="poFormTitle" class="text-base font-semibold text-white flex items-center gap-2">
                                 <i class="fa-solid fa-file-circle-plus text-cyan-400"></i> Buat Pre-Order (PO) Baru
@@ -327,11 +327,15 @@
                         <form id="poForm" class="space-y-4">
                             <input type="hidden" id="editingPoId" value="">
 
-                            <!-- Header PO -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-900/60 p-4 rounded-xl border border-slate-700/50">
+                            <!-- Header PO: Nomor PO, Tanggal PO, & Nama Vendor (Global) -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-900/60 p-4 rounded-xl border border-slate-700/50">
                                 <div>
                                     <label class="block text-xs font-medium text-slate-300 mb-1">Nomor PO</label>
                                     <input type="text" id="poNumber" placeholder="PO/2026/001" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">Nama Vendor / Supplier</label>
+                                    <input type="text" id="poVendor" placeholder="PT. Vendor Jaya Utama" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-slate-300 mb-1">Pilih Tanggal PO</label>
@@ -356,10 +360,10 @@
                                             <tr class="bg-slate-900 border-b border-slate-700 text-slate-400">
                                                 <th class="py-2.5 px-3 min-w-[150px]">Nama Barang / Pajak / Diskon</th>
                                                 <th class="py-2.5 px-3 min-w-[130px]">Spesifikasi</th>
-                                                <th class="py-2.5 px-3 min-w-[150px]">Vendor / Supplier</th>
                                                 <th class="py-2.5 px-3 w-24">Volume/Qty</th>
                                                 <th class="py-2.5 px-3 w-36 text-right">Harga Total (IDR)</th>
-                                                <th class="py-2.5 px-3 min-w-[140px]">Status Item</th>
+                                                <th class="py-2.5 px-3 min-w-[130px]">Status Item</th>
+                                                <th class="py-2.5 px-3 min-w-[150px]">Keterangan</th>
                                                 <th class="py-2.5 px-3 w-10 text-center">Aksi</th>
                                             </tr>
                                         </thead>
@@ -386,11 +390,11 @@
                         </form>
                     </div>
 
-                    <!-- Tabel Ringkasan PO -->
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4">
+                    <!-- Tabel Ringkasan PO (Daftar Pre-Order yang akan dicetak) -->
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 print-card">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                             <h3 class="text-sm font-semibold text-white">Daftar Pre-Order (PO) Proyek</h3>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 no-print">
                                 <span class="text-xs text-slate-400">Filter Status Item:</span>
                                 <select id="filterPoStatus" onchange="renderPOTable()" class="bg-slate-900 border border-slate-700 rounded-lg py-1 px-2.5 text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
                                     <option value="ALL">Semua Status</option>
@@ -406,13 +410,14 @@
                             <table class="w-full text-left border-collapse text-xs sm:text-sm">
                                 <thead>
                                     <tr class="bg-slate-900 border-b border-slate-700 text-slate-400 font-semibold text-[11px]">
-                                        <th class="py-3 px-4 w-10 text-center"></th>
+                                        <th class="py-3 px-4 w-10 text-center no-print"></th>
                                         <th class="py-3 px-4">Nomor PO</th>
+                                        <th class="py-3 px-4">Nama Vendor / Supplier</th>
                                         <th class="py-3 px-4">Tanggal</th>
                                         <th class="py-3 px-4 text-center">Jumlah Item</th>
                                         <th class="py-3 px-4 text-center">Progres Status Item</th>
                                         <th class="py-3 px-4 text-right">Total Nilai PO</th>
-                                        <th class="py-3 px-4 text-center">Aksi</th>
+                                        <th class="py-3 px-4 text-center no-print">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="poTableBody" class="divide-y divide-slate-700/50"></tbody>
@@ -423,7 +428,7 @@
 
                 <!-- MODUL OPERASIONAL ALAT BERAT -->
                 <div id="module-heavy" class="space-y-6 hidden">
-                    <div class="flex flex-wrap gap-2 border-b border-slate-700 pb-3">
+                    <div class="flex flex-wrap gap-2 border-b border-slate-700 pb-3 no-print">
                         <button onclick="switchHeavySubTab('exca')" id="subnav-exca" class="px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-600 text-white transition"><i class="fa-solid fa-truck-monster"></i> HM Excavator</button>
                         <button onclick="switchHeavySubTab('compact')" id="subnav-compact" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-700 transition"><i class="fa-solid fa-compact-disc"></i> HM Compact</button>
                         <button onclick="switchHeavySubTab('dt')" id="subnav-dt" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-700 transition"><i class="fa-solid fa-truck-moving"></i> Ritase DT</button>
@@ -431,7 +436,7 @@
 
                     <!-- EXCAVATOR -->
                     <div id="heavy-exca" class="space-y-6">
-                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
+                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
                             <h3 class="text-sm font-bold text-white mb-3">Input Daily Log HM & Fuel Excavator</h3>
                             <form id="excaForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                                 <div><label class="block text-xs text-slate-300 mb-1">Pilih Tanggal</label><input type="date" id="excaDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer"></div>
@@ -442,11 +447,11 @@
                                 <div class="lg:col-span-5 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs">Simpan Record Excavator</button></div>
                             </form>
                         </div>
-                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4">
+                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 print-card">
                             <h3 class="text-sm font-semibold text-white">Log Operasional Excavator</h3>
                             <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">HM Awal</th><th class="py-2.5 px-4 text-center">HM Akhir</th><th class="py-2.5 px-4 text-center">Total Jam</th><th class="py-2.5 px-4 text-center">Fuel (L)</th><th class="py-2.5 px-4 text-center">Konsumsi (L/Jam)</th><th class="py-2.5 px-4 text-right">Total Biaya Fuel</th><th class="py-2.5 px-4 text-center">Aksi</th></tr></thead>
+                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">HM Awal</th><th class="py-2.5 px-4 text-center">HM Akhir</th><th class="py-2.5 px-4 text-center">Total Jam</th><th class="py-2.5 px-4 text-center">Fuel (L)</th><th class="py-2.5 px-4 text-center">Konsumsi (L/Jam)</th><th class="py-2.5 px-4 text-right">Total Biaya Fuel</th><th class="py-2.5 px-4 text-center no-print">Aksi</th></tr></thead>
                                     <tbody id="excaTableBody" class="divide-y divide-slate-700/50"></tbody>
                                 </table>
                             </div>
@@ -461,7 +466,7 @@
 
                     <!-- COMPACT -->
                     <div id="heavy-compact" class="space-y-6 hidden">
-                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
+                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
                             <h3 class="text-sm font-bold text-white mb-3">Input Daily Log HM & Fuel Compact</h3>
                             <form id="compactForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                                 <div><label class="block text-xs text-slate-300 mb-1">Pilih Tanggal</label><input type="date" id="compactDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer"></div>
@@ -472,11 +477,11 @@
                                 <div class="lg:col-span-5 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs">Simpan Record Compact</button></div>
                             </form>
                         </div>
-                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4">
+                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 print-card">
                             <h3 class="text-sm font-semibold text-white">Log Operasional Compact Roller</h3>
                             <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">HM Awal</th><th class="py-2.5 px-4 text-center">HM Akhir</th><th class="py-2.5 px-4 text-center">Total Jam</th><th class="py-2.5 px-4 text-center">Fuel (L)</th><th class="py-2.5 px-4 text-center">Konsumsi (L/Jam)</th><th class="py-2.5 px-4 text-right">Total Biaya Fuel</th><th class="py-2.5 px-4 text-center">Aksi</th></tr></thead>
+                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">HM Awal</th><th class="py-2.5 px-4 text-center">HM Akhir</th><th class="py-2.5 px-4 text-center">Total Jam</th><th class="py-2.5 px-4 text-center">Fuel (L)</th><th class="py-2.5 px-4 text-center">Konsumsi (L/Jam)</th><th class="py-2.5 px-4 text-right">Total Biaya Fuel</th><th class="py-2.5 px-4 text-center no-print">Aksi</th></tr></thead>
                                     <tbody id="compactTableBody" class="divide-y divide-slate-700/50"></tbody>
                                 </table>
                             </div>
@@ -491,7 +496,7 @@
 
                     <!-- DUMP TRUCK -->
                     <div id="heavy-dt" class="space-y-6 hidden">
-                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm">
+                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
                             <h3 class="text-sm font-bold text-white mb-3">Input Daily Log Ritase Dump Truck</h3>
                             <form id="dtForm" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div><label class="block text-xs text-slate-300 mb-1">Pilih Tanggal</label><input type="date" id="dtDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer"></div>
@@ -500,11 +505,11 @@
                                 <div class="sm:col-span-3 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs">Simpan Record Ritase</button></div>
                             </form>
                         </div>
-                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4">
+                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 print-card">
                             <h3 class="text-sm font-semibold text-white">Log Ritase Dump Truck</h3>
                             <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">Jumlah Rit</th><th class="py-2.5 px-4 text-center">Konversi Jam (8 Rit/J)</th><th class="py-2.5 px-4 text-right">HPP Vendor</th><th class="py-2.5 px-4 text-center">Aksi</th></tr></thead>
+                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">Jumlah Rit</th><th class="py-2.5 px-4 text-center">Konversi Jam (8 Rit/J)</th><th class="py-2.5 px-4 text-right">HPP Vendor</th><th class="py-2.5 px-4 text-center no-print">Aksi</th></tr></thead>
                                     <tbody id="dtTableBody" class="divide-y divide-slate-700/50"></tbody>
                                 </table>
                             </div>
@@ -520,7 +525,7 @@
         </main>
 
         <!-- MODAL KELOLA KATEGORI -->
-        <div id="categoryModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div id="categoryModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
             <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
                     <h3 class="text-sm font-bold text-white flex items-center gap-2">
@@ -557,13 +562,13 @@
         </div>
 
         <!-- Footer -->
-        <footer class="bg-slate-800 border-t border-slate-700 py-4 text-center text-xs text-slate-500">
+        <footer class="bg-slate-800 border-t border-slate-700 py-4 text-center text-xs text-slate-500 no-print">
             Dashboard Cost Control Proyek &copy; 2026 PT. Orecon Putra Perkasa - All Rights Reserved
         </footer>
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-800 border border-slate-700 text-slate-200 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-800 border border-slate-700 text-slate-200 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 no-print">
         <i id="toastIcon" class="fa-solid fa-circle-info text-cyan-400"></i>
         <span id="toastMsg" class="text-xs sm:text-sm font-medium">Notifikasi</span>
     </div>
@@ -948,7 +953,7 @@
             resetTxForm();
         });
 
-        // ================= PO MULTI-ITEM (BISA DENGAN NOMINAL MINUS) =================
+        // ================= PO MULTI-ITEM DENGAN VENDOR GLOBAL & KOLOM KETERANGAN =================
         function addPoItemRow(itemData = null) {
             const container = document.getElementById('poItemsContainer');
             const rowId = 'po-item-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
@@ -959,15 +964,14 @@
             
             const name = itemData ? itemData.itemName : '';
             const specs = itemData ? itemData.specs : '';
-            const vendor = itemData ? itemData.vendor : '';
             const volume = itemData ? itemData.volume : '';
             const price = itemData ? itemData.price : '';
             const status = itemData ? itemData.status : 'BELUM_PROSES';
+            const note = itemData ? itemData.note : '';
 
             tr.innerHTML = `
                 <td class="p-2"><input type="text" value="${name}" placeholder="Material / Diskon / Pajak PPh" required class="po-item-name w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
                 <td class="p-2"><input type="text" value="${specs}" placeholder="WF 250 / PPh 22 (1.5%)" class="po-item-specs w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
-                <td class="p-2"><input type="text" value="${vendor}" placeholder="PT. Vendor / KPP Pratama" class="po-item-vendor w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
                 <td class="p-2"><input type="text" value="${volume}" placeholder="10 Ton / 1 Ls" class="po-item-volume w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
                 <td class="p-2"><input type="number" step="any" value="${price}" placeholder="15000000 / -500000" required oninput="calculatePoTotals()" class="po-item-price w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white text-right font-mono focus:outline-none focus:border-cyan-500"></td>
                 <td class="p-2">
@@ -977,6 +981,7 @@
                         <option value="SELESAI" ${status === 'SELESAI' ? 'selected' : ''}>🟢 Selesai</option>
                     </select>
                 </td>
+                <td class="p-2"><input type="text" value="${note}" placeholder="Catatan / Keterangan tambahan" class="po-item-note w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
                 <td class="p-2 text-center">
                     <button type="button" onclick="removePoItemRow('${rowId}')" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
                 </td>
@@ -1024,6 +1029,7 @@
 
             document.getElementById('editingPoId').value = po.id;
             document.getElementById('poNumber').value = po.poNumber || '';
+            document.getElementById('poVendor').value = po.vendor || '';
             document.getElementById('poDate').value = po.date || '';
 
             document.getElementById('poFormTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Pre-Order (PO): ${po.poNumber || po.id}`;
@@ -1034,7 +1040,7 @@
             const container = document.getElementById('poItemsContainer');
             container.innerHTML = '';
             
-            const itemsArray = po.items || [{ itemName: po.itemName || '', specs: po.specs || '', vendor: po.vendor || '', volume: po.volume || '', price: po.total || 0, status: po.status || 'BELUM_PROSES' }];
+            const itemsArray = po.items || [{ itemName: po.itemName || '', specs: po.specs || '', volume: po.volume || '', price: po.total || 0, status: po.status || 'BELUM_PROSES', note: '' }];
             itemsArray.forEach(item => addPoItemRow(item));
 
             document.getElementById('poForm').scrollIntoView({ behavior: 'smooth' });
@@ -1061,29 +1067,25 @@
             const editingId = document.getElementById('editingPoId').value;
             const selectedDate = document.getElementById('poDate').value;
             const poNum = document.getElementById('poNumber').value.trim();
+            const vendorName = document.getElementById('poVendor').value.trim();
 
             const rows = document.querySelectorAll('#poItemsContainer tr');
             const itemsList = [];
             let totalAmount = 0;
-            const vendorSet = new Set();
 
             rows.forEach(row => {
                 const price = parseFloat(row.querySelector('.po-item-price').value) || 0;
-                const vendorName = row.querySelector('.po-item-vendor').value.trim();
-                if (vendorName) vendorSet.add(vendorName);
 
                 itemsList.push({
                     itemName: row.querySelector('.po-item-name').value.trim(),
                     specs: row.querySelector('.po-item-specs').value.trim(),
-                    vendor: vendorName,
                     volume: row.querySelector('.po-item-volume').value.trim(),
                     price: price,
-                    status: row.querySelector('.po-item-status').value
+                    status: row.querySelector('.po-item-status').value,
+                    note: row.querySelector('.po-item-note').value.trim()
                 });
                 totalAmount += price;
             });
-
-            const vendorsSummary = Array.from(vendorSet).join(', ') || '-';
 
             const poCategoryName = "Pengadaan PO";
             if (!customCategoriesList.includes(poCategoryName)) {
@@ -1098,6 +1100,7 @@
                     purchaseOrders[index] = {
                         ...purchaseOrders[index],
                         poNumber: poNum,
+                        vendor: vendorName,
                         date: selectedDate,
                         items: itemsList,
                         total: totalAmount
@@ -1107,7 +1110,7 @@
                     if (txIndex !== -1) {
                         transactions[txIndex].amount = totalAmount;
                         transactions[txIndex].date = selectedDate;
-                        transactions[txIndex].desc = `Pengadaan ${poNum} (${vendorsSummary})`;
+                        transactions[txIndex].desc = `Pengadaan ${poNum} (${vendorName})`;
                         await saveCloudData('transactions', transactions[txIndex]);
                     }
 
@@ -1119,6 +1122,7 @@
                 const newPO = {
                     id: newPoId,
                     poNumber: poNum,
+                    vendor: vendorName,
                     date: selectedDate,
                     items: itemsList,
                     total: totalAmount
@@ -1132,7 +1136,7 @@
                     type: 'EXPENSE',
                     category: poCategoryName,
                     amount: totalAmount,
-                    desc: `Pengadaan ${poNum} (${vendorsSummary})`,
+                    desc: `Pengadaan ${poNum} (${vendorName})`,
                     poRefId: newPoId
                 };
 
@@ -1191,12 +1195,12 @@
             document.getElementById('poCount').innerText = filteredPOs.length + ' Dokumen PO';
 
             if (filteredPOs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-500 italic">Belum ada dokumen Pre-Order (PO) yang sesuai filter.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-500 italic">Belum ada dokumen Pre-Order (PO) yang sesuai filter.</td></tr>`;
                 return;
             }
 
             filteredPOs.forEach(po => {
-                const itemsArray = po.items || [{ itemName: po.itemName || '-', specs: po.specs || '-', vendor: po.vendor || '-', volume: po.volume || '-', price: po.total || 0, status: po.status || 'BELUM_PROSES' }];
+                const itemsArray = po.items || [{ itemName: po.itemName || '-', specs: po.specs || '-', volume: po.volume || '-', price: po.total || 0, status: po.status || 'BELUM_PROSES', note: '' }];
                 const itemsCount = itemsArray.length;
 
                 const finishedCount = itemsArray.filter(it => (it.status || 'BELUM_PROSES') === 'SELESAI').length;
@@ -1209,30 +1213,32 @@
                     progressBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟡 Dalam Proses / Belum</span>`;
                 }
 
+                // Default detail terbuka (chevron down), namun pengguna bisa mengklik untuk hide/toggle
                 tbody.innerHTML += `
                     <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition cursor-pointer" onclick="togglePoDetail(${po.id})">
-                        <td class="py-3.5 px-4 text-center">
-                            <i id="po-icon-${po.id}" class="fa-solid fa-chevron-right text-slate-400 text-xs"></i>
+                        <td class="py-3.5 px-4 text-center no-print">
+                            <i id="po-icon-${po.id}" class="fa-solid fa-chevron-down text-cyan-400 text-xs"></i>
                         </td>
                         <td class="py-3.5 px-4 font-bold text-cyan-400 font-mono">${po.poNumber || 'PO-' + po.id.toString().slice(-4)}</td>
+                        <td class="py-3.5 px-4 font-semibold text-white">${po.vendor || '-'}</td>
                         <td class="py-3.5 px-4 font-mono text-slate-300 text-xs">${po.date}</td>
                         <td class="py-3.5 px-4 text-center"><span class="bg-slate-700 text-cyan-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold">${itemsCount} Item</span></td>
                         <td class="py-3.5 px-4 text-center">${progressBadge}</td>
                         <td class="py-3.5 px-4 text-right font-mono font-bold ${po.total < 0 ? 'text-amber-400' : 'text-emerald-400'}">${formatIDR(po.total)}</td>
-                        <td class="py-3.5 px-4 text-center" onclick="event.stopPropagation()">
+                        <td class="py-3.5 px-4 text-center no-print" onclick="event.stopPropagation()">
                             <button onclick="editPO(${po.id})" title="Edit PO" class="text-amber-400 hover:text-amber-300 p-1 mr-1"><i class="fa-solid fa-pen-to-square"></i></button>
                             <button onclick="deletePO(${po.id})" title="Hapus PO" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
                         </td>
                     </tr>
                     
-                    <tr id="po-detail-${po.id}" class="hidden bg-slate-900/90 border-b border-slate-700/80">
-                        <td colspan="7" class="p-4">
+                    <tr id="po-detail-${po.id}" class="bg-slate-900/90 border-b border-slate-700/80">
+                        <td colspan="8" class="p-4">
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                                 <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                                     <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                                         <i class="fa-solid fa-list-check text-cyan-400"></i> Rincian Barang / Material / Potongan - ${po.poNumber || 'PO-' + po.id}
                                     </h4>
-                                    <span class="text-xs text-slate-400">Tanggal PO: <strong class="text-slate-200">${po.date}</strong></span>
+                                    <span class="text-xs text-slate-400">Vendor: <strong class="text-cyan-300 font-semibold">${po.vendor || '-'}</strong> | Tanggal PO: <strong class="text-slate-200">${po.date}</strong></span>
                                 </div>
                                 <div class="overflow-x-auto">
                                     <table class="w-full text-left text-xs border-collapse">
@@ -1241,10 +1247,10 @@
                                                 <th class="py-1.5 px-2">No</th>
                                                 <th class="py-1.5 px-2">Nama Barang / Uraian</th>
                                                 <th class="py-1.5 px-2">Spesifikasi</th>
-                                                <th class="py-1.5 px-2">Vendor / Supplier</th>
                                                 <th class="py-1.5 px-2 text-center">Volume / Qty</th>
                                                 <th class="py-1.5 px-2 text-right">Harga Total Item</th>
                                                 <th class="py-1.5 px-2 text-center">Status Item</th>
+                                                <th class="py-1.5 px-2">Keterangan</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-slate-800/60 text-slate-300">
@@ -1253,10 +1259,10 @@
                                                     <td class="py-2 px-2 text-slate-500 font-mono">${idx + 1}</td>
                                                     <td class="py-2 px-2 font-semibold text-white">${it.itemName}</td>
                                                     <td class="py-2 px-2 text-slate-400">${it.specs || '-'}</td>
-                                                    <td class="py-2 px-2 text-cyan-300 font-medium">${it.vendor || '-'}</td>
                                                     <td class="py-2 px-2 text-center font-mono text-slate-200">${it.volume || '-'}</td>
                                                     <td class="py-2 px-2 text-right font-mono ${it.price < 0 ? 'text-amber-400 font-bold' : 'text-emerald-400'}">${formatIDR(it.price)}</td>
                                                     <td class="py-2 px-2 text-center">${getStatusBadge(it.status || 'BELUM_PROSES')}</td>
+                                                    <td class="py-2 px-2 text-slate-300 italic">${it.note || '-'}</td>
                                                 </tr>
                                             `).join('')}
                                         </tbody>
@@ -1406,7 +1412,7 @@
                         <td class="py-2.5 px-4 text-center font-mono text-amber-400">${fuel.toFixed(1)} L</td>
                         <td class="py-2.5 px-4 text-center font-mono text-purple-300">${cons > 0 ? cons.toFixed(2) + ' L/J' : '-'}</td>
                         <td class="py-2.5 px-4 text-right font-mono text-emerald-400">${formatIDR(cost)}</td>
-                        <td class="py-2.5 px-4 text-center"><button onclick="deleteExcaLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
+                        <td class="py-2.5 px-4 text-center no-print"><button onclick="deleteExcaLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
                     </tr>`;
             });
             const avgCons = sumH > 0 ? (sumF / sumH) : 0;
@@ -1437,7 +1443,7 @@
                         <td class="py-2.5 px-4 text-center font-mono text-amber-400">${fuel.toFixed(1)} L</td>
                         <td class="py-2.5 px-4 text-center font-mono text-purple-300">${cons > 0 ? cons.toFixed(2) + ' L/J' : '-'}</td>
                         <td class="py-2.5 px-4 text-right font-mono text-emerald-400">${formatIDR(cost)}</td>
-                        <td class="py-2.5 px-4 text-center"><button onclick="deleteCompactLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
+                        <td class="py-2.5 px-4 text-center no-print"><button onclick="deleteCompactLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
                     </tr>`;
             });
             const avgCons = sumH > 0 ? (sumF / sumH) : 0;
@@ -1464,7 +1470,7 @@
                         <td class="py-2.5 px-4 text-center font-bold text-cyan-400 font-mono">${rit} Rit</td>
                         <td class="py-2.5 px-4 text-center font-mono text-slate-300">${hours.toFixed(2)} Jam</td>
                         <td class="py-2.5 px-4 text-right font-mono text-amber-400">${formatIDR(l.totalCost)}</td>
-                        <td class="py-2.5 px-4 text-center"><button onclick="deleteDtLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
+                        <td class="py-2.5 px-4 text-center no-print"><button onclick="deleteDtLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
                     </tr>`;
             });
             document.getElementById('sumDtRitase').innerText = sumR + ' Rit';
@@ -1553,7 +1559,7 @@
             const dtHpp = totalDtVendorHpp;
             const totalHpp = excaHpp + compactHpp + dtHpp;
 
-            // PENAMBAHAN KALKULASI MARGIN
+            // KALKULASI MARGIN
             const totalMargin = totalRevenue - totalHpp;
             const marginPct = totalRevenue > 0 ? (totalMargin / totalRevenue) * 100 : 0;
 
@@ -1664,7 +1670,7 @@
                             <td class="py-3 px-4 font-medium text-slate-200">${t.category}</td>
                             <td class="py-3 px-4 text-slate-400">${t.desc}</td>
                             <td class="py-3 px-4 text-right font-mono font-semibold ${isIncome ? 'text-emerald-400' : 'text-slate-200'}">${isIncome ? '+' : '-'} ${formatIDR(amt)}</td>
-                            <td class="py-3 px-4 text-center">
+                            <td class="py-3 px-4 text-center no-print">
                                 <button onclick="editTransaction(${t.id})" title="Edit Transaksi" class="text-amber-400 hover:text-amber-300 p-1 mr-1"><i class="fa-solid fa-pen-to-square"></i></button>
                                 <button onclick="deleteTransaction(${t.id})" title="Hapus Transaksi" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
                             </td>
@@ -1769,7 +1775,7 @@
         function showToast(msg, type = 'info') {
             const toast = document.getElementById('toast');
             document.getElementById('toastMsg').innerText = msg;
-            toast.className = `fixed bottom-5 right-5 z-50 bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300`;
+            toast.className = `fixed bottom-5 right-5 z-50 bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 no-print`;
             setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
         }
 
