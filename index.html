@@ -75,7 +75,7 @@
                 </select>
             </div>
 
-            <!-- Menu Navigasi -->
+            <!-- Menu Navigasi Sidebar -->
             <nav class="p-3 space-y-1">
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20">
                     <i class="fa-solid fa-chart-pie w-4 text-center"></i> Dashboard & Cost Control
@@ -83,6 +83,10 @@
                 <button onclick="switchTab('po')" id="nav-po" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white">
                     <i id="nav-po-icon" class="fa-solid fa-file-invoice-dollar w-4 text-center"></i> 
                     <span id="nav-po-text">Manajemen Pre-Order (PO)</span>
+                </button>
+                <button onclick="switchTab('po-payment')" id="nav-po-payment" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white">
+                    <i class="fa-solid fa-wallet w-4 text-center text-amber-400"></i> 
+                    <span>Kontrol Pembayaran & Hutang PO</span>
                 </button>
             </nav>
         </div>
@@ -121,27 +125,33 @@
             <!-- TAB 1: DASHBOARD & COST CONTROL -->
             <section id="tab-dashboard" class="space-y-6">
                 <!-- Executive KPI Cards Grid (Sporthall) -->
-                <div id="kpi-grid-sporthall" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div id="kpi-grid-sporthall" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Nilai Kontrak Utama</p>
-                        <h3 id="kpiContract" class="text-2xl font-bold text-white mt-2">Rp 0</h3>
+                        <h3 id="kpiContract" class="text-xl font-bold text-white mt-2">Rp 0</h3>
                     </div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Realisasi Biaya (RAP)</p>
-                        <h3 id="kpiRAP" class="text-2xl font-bold text-amber-400 mt-2">Rp 0</h3>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Realisasi Pengeluaran (Biaya)</p>
+                        <h3 id="kpiRAP" class="text-xl font-bold text-amber-400 mt-2">Rp 0</h3>
+                        <p class="text-[10px] text-slate-400 mt-1">*Uang Tunai / DP Real Terbayar</p>
+                    </div>
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Hutang PO Belum Lunas</p>
+                        <h3 id="kpiDebt" class="text-xl font-bold text-red-400 mt-2">Rp 0</h3>
+                        <p id="kpiDebtDesc" class="text-[10px] text-red-300 mt-1">Sisa kewajiban ke Vendor</p>
                     </div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Proyeksi Net Margin</p>
-                        <h3 id="kpiMargin" class="text-2xl font-bold text-emerald-400 mt-2">Rp 0</h3>
+                        <h3 id="kpiMargin" class="text-xl font-bold text-emerald-400 mt-2">Rp 0</h3>
                         <p id="kpiMarginPct" class="text-xs text-emerald-400 mt-1">0.0%</p>
                     </div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Saldo Kas Proyek</p>
-                        <h3 id="kpiCash" class="text-2xl font-bold text-cyan-400 mt-2">Rp 0</h3>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Saldo Kas Aktual</p>
+                        <h3 id="kpiCash" class="text-xl font-bold text-cyan-400 mt-2">Rp 0</h3>
                     </div>
                 </div>
 
-                <!-- Executive Summary Cards Grid (Penataan Lahan Mess) - 4 Kartu KPI Ringkasan -->
+                <!-- Executive Summary Cards Grid (Penataan Lahan Mess) -->
                 <div id="kpi-grid-mess" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 hidden">
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Total Jam Exca & Compact</p>
@@ -235,9 +245,9 @@
                     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                         <div>
                             <h2 class="text-base font-semibold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-receipt text-cyan-400"></i> Jurnal Transaksi Keuangan
+                                <i class="fa-solid fa-receipt text-cyan-400"></i> Jurnal Transaksi Keuangan (Pengeluaran Kas Real)
                             </h2>
-                            <p class="text-xs text-slate-400">Transaksi diurutkan otomatis berdasarkan tanggal (terlama ke terbaru).</p>
+                            <p class="text-xs text-slate-400">Menampilkan seluruh arus kas tunai / termin pembayaran yang memotong saldo kas proyek.</p>
                         </div>
 
                         <!-- Bar Filter & Sort Transaksi -->
@@ -314,7 +324,7 @@
             <section id="tab-po" class="space-y-6 hidden">
                 <!-- MODUL PRE-ORDER MULTI-ITEM -->
                 <div id="module-po" class="space-y-6">
-                    <!-- Form Pembuatan / Edit PO (Ditambahkan class no-print agar tidak ikut ter-print) -->
+                    <!-- Form Pembuatan / Edit PO -->
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 no-print">
                         <div class="flex justify-between items-center">
                             <h2 id="poFormTitle" class="text-base font-semibold text-white flex items-center gap-2">
@@ -327,7 +337,7 @@
                         <form id="poForm" class="space-y-4">
                             <input type="hidden" id="editingPoId" value="">
 
-                            <!-- Header PO: Nomor PO, Tanggal PO, & Nama Vendor (Global) -->
+                            <!-- Header PO: Nomor PO, Vendor, Tanggal PO -->
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-900/60 p-4 rounded-xl border border-slate-700/50">
                                 <div>
                                     <label class="block text-xs font-medium text-slate-300 mb-1">Nomor PO</label>
@@ -390,10 +400,13 @@
                         </form>
                     </div>
 
-                    <!-- Tabel Ringkasan PO (Daftar Pre-Order yang akan dicetak) -->
+                    <!-- Tabel Ringkasan PO (Daftar Pre-Order Ringkas) -->
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 print-card">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                            <h3 class="text-sm font-semibold text-white">Daftar Pre-Order (PO) Proyek</h3>
+                            <div>
+                                <h3 class="text-sm font-semibold text-white">Daftar Pre-Order (PO) Proyek</h3>
+                                <p class="text-xs text-slate-400">Daftar PO terdaftar dan progres pengerjaan material.</p>
+                            </div>
                             <div class="flex items-center gap-2 no-print">
                                 <span class="text-xs text-slate-400">Filter Status Item:</span>
                                 <select id="filterPoStatus" onchange="renderPOTable()" class="bg-slate-900 border border-slate-700 rounded-lg py-1 px-2.5 text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
@@ -522,7 +535,115 @@
                     </div>
                 </div>
             </section>
+
+            <!-- TAB 3: MENU BARU - KONTROL PEMBAYARAN & HUTANG PO -->
+            <section id="tab-po-payment" class="space-y-6 hidden">
+                <!-- Ringkasan Statistik Pembayaran & Kewajiban -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Total Nilai Komitmen PO</p>
+                        <h3 id="payKpiTotalPo" class="text-xl font-bold text-white mt-2">Rp 0</h3>
+                        <p class="text-[10px] text-slate-400 mt-1">Akumulasi seluruh PO terdaftar</p>
+                    </div>
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Total Realisasi Terbayar (Kas Out)</p>
+                        <h3 id="payKpiTotalPaid" class="text-xl font-bold text-emerald-400 mt-2">Rp 0</h3>
+                        <p class="text-[10px] text-emerald-400 mt-1">DP + Pelunasan memotong Kas</p>
+                    </div>
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Sisa Hutang Ke Vendor</p>
+                        <h3 id="payKpiRemainingDebt" class="text-xl font-bold text-red-400 mt-2">Rp 0</h3>
+                        <p class="text-[10px] text-red-300 mt-1">Kewajiban kas yang harus disiapkan</p>
+                    </div>
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Status Pelunasan PO</p>
+                        <h3 id="payKpiRatio" class="text-xl font-bold text-cyan-400 mt-2">0 / 0 PO Lunas</h3>
+                        <p id="payKpiRatioPct" class="text-[10px] text-cyan-300 mt-1">0.0% Terbayar</p>
+                    </div>
+                </div>
+
+                <!-- Tabel Kontrol & Pelunasan Pembayaran PO -->
+                <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 print-card">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div>
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-wallet text-amber-400"></i> Daftar Kewajiban & Update Pembayaran PO
+                            </h3>
+                            <p class="text-xs text-slate-400">Pilih status pembayaran dan update nominal DP / pelunasan untuk masing-masing PO.</p>
+                        </div>
+                        <div class="flex items-center gap-2 no-print">
+                            <span class="text-xs text-slate-400">Filter Pembayaran:</span>
+                            <select id="filterPaymentStatus" onchange="renderPaymentControlTable()" class="bg-slate-900 border border-slate-700 rounded-lg py-1 px-2.5 text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
+                                <option value="ALL">Semua Status Bayar</option>
+                                <option value="LUNAS">🟢 Lunas</option>
+                                <option value="DP">🔵 DP (Bayar Sebagian)</option>
+                                <option value="TEMPO">🟡 Tempo</option>
+                                <option value="BELUM_BAYAR">🔴 Belum Dibayar</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-xl border border-slate-700/50">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                            <thead>
+                                <tr class="bg-slate-900 border-b border-slate-700 text-slate-400 font-semibold text-[11px]">
+                                    <th class="py-3 px-4">Nomor PO</th>
+                                    <th class="py-3 px-4">Nama Vendor / Supplier</th>
+                                    <th class="py-3 px-4">Tanggal PO</th>
+                                    <th class="py-3 px-4 text-center">Status Pembayaran</th>
+                                    <th class="py-3 px-4 text-right">Total Nilai PO</th>
+                                    <th class="py-3 px-4 text-right">Telah Dibayar (Kas Out)</th>
+                                    <th class="py-3 px-4 text-right">Sisa Hutang</th>
+                                    <th class="py-3 px-4 text-center no-print">Update Bayar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentTableBody" class="divide-y divide-slate-700/50"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
         </main>
+
+        <!-- MODAL UPDATE PEMBAYARAN PO -->
+        <div id="paymentModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+                <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-money-bill-wave text-emerald-400"></i> Update Pembayaran PO
+                    </h3>
+                    <button onclick="closePaymentModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+
+                <form id="updatePaymentForm" onsubmit="savePaymentUpdate(event)" class="space-y-4">
+                    <input type="hidden" id="modalPoId" value="">
+                    <div>
+                        <p class="text-xs text-slate-400">Nomor PO: <strong id="modalPoNum" class="text-cyan-400"></strong></p>
+                        <p class="text-xs text-slate-400">Vendor: <strong id="modalPoVendor" class="text-white"></strong></p>
+                        <p class="text-xs text-slate-400">Total PO: <strong id="modalPoTotal" class="text-emerald-400"></strong></p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Status Pembayaran Baru</label>
+                        <select id="modalPayStatus" onchange="handleModalPayStatusChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 cursor-pointer font-semibold">
+                            <option value="LUNAS">🟢 Lunas (Memotong Kas 100%)</option>
+                            <option value="DP">🔵 DP / Uang Muka (Memotong Kas Sebagian)</option>
+                            <option value="TEMPO">🟡 Tempo (Belum Potong Kas)</option>
+                            <option value="BELUM_BAYAR">🔴 Belum Dibayar (Belum Potong Kas)</option>
+                        </select>
+                    </div>
+
+                    <div id="modalDpAmountWrapper">
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Nominal Pembayaran / DP (IDR)</label>
+                        <input type="number" id="modalPaidAmount" placeholder="5000000" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-cyan-200 font-mono focus:outline-none focus:border-cyan-500">
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-700 flex justify-end gap-2">
+                        <button type="button" onclick="closePaymentModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold px-4 py-2 rounded-xl text-xs transition">Batal</button>
+                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-md">Simpan Pembayaran</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
         <!-- MODAL KELOLA KATEGORI -->
         <div id="categoryModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
@@ -548,9 +669,7 @@
                 <!-- Daftar Kategori Yang Ada -->
                 <div class="space-y-2 pt-2">
                     <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider">Daftar Kategori Terdaftar:</label>
-                    <div id="categoryListContainer" class="max-h-60 overflow-y-auto space-y-1.5 pr-1">
-                        <!-- Items rendered by JS -->
-                    </div>
+                    <div id="categoryListContainer" class="max-h-60 overflow-y-auto space-y-1.5 pr-1"></div>
                 </div>
 
                 <div class="pt-2 border-t border-slate-700 flex justify-end">
@@ -670,6 +789,7 @@
 
             const navPoText = document.getElementById('nav-po-text');
             const navPoIcon = document.getElementById('nav-po-icon');
+            const navPoPayment = document.getElementById('nav-po-payment');
             
             const kpiSporthall = document.getElementById('kpi-grid-sporthall');
             const kpiMess = document.getElementById('kpi-grid-mess');
@@ -682,6 +802,7 @@
             if (projId === 'mess') {
                 navPoText.innerText = "Alat Berat & Ritase DT";
                 navPoIcon.className = "fa-solid fa-truck-monster w-4 text-center";
+                navPoPayment.classList.add('hidden');
                 kpiSporthall.classList.add('hidden');
                 kpiMess.classList.remove('hidden');
                 messComparison.classList.remove('hidden');
@@ -692,6 +813,7 @@
             } else {
                 navPoText.innerText = "Manajemen Pre-Order (PO)";
                 navPoIcon.className = "fa-solid fa-file-invoice-dollar w-4 text-center";
+                navPoPayment.classList.remove('hidden');
                 kpiSporthall.classList.remove('hidden');
                 kpiMess.classList.add('hidden');
                 messComparison.classList.add('hidden');
@@ -724,8 +846,11 @@
 
             populateFormDropdowns();
             updateDashboard();
+            
             if (!document.getElementById('tab-po').classList.contains('hidden')) {
                 renderTabTwoContent();
+            } else if (!document.getElementById('tab-po-payment').classList.contains('hidden')) {
+                renderPaymentControlTable();
             }
             showToast('Data telah diperbarui!', 'success');
         }
@@ -733,20 +858,32 @@
         function switchTab(tabId) {
             const dashboardTab = document.getElementById('tab-dashboard');
             const poTab = document.getElementById('tab-po');
+            const poPaymentTab = document.getElementById('tab-po-payment');
+            
             const navDashboard = document.getElementById('nav-dashboard');
             const navPo = document.getElementById('nav-po');
+            const navPoPayment = document.getElementById('nav-po-payment');
+
+            // Reset Kelas Navigasi
+            [navDashboard, navPo, navPoPayment].forEach(btn => {
+                btn.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white";
+            });
+
+            dashboardTab.classList.add('hidden');
+            poTab.classList.add('hidden');
+            poPaymentTab.classList.add('hidden');
 
             if (tabId === 'dashboard') {
                 dashboardTab.classList.remove('hidden');
-                poTab.classList.add('hidden');
-                navDashboard.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold bg-cyan-600 text-white shadow-md";
-                navPo.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-700";
-            } else {
-                dashboardTab.classList.add('hidden');
+                navDashboard.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
+            } else if (tabId === 'po') {
                 poTab.classList.remove('hidden');
-                navPo.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold bg-cyan-600 text-white shadow-md";
-                navDashboard.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-slate-700";
+                navPo.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
                 renderTabTwoContent();
+            } else if (tabId === 'po-payment') {
+                poPaymentTab.classList.remove('hidden');
+                navPoPayment.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
+                renderPaymentControlTable();
             }
         }
 
@@ -953,7 +1090,7 @@
             resetTxForm();
         });
 
-        // ================= PO MULTI-ITEM DENGAN VENDOR GLOBAL & KOLOM KETERANGAN =================
+        // ================= PO ITEM ROW MANAGEMENT =================
         function addPoItemRow(itemData = null) {
             const container = document.getElementById('poItemsContainer');
             const rowId = 'po-item-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
@@ -1061,7 +1198,7 @@
             addPoItemRow();
         }
 
-        // Form Submit PO
+        // Form Submit PO (Default Pembayaran Baru: TEMPO / BELUM BAYAR jika belum diset)
         document.getElementById('poForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const editingId = document.getElementById('editingPoId').value;
@@ -1097,20 +1234,30 @@
                 const numericId = Number(editingId);
                 const index = purchaseOrders.findIndex(p => p.id === numericId);
                 if (index !== -1) {
+                    const existingPo = purchaseOrders[index];
+                    const payStatus = existingPo.paymentStatus || 'BELUM_BAYAR';
+                    let paidAmount = Number(existingPo.paidAmount) || 0;
+                    if (payStatus === 'LUNAS') paidAmount = totalAmount;
+
+                    const remainingDebt = totalAmount - paidAmount;
+
                     purchaseOrders[index] = {
-                        ...purchaseOrders[index],
+                        ...existingPo,
                         poNumber: poNum,
                         vendor: vendorName,
                         date: selectedDate,
                         items: itemsList,
-                        total: totalAmount
+                        total: totalAmount,
+                        paymentStatus: payStatus,
+                        paidAmount: paidAmount,
+                        remainingDebt: remainingDebt > 0 ? remainingDebt : 0
                     };
 
                     const txIndex = transactions.findIndex(t => t.poRefId === numericId);
                     if (txIndex !== -1) {
-                        transactions[txIndex].amount = totalAmount;
+                        transactions[txIndex].amount = paidAmount;
                         transactions[txIndex].date = selectedDate;
-                        transactions[txIndex].desc = `Pengadaan ${poNum} (${vendorName})`;
+                        transactions[txIndex].desc = `Pengadaan ${poNum} (${vendorName}) - Status: ${payStatus}`;
                         await saveCloudData('transactions', transactions[txIndex]);
                     }
 
@@ -1119,13 +1266,17 @@
                 }
             } else {
                 const newPoId = Date.now();
+                // Default PO Baru diset ke TEMPO (Pengeluaran Kas = 0 sampai diupdate pada menu Kontrol Pembayaran)
                 const newPO = {
                     id: newPoId,
                     poNumber: poNum,
                     vendor: vendorName,
                     date: selectedDate,
                     items: itemsList,
-                    total: totalAmount
+                    total: totalAmount,
+                    paymentStatus: 'TEMPO',
+                    paidAmount: 0,
+                    remainingDebt: totalAmount
                 };
 
                 purchaseOrders.push(newPO);
@@ -1135,15 +1286,15 @@
                     date: selectedDate,
                     type: 'EXPENSE',
                     category: poCategoryName,
-                    amount: totalAmount,
-                    desc: `Pengadaan ${poNum} (${vendorName})`,
+                    amount: 0,
+                    desc: `Pengadaan ${poNum} (${vendorName}) - Status: TEMPO`,
                     poRefId: newPoId
                 };
 
                 transactions.push(autoTx);
                 await saveCloudData('po', newPO);
                 await saveCloudData('transactions', autoTx);
-                showToast(`PO ${poNum} berhasil dibuat & dicatat di Pengeluaran!`, 'success');
+                showToast(`PO ${poNum} berhasil dibuat (Status: TEMPO)!`, 'success');
             }
 
             populateFormDropdowns();
@@ -1152,7 +1303,7 @@
             resetPoForm();
         });
 
-        // Helper Status Badge
+        // Helper Badge Status Item Material
         function getStatusBadge(status) {
             switch(status) {
                 case 'SELESAI':
@@ -1161,6 +1312,20 @@
                     return `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🔵 Dalam Proses</span>`;
                 default:
                     return `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🟡 Belum Diproses</span>`;
+            }
+        }
+
+        // Helper Badge Status Bayar PO
+        function getPaymentStatusBadge(status) {
+            switch(status) {
+                case 'LUNAS':
+                    return `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟢 Lunas</span>`;
+                case 'DP':
+                    return `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔵 Bayar DP</span>`;
+                case 'TEMPO':
+                    return `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟡 Tempo</span>`;
+                default:
+                    return `<span class="bg-red-500/10 text-red-400 border border-red-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔴 Belum Bayar</span>`;
             }
         }
 
@@ -1177,6 +1342,7 @@
             }
         }
 
+        // RENDER TABEL DAFTAR PO (RINGKAS & TERFOKUS)
         function renderPOTable() {
             const tbody = document.getElementById('poTableBody');
             tbody.innerHTML = '';
@@ -1213,7 +1379,6 @@
                     progressBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟡 Dalam Proses / Belum</span>`;
                 }
 
-                // Default detail terbuka (chevron down), namun pengguna bisa mengklik untuk hide/toggle
                 tbody.innerHTML += `
                     <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition cursor-pointer" onclick="togglePoDetail(${po.id})">
                         <td class="py-3.5 px-4 text-center no-print">
@@ -1236,7 +1401,7 @@
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                                 <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                                     <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                                        <i class="fa-solid fa-list-check text-cyan-400"></i> Rincian Barang / Material / Potongan - ${po.poNumber || 'PO-' + po.id}
+                                        <i class="fa-solid fa-list-check text-cyan-400"></i> Rincian Barang / Material - ${po.poNumber || 'PO-' + po.id}
                                     </h4>
                                     <span class="text-xs text-slate-400">Vendor: <strong class="text-cyan-300 font-semibold">${po.vendor || '-'}</strong> | Tanggal PO: <strong class="text-slate-200">${po.date}</strong></span>
                                 </div>
@@ -1275,6 +1440,153 @@
             });
         }
 
+        // ================= LOGIC MENU BARU: KONTROL PEMBAYARAN PO =================
+        function renderPaymentControlTable() {
+            const tbody = document.getElementById('paymentTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const filterVal = document.getElementById('filterPaymentStatus') ? document.getElementById('filterPaymentStatus').value : 'ALL';
+            
+            let totalPoCommit = 0;
+            let totalPaidCash = 0;
+            let totalDebt = 0;
+            let paidCount = 0;
+
+            const filteredPOs = purchaseOrders.filter(p => {
+                const payStat = p.paymentStatus || 'BELUM_BAYAR';
+                if (filterVal === 'ALL') return true;
+                return payStat === filterVal;
+            });
+
+            purchaseOrders.forEach(p => {
+                const tot = Number(p.total) || 0;
+                const paid = Number(p.paidAmount) || 0;
+                const debt = Number(p.remainingDebt) || (tot - paid);
+
+                totalPoCommit += tot;
+                totalPaidCash += paid;
+                totalDebt += (debt > 0 ? debt : 0);
+
+                if (p.paymentStatus === 'LUNAS') paidCount++;
+            });
+
+            // Update KPI Ringkasan Pembayaran
+            document.getElementById('payKpiTotalPo').innerText = formatIDR(totalPoCommit);
+            document.getElementById('payKpiTotalPaid').innerText = formatIDR(totalPaidCash);
+            document.getElementById('payKpiRemainingDebt').innerText = formatIDR(totalDebt);
+            document.getElementById('payKpiRatio').innerText = `${paidCount} / ${purchaseOrders.length} PO Lunas`;
+            
+            const ratioPct = purchaseOrders.length > 0 ? (paidCount / purchaseOrders.length) * 100 : 0;
+            document.getElementById('payKpiRatioPct').innerText = `${ratioPct.toFixed(1)}% Terbayar Lunas`;
+
+            if (filteredPOs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-500 italic">Belum ada PO yang sesuai filter status pembayaran.</td></tr>`;
+                return;
+            }
+
+            filteredPOs.forEach(po => {
+                const tot = Number(po.total) || 0;
+                const paid = Number(po.paidAmount) || 0;
+                const debt = Number(po.remainingDebt) || (tot - paid);
+
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition">
+                        <td class="py-3.5 px-4 font-bold text-cyan-400 font-mono">${po.poNumber || 'PO-' + po.id.toString().slice(-4)}</td>
+                        <td class="py-3.5 px-4 font-semibold text-white">${po.vendor || '-'}</td>
+                        <td class="py-3.5 px-4 font-mono text-slate-300 text-xs">${po.date}</td>
+                        <td class="py-3.5 px-4 text-center">${getPaymentStatusBadge(po.paymentStatus || 'BELUM_BAYAR')}</td>
+                        <td class="py-3.5 px-4 text-right font-mono font-bold text-white">${formatIDR(tot)}</td>
+                        <td class="py-3.5 px-4 text-right font-mono text-emerald-400 font-semibold">${formatIDR(paid)}</td>
+                        <td class="py-3.5 px-4 text-right font-mono font-bold ${debt > 0 ? 'text-red-400' : 'text-slate-500'}">${formatIDR(debt)}</td>
+                        <td class="py-3.5 px-4 text-center no-print">
+                            <button onclick="openPaymentModal(${po.id})" class="text-xs bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/40 border border-cyan-500/30 px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1 mx-auto">
+                                <i class="fa-solid fa-pen-to-square"></i> Edit Bayar
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openPaymentModal(poId) {
+            const po = purchaseOrders.find(p => p.id === poId);
+            if (!po) return;
+
+            document.getElementById('modalPoId').value = po.id;
+            document.getElementById('modalPoNum').innerText = po.poNumber || 'PO-' + po.id;
+            document.getElementById('modalPoVendor').innerText = po.vendor || '-';
+            document.getElementById('modalPoTotal').innerText = formatIDR(po.total || 0);
+
+            const status = po.paymentStatus || 'TEMPO';
+            document.getElementById('modalPayStatus').value = status;
+            document.getElementById('modalPaidAmount').value = po.paidAmount || 0;
+
+            handleModalPayStatusChange();
+            document.getElementById('paymentModal').classList.remove('hidden');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+        }
+
+        function handleModalPayStatusChange() {
+            const status = document.getElementById('modalPayStatus').value;
+            const wrapper = document.getElementById('modalDpAmountWrapper');
+            if (status === 'DP') {
+                wrapper.classList.remove('hidden');
+            } else if (status === 'LUNAS') {
+                wrapper.classList.add('hidden');
+            } else {
+                wrapper.classList.add('hidden');
+            }
+        }
+
+        async function savePaymentUpdate(e) {
+            e.preventDefault();
+            const poId = Number(document.getElementById('modalPoId').value);
+            const status = document.getElementById('modalPayStatus').value;
+            
+            const index = purchaseOrders.findIndex(p => p.id === poId);
+            if (index === -1) return;
+
+            const po = purchaseOrders[index];
+            let paidAmount = 0;
+
+            if (status === 'LUNAS') {
+                paidAmount = po.total;
+            } else if (status === 'DP') {
+                paidAmount = parseFloat(document.getElementById('modalPaidAmount').value) || 0;
+            } else {
+                paidAmount = 0;
+            }
+
+            const remainingDebt = po.total - paidAmount;
+
+            purchaseOrders[index] = {
+                ...po,
+                paymentStatus: status,
+                paidAmount: paidAmount,
+                remainingDebt: remainingDebt > 0 ? remainingDebt : 0
+            };
+
+            // Update Transaksi Kas Keluar
+            const txIndex = transactions.findIndex(t => t.poRefId === poId);
+            if (txIndex !== -1) {
+                transactions[txIndex].amount = paidAmount;
+                transactions[txIndex].desc = `Pengadaan ${po.poNumber || po.id} (${po.vendor}) - Status: ${status}`;
+                await saveCloudData('transactions', transactions[txIndex]);
+            }
+
+            await saveCloudData('po', purchaseOrders[index]);
+            showToast(`Status pembayaran PO ${po.poNumber} berhasil diperbarui!`, 'success');
+
+            closePaymentModal();
+            renderPaymentControlTable();
+            updateDashboard();
+        }
+
+        // OPERASIONAL ALAT BERAT & HELPER LOGIC
         document.getElementById('excaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const selectedDate = document.getElementById('excaDate').value;
@@ -1390,7 +1702,7 @@
             }
         }
 
-        // Render Functions
+        // Render Functions Alat Berat
         function renderExcaTable() {
             const tbody = document.getElementById('excaTableBody');
             tbody.innerHTML = '';
@@ -1604,18 +1916,36 @@
         }
 
         function renderSporthallDashboard() {
-            let totalIncome = 0, totalExpense = 0;
+            let totalIncome = 0, totalRealExpense = 0;
             transactions.forEach(t => {
                 if (t.type === 'INCOME') totalIncome += Number(t.amount);
-                else totalExpense += Number(t.amount);
+                else totalRealExpense += Number(t.amount); // Hanya uang tunai/DP yang sudah memotong kas
             });
 
-            const netMargin = currentContractValue - totalExpense;
+            // Hitung Total Kewajiban PO & Total Sisa Hutang
+            let totalPoCommitment = 0;
+            let totalPoDebt = 0;
+
+            purchaseOrders.forEach(p => {
+                const poTot = Number(p.total) || 0;
+                const paid = Number(p.paidAmount) || 0;
+                const debt = Number(p.remainingDebt) || (poTot - paid);
+                
+                totalPoCommitment += poTot;
+                totalPoDebt += (debt > 0 ? debt : 0);
+            });
+
+            // Total Biaya Proyeksi (Uang Keluar Aktual + Sisa Hutang PO)
+            const totalProjectCost = totalRealExpense + totalPoDebt;
+            const netMargin = currentContractValue - totalProjectCost;
             const marginPct = (netMargin / currentContractValue) * 100;
-            const netCash = totalIncome - totalExpense;
+            const netCash = totalIncome - totalRealExpense;
 
             document.getElementById('kpiContract').innerText = formatIDR(currentContractValue);
-            document.getElementById('kpiRAP').innerText = formatIDR(totalExpense);
+            document.getElementById('kpiRAP').innerText = formatIDR(totalRealExpense);
+            document.getElementById('kpiDebt').innerText = formatIDR(totalPoDebt);
+            document.getElementById('kpiDebtDesc').innerText = `Perlu ${formatIDR(totalPoDebt)} lagi penuhan pelunasan`;
+            
             document.getElementById('kpiMargin').innerText = formatIDR(netMargin);
             document.getElementById('kpiMarginPct').innerText = `${marginPct.toFixed(1)}% dari nilai kontrak`;
             document.getElementById('kpiCash').innerText = formatIDR(netCash);
@@ -1712,7 +2042,7 @@
                     data: {
                         labels: customCategoriesList,
                         datasets: [
-                            { label: 'Realisasi Pengeluaran', data: customCategoriesList.map(c => actuals[c] || 0), backgroundColor: 'rgba(14, 165, 233, 0.7)' }
+                            { label: 'Realisasi Pengeluaran Kas', data: customCategoriesList.map(c => actuals[c] || 0), backgroundColor: 'rgba(14, 165, 233, 0.7)' }
                         ]
                     },
                     options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#94a3b8', font: { size: 9 } } }, y: { ticks: { color: '#94a3b8' } } } }
