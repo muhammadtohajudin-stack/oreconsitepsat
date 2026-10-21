@@ -131,19 +131,19 @@
                         <h3 id="kpiContract" class="text-xl font-bold text-white mt-2">Rp 0</h3>
                     </div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Realisasi Pengeluaran (Biaya)</p>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Realisasi Pengeluaran (RAP)</p>
                         <h3 id="kpiRAP" class="text-xl font-bold text-amber-400 mt-2">Rp 0</h3>
-                        <p class="text-[10px] text-slate-400 mt-1">*Uang Tunai / DP Real Terbayar</p>
+                        <p class="text-[10px] text-slate-400 mt-1">*Uang Real Terbayar</p>
                     </div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Hutang PO Belum Lunas</p>
                         <h3 id="kpiDebt" class="text-xl font-bold text-red-400 mt-2">Rp 0</h3>
-                        <p id="kpiDebtDesc" class="text-[10px] text-red-300 mt-1">Sisa kewajiban ke Vendor</p>
+                        <p id="kpiDebtDesc" class="text-[10px] text-red-300 mt-1">Sisa kewajiban Vendor</p>
                     </div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Proyeksi Net Margin</p>
                         <h3 id="kpiMargin" class="text-xl font-bold text-emerald-400 mt-2">Rp 0</h3>
-                        <p id="kpiMarginPct" class="text-xs text-emerald-400 mt-1">0.0%</p>
+                        <p id="kpiMarginPct" class="text-xs text-emerald-400 mt-1">0.0% (Kontrak - RAP)</p>
                     </div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Saldo Kas Aktual</p>
@@ -536,7 +536,7 @@
                 </div>
             </section>
 
-            <!-- TAB 3: MENU BARU - KONTROL PEMBAYARAN & HUTANG PO -->
+            <!-- TAB 3: KONTROL PEMBAYARAN & HUTANG PO -->
             <section id="tab-po-payment" class="space-y-6 hidden">
                 <!-- Ringkasan Statistik Pembayaran & Kewajiban -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -864,7 +864,6 @@
             const navPo = document.getElementById('nav-po');
             const navPoPayment = document.getElementById('nav-po-payment');
 
-            // Reset Kelas Navigasi
             [navDashboard, navPo, navPoPayment].forEach(btn => {
                 btn.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white";
             });
@@ -1198,7 +1197,7 @@
             addPoItemRow();
         }
 
-        // Form Submit PO (Default Pembayaran Baru: TEMPO / BELUM BAYAR jika belum diset)
+        // Form Submit PO
         document.getElementById('poForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const editingId = document.getElementById('editingPoId').value;
@@ -1266,7 +1265,6 @@
                 }
             } else {
                 const newPoId = Date.now();
-                // Default PO Baru diset ke TEMPO (Pengeluaran Kas = 0 sampai diupdate pada menu Kontrol Pembayaran)
                 const newPO = {
                     id: newPoId,
                     poNumber: poNum,
@@ -1303,7 +1301,6 @@
             resetPoForm();
         });
 
-        // Helper Badge Status Item Material
         function getStatusBadge(status) {
             switch(status) {
                 case 'SELESAI':
@@ -1315,7 +1312,6 @@
             }
         }
 
-        // Helper Badge Status Bayar PO
         function getPaymentStatusBadge(status) {
             switch(status) {
                 case 'LUNAS':
@@ -1329,7 +1325,6 @@
             }
         }
 
-        // Toggle Accordion Detail PO
         function togglePoDetail(poId) {
             const detailRow = document.getElementById(`po-detail-${poId}`);
             const icon = document.getElementById(`po-icon-${poId}`);
@@ -1342,7 +1337,6 @@
             }
         }
 
-        // RENDER TABEL DAFTAR PO (RINGKAS & TERFOKUS)
         function renderPOTable() {
             const tbody = document.getElementById('poTableBody');
             tbody.innerHTML = '';
@@ -1440,7 +1434,7 @@
             });
         }
 
-        // ================= LOGIC MENU BARU: KONTROL PEMBAYARAN PO =================
+        // ================= LOGIC MENU: KONTROL PEMBAYARAN PO =================
         function renderPaymentControlTable() {
             const tbody = document.getElementById('paymentTableBody');
             if (!tbody) return;
@@ -1471,7 +1465,6 @@
                 if (p.paymentStatus === 'LUNAS') paidCount++;
             });
 
-            // Update KPI Ringkasan Pembayaran
             document.getElementById('payKpiTotalPo').innerText = formatIDR(totalPoCommit);
             document.getElementById('payKpiTotalPaid').innerText = formatIDR(totalPaidCash);
             document.getElementById('payKpiRemainingDebt').innerText = formatIDR(totalDebt);
@@ -1570,7 +1563,6 @@
                 remainingDebt: remainingDebt > 0 ? remainingDebt : 0
             };
 
-            // Update Transaksi Kas Keluar
             const txIndex = transactions.findIndex(t => t.poRefId === poId);
             if (txIndex !== -1) {
                 transactions[txIndex].amount = paidAmount;
@@ -1856,13 +1848,11 @@
             document.getElementById('messKpiTotalHours').innerText = combinedHours.toFixed(1) + ' Jam';
             document.getElementById('messKpiFuelSummary').innerText = `Fuel: ${combinedFuelVol.toFixed(1)} L (${formatIDR(combinedFuelCost)})`;
 
-            // TARIF SATUAN KONTRAK:
             const excaRevenue = totalExcaHours * 669500;
             const compactRevenue = totalCompactHours * 571000;
             const dtRevenue = totalDtHours * 566300;
             const totalRevenue = excaRevenue + compactRevenue + dtRevenue;
 
-            // HPP Operasional Aktual:
             const excaHppAlat = calculateMonthlyHpp(excaLogs, 250000);
             const compactHppAlat = calculateMonthlyHpp(compactLogs, 210000);
 
@@ -1871,14 +1861,12 @@
             const dtHpp = totalDtVendorHpp;
             const totalHpp = excaHpp + compactHpp + dtHpp;
 
-            // KALKULASI MARGIN
             const totalMargin = totalRevenue - totalHpp;
             const marginPct = totalRevenue > 0 ? (totalMargin / totalRevenue) * 100 : 0;
 
             document.getElementById('messKpiRevenue').innerText = formatIDR(totalRevenue);
             document.getElementById('messKpiHpp').innerText = formatIDR(totalHpp);
             
-            // UPDATE KARTU KPI TOTAL MARGIN
             const marginEl = document.getElementById('messKpiMargin');
             const marginPctEl = document.getElementById('messKpiMarginPct');
             marginEl.innerText = formatIDR(totalMargin);
@@ -1919,35 +1907,30 @@
             let totalIncome = 0, totalRealExpense = 0;
             transactions.forEach(t => {
                 if (t.type === 'INCOME') totalIncome += Number(t.amount);
-                else totalRealExpense += Number(t.amount); // Hanya uang tunai/DP yang sudah memotong kas
+                else totalRealExpense += Number(t.amount); // RAP / Uang Terbayar
             });
 
-            // Hitung Total Kewajiban PO & Total Sisa Hutang
-            let totalPoCommitment = 0;
+            // Hitung Total Sisa Hutang PO untuk kartu KPI Hutang
             let totalPoDebt = 0;
-
             purchaseOrders.forEach(p => {
                 const poTot = Number(p.total) || 0;
                 const paid = Number(p.paidAmount) || 0;
                 const debt = Number(p.remainingDebt) || (poTot - paid);
-                
-                totalPoCommitment += poTot;
                 totalPoDebt += (debt > 0 ? debt : 0);
             });
 
-            // Total Biaya Proyeksi (Uang Keluar Aktual + Sisa Hutang PO)
-            const totalProjectCost = totalRealExpense + totalPoDebt;
-            const netMargin = currentContractValue - totalProjectCost;
-            const marginPct = (netMargin / currentContractValue) * 100;
+            // REVISI RUMUS: Proyeksi Net Margin = Nilai Kontrak - Realisasi Pengeluaran RAP (tanpa memperhitungkan hutang PO)
+            const netMargin = currentContractValue - totalRealExpense;
+            const marginPct = currentContractValue > 0 ? (netMargin / currentContractValue) * 100 : 0;
             const netCash = totalIncome - totalRealExpense;
 
             document.getElementById('kpiContract').innerText = formatIDR(currentContractValue);
             document.getElementById('kpiRAP').innerText = formatIDR(totalRealExpense);
             document.getElementById('kpiDebt').innerText = formatIDR(totalPoDebt);
-            document.getElementById('kpiDebtDesc').innerText = `Perlu ${formatIDR(totalPoDebt)} lagi penuhan pelunasan`;
+            document.getElementById('kpiDebtDesc').innerText = `Sisa kewajiban Vendor`;
             
             document.getElementById('kpiMargin').innerText = formatIDR(netMargin);
-            document.getElementById('kpiMarginPct').innerText = `${marginPct.toFixed(1)}% dari nilai kontrak`;
+            document.getElementById('kpiMarginPct').innerText = `${marginPct.toFixed(1)}% (Kontrak - RAP)`;
             document.getElementById('kpiCash').innerText = formatIDR(netCash);
 
             renderTable();
@@ -1964,14 +1947,12 @@
             const typeFilter = document.getElementById('filterTypeSelect') ? document.getElementById('filterTypeSelect').value : 'ALL';
             const sortOrder = document.getElementById('sortOrderSelect') ? document.getElementById('sortOrderSelect').value : 'ASC';
 
-            // Filter Transaksi
             let filteredTx = transactions.filter(t => {
                 const matchCat = (categoryFilter === 'ALL') || (t.category === categoryFilter);
                 const matchType = (typeFilter === 'ALL') || (t.type === typeFilter);
                 return matchCat && matchType;
             });
 
-            // Urutkan Transaksi berdasarkan Tanggal
             filteredTx.sort((a, b) => {
                 const dateA = new Date(a.date || '1970-01-01');
                 const dateB = new Date(b.date || '1970-01-01');
@@ -2009,7 +1990,6 @@
                 });
             }
 
-            // Update Rekap Subtotal Kartu
             const netFiltered = subtotalIncome - subtotalExpense;
             document.getElementById('filterSubtotalIncome').innerText = formatIDR(subtotalIncome);
             document.getElementById('filterSubtotalExpense').innerText = formatIDR(subtotalExpense);
@@ -2133,7 +2113,7 @@
                 document.getElementById('companyLogoImg').classList.remove('hidden');
                 document.getElementById('companyLogoPlaceholder').classList.add('hidden');
             }
-            addPoItemRow(); // Inisialisasi 1 baris item PO kosong
+            addPoItemRow();
             switchProject(currentProjectId);
         };
     </script>
