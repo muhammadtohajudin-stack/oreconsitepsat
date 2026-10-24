@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Cost Control & SPI/CPI - PT. Orecon Putra Perkasa</title>
+    <title>Cost Control & EVM Dashboard - PT. Orecon Putra Perkasa</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -13,2290 +13,1027 @@
                 extend: {
                     colors: {
                         brand: {
-                            50: '#f0f9ff',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
                         }
                     }
                 }
             }
         }
     </script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font Inter -->
+    <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white !important; color: black !important; }
-            .print-card { border: 1px solid #ccc !important; background: white !important; color: black !important; box-shadow: none !important; }
+        /* Custom scrollbar for table containers */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(31, 41, 55, 0.5);
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(75, 85, 99, 0.8);
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(107, 114, 128, 1);
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col md:flex-row antialiased">
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
 
-    <!-- Sidebar Navigation -->
-    <aside class="w-full md:w-64 bg-slate-800/95 backdrop-blur-md border-r border-slate-700/80 flex flex-col justify-between no-print sticky top-0 h-auto md:h-screen z-40">
-        <div>
-            <!-- Sidebar Header -->
-            <div class="p-3.5 border-b border-slate-700/80 flex items-center gap-3 relative group">
-                <div class="relative flex-shrink-0 w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center overflow-hidden shadow-inner">
-                    <img id="companyLogoImg" src="" class="w-full h-full object-contain hidden" alt="Logo Perusahaan">
-                    <div id="companyLogoPlaceholder" class="w-full h-full bg-red-600 flex items-center justify-center p-1">
-                        <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                            <circle cx="50" cy="50" r="46" fill="none" stroke="white" stroke-width="8"/>
-                            <circle cx="50" cy="32" r="8"/>
-                            <path d="M 30 52 C 30 40, 70 40, 70 52 C 60 52, 40 52, 30 52 Z" />
-                            <path d="M 42 50 L 32 82 M 58 50 L 68 82" stroke="white" stroke-width="8" stroke-linecap="round"/>
-                        </svg>
-                    </div>
-                    <label for="uploadLogoInput" class="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-[8px] text-white opacity-0 group-hover:opacity-100 transition cursor-pointer font-medium text-center p-0.5">
-                        <i class="fa-solid fa-camera text-[10px] mb-0.5 text-cyan-400"></i> Logo
-                    </label>
-                    <input type="file" id="uploadLogoInput" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
+    <!-- Top Navigation Bar -->
+    <header class="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-brand-600 p-2 rounded-lg text-white shadow-lg shadow-brand-600/30">
+                    <i class="fa-solid me-1 fa-building-user text-xl"></i>
                 </div>
-                <div class="overflow-hidden">
-                    <h1 class="text-xs font-bold text-white tracking-tight uppercase">Orecon PRO</h1>
-                    <p class="text-[10px] text-slate-300 font-semibold leading-tight truncate">PT. Orecon Putra Perkasa</p>
-                    <p class="text-[8px] text-slate-400">member of PPA</p>
-                </div>
-            </div>
-
-            <!-- Pilih Proyek -->
-            <div class="px-3 py-2.5 bg-slate-800/40 border-b border-slate-700/60">
-                <select id="projectSelect" onchange="switchProject(this.value)" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-lg py-1.5 px-2 text-[11px] font-semibold text-cyan-400 focus:outline-none focus:border-cyan-500 transition cursor-pointer">
-                    <option value="sporthall">🏢 Proyek Sporthall Indoor</option>
-                    <option value="mess">🚜 Penataan Lahan Mess</option>
-                </select>
-            </div>
-
-            <!-- Menu Navigasi Sidebar -->
-            <nav class="p-3 space-y-1">
-                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20">
-                    <i class="fa-solid fa-chart-pie w-4 text-center"></i> Dashboard & Cost Control
-                </button>
-                <button onclick="switchTab('po')" id="nav-po" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white">
-                    <i id="nav-po-icon" class="fa-solid fa-file-invoice-dollar w-4 text-center"></i> 
-                    <span id="nav-po-text">Manajemen Pre-Order (PO)</span>
-                </button>
-                <button onclick="switchTab('po-payment')" id="nav-po-payment" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white">
-                    <i class="fa-solid fa-wallet w-4 text-center text-amber-400"></i> 
-                    <span>Kontrol Pembayaran & Hutang PO</span>
-                </button>
-            </nav>
-        </div>
-
-        <!-- Sidebar Footer -->
-        <div class="p-3 border-t border-slate-700/80 text-xs text-slate-400">
-            <p class="font-medium text-slate-200">Muhammad Tegar Tohajudin</p>
-            <p class="text-[10px] text-slate-500">Site Engineer / PM</p>
-        </div>
-    </aside>
-
-    <!-- Main Content Wrapper -->
-    <div class="flex-grow flex flex-col justify-between min-h-screen">
-
-        <!-- Top Header Bar -->
-        <header class="bg-slate-800/95 backdrop-blur-md border-b border-slate-700/80 sticky top-0 z-30 shadow-lg no-print">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center gap-4">
                 <div>
-                    <h2 id="pageTitle" class="text-base sm:text-lg font-bold text-white tracking-tight">Proyek Sporthall Indoor</h2>
-                    <p id="headerContractWrapper" class="text-xs text-slate-400">Nilai Kontrak Proyek: <span id="headerContractVal" class="text-cyan-400 font-semibold">Rp 10.802.640.000</span></p>
-                </div>
-                <div class="flex items-center gap-2.5">
-                    <button onclick="syncDataFromCloud()" title="Sinkronisasi Data" class="px-3 py-2 text-xs bg-slate-700 hover:bg-slate-600 text-cyan-300 rounded-lg transition font-medium flex items-center gap-1.5 border border-slate-600">
-                        <i class="fa-solid fa-rotate"></i> <span class="hidden sm:inline">Sinkron Cloud</span>
-                    </button>
-                    <button onclick="window.print()" class="px-3.5 py-2 text-xs bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition font-semibold flex items-center gap-1.5 shadow-md shadow-cyan-600/20">
-                        <i class="fa-solid fa-print"></i> Cetak
-                    </button>
+                    <h1 class="text-lg font-bold text-white tracking-wide leading-tight">PT. ORECON PUTRA PERKASA</h1>
+                    <p class="text-xs text-brand-500 font-medium">Cost Control & Earned Value Management System</p>
                 </div>
             </div>
-        </header>
 
-        <!-- Dynamic Content Body -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6 flex-grow">
+            <!-- Sync Indicator & Settings -->
+            <div class="flex items-center space-x-4">
+                <div class="hidden sm:flex items-center space-x-2 bg-gray-900/60 px-3 py-1.5 rounded-full border border-gray-700 text-xs">
+                    <span id="syncStatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="syncStatusText" class="text-gray-300">Google Sheets Ready</span>
+                </div>
+                <button onclick="openConfigModal()" class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition" title="Pengaturan Webhook API">
+                    <i class="fa-solid fa-gear text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
 
-            <!-- TAB 1: DASHBOARD & COST CONTROL -->
-            <section id="tab-dashboard" class="space-y-6">
-                <!-- Executive KPI Cards Grid (Sporthall) -->
-                <div id="kpi-grid-sporthall" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Nilai Kontrak Utama</p>
-                        <h3 id="kpiContract" class="text-xl font-bold text-white mt-2">Rp 0</h3>
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Notification Toast Box -->
+        <div id="toast" class="hidden fixed bottom-5 right-5 z-50 bg-brand-600 text-white px-5 py-3 rounded-lg shadow-xl flex items-center space-x-3 transition-all duration-300">
+            <i class="fa-solid fa-circle-check text-xl"></i>
+            <span id="toastMsg" class="text-sm font-medium">Berhasil disimpan</span>
+        </div>
+
+        <!-- Top Summary Cards (KPI Metrics) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Total Anggaran -->
+            <div class="bg-gray-800 p-4 rounded-xl border border-gray-700/80 shadow-md">
+                <div class="flex items-center justify-between text-gray-400 mb-1">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Total RAP (BAC)</span>
+                    <i class="fa-solid fa-wallet text-brand-500"></i>
+                </div>
+                <div class="text-xl font-bold text-white" id="cardTotalRAP">Rp 0</div>
+                <div class="text-xs text-gray-400 mt-1">Budget at Completion</div>
+            </div>
+
+            <!-- Total Pengeluaran / Aktual -->
+            <div class="bg-gray-800 p-4 rounded-xl border border-gray-700/80 shadow-md">
+                <div class="flex items-center justify-between text-gray-400 mb-1">
+                    <span class="text-xs font-semibold uppercase tracking-wider">Aktual Biaya (AC)</span>
+                    <i class="fa-solid fa-receipt text-amber-500"></i>
+                </div>
+                <div class="text-xl font-bold text-amber-400" id="cardTotalActual">Rp 0</div>
+                <div class="text-xs text-gray-400 mt-1" id="cardRAPMargin">Deviasi: Rp 0</div>
+            </div>
+
+            <!-- Indeks SPI Terbaru -->
+            <div class="bg-gray-800 p-4 rounded-xl border border-gray-700/80 shadow-md">
+                <div class="flex items-center justify-between text-gray-400 mb-1">
+                    <span class="text-xs font-semibold uppercase tracking-wider">SPI (Jadwal)</span>
+                    <i class="fa-solid fa-chart-line text-blue-400"></i>
+                </div>
+                <div class="text-xl font-bold text-white flex items-center space-x-2">
+                    <span id="cardLatestSPI">0.00</span>
+                    <span id="badgeSPI" class="text-xs px-2 py-0.5 rounded font-semibold bg-gray-700 text-gray-300">-</span>
+                </div>
+                <div class="text-xs text-gray-400 mt-1" id="subSPIText">Progress Schedule Index</div>
+            </div>
+
+            <!-- Indeks CPI Terbaru -->
+            <div class="bg-gray-800 p-4 rounded-xl border border-gray-700/80 shadow-md">
+                <div class="flex items-center justify-between text-gray-400 mb-1">
+                    <span class="text-xs font-semibold uppercase tracking-wider">CPI (Biaya)</span>
+                    <i class="fa-solid fa-coins text-emerald-400"></i>
+                </div>
+                <div class="text-xl font-bold text-white flex items-center space-x-2">
+                    <span id="cardLatestCPI">0.00</span>
+                    <span id="badgeCPI" class="text-xs px-2 py-0.5 rounded font-semibold bg-gray-700 text-gray-300">-</span>
+                </div>
+                <div class="text-xs text-gray-400 mt-1" id="subCPIText">Cost Performance Index</div>
+            </div>
+        </div>
+
+        <!-- Section 1: SPI & CPI Dashboard (Grafik & Form Input Per Minggu) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left 2 Cols: Performance Index Trend Chart -->
+            <div class="lg:col-span-2 bg-gray-800 p-5 rounded-xl border border-gray-700 shadow-md flex flex-col justify-between">
+                <div>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-chart-line text-brand-500"></i>
+                                Grafik Tren Indeks Kinerja SPI & CPI (Minggu 1 - 32)
+                            </h2>
+                            <p class="text-xs text-gray-400">Garis target = 1.0. Nilai > 1.0 (Bagus), Nilai < 1.0 (Perlu Evaluasi)</p>
+                        </div>
+                        <div class="flex items-center space-x-3 text-xs">
+                            <span class="flex items-center space-x-1"><span class="w-3 h-3 bg-blue-500 rounded-full inline-block"></span> <span>SPI</span></span>
+                            <span class="flex items-center space-x-1"><span class="w-3 h-3 bg-emerald-500 rounded-full inline-block"></span> <span>CPI</span></span>
+                        </div>
                     </div>
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Realisasi Pengeluaran (RAP)</p>
-                        <h3 id="kpiRAP" class="text-xl font-bold text-amber-400 mt-2">Rp 0</h3>
-                        <p class="text-[10px] text-slate-400 mt-1">*Uang Real Terbayar</p>
-                    </div>
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Hutang PO Belum Lunas</p>
-                        <h3 id="kpiDebt" class="text-xl font-bold text-red-400 mt-2">Rp 0</h3>
-                        <p id="kpiDebtDesc" class="text-[10px] text-red-300 mt-1">Sisa kewajiban Vendor</p>
-                    </div>
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Proyeksi Net Margin</p>
-                        <h3 id="kpiMargin" class="text-xl font-bold text-emerald-400 mt-2">Rp 0</h3>
-                        <p id="kpiMarginPct" class="text-xs text-emerald-400 mt-1">0.0% (Kontrak - RAP - Hutang)</p>
-                    </div>
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Saldo Kas Aktual</p>
-                        <h3 id="kpiCash" class="text-xl font-bold text-cyan-400 mt-2">Rp 0</h3>
+                    <div class="relative w-full h-72 sm:h-80">
+                        <canvas id="spicpiChart"></canvas>
                     </div>
                 </div>
-
-                <!-- Executive Summary Cards Grid (Penataan Lahan Mess) -->
-                <div id="kpi-grid-mess" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 hidden">
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Total Jam Exca & Compact</p>
-                        <h3 id="messKpiTotalHours" class="text-2xl font-bold text-cyan-400 mt-2">0.0 Jam</h3>
-                        <p id="messKpiFuelSummary" class="text-xs text-slate-400 mt-1">Fuel: 0.0 L (Rp 0)</p>
-                    </div>
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Total Pendapatan Kontrak</p>
-                        <h3 id="messKpiRevenue" class="text-2xl font-bold text-emerald-400 mt-2">Rp 0</h3>
-                        <p class="text-xs text-slate-400 mt-1">Berdasarkan tarif satuan jam/rit</p>
-                    </div>
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Total HPP Alat Berat</p>
-                        <h3 id="messKpiHpp" class="text-2xl font-bold text-amber-400 mt-2">Rp 0</h3>
-                        <p class="text-xs text-slate-400 mt-1">Min 200 Jam/Bulan + Fuel + DT</p>
-                    </div>
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Total Proyeksi Margin (Net)</p>
-                        <h3 id="messKpiMargin" class="text-2xl font-bold text-cyan-400 mt-2">Rp 0</h3>
-                        <p id="messKpiMarginPct" class="text-xs text-cyan-400 mt-1">0.0% Margin</p>
-                    </div>
+                <div class="mt-4 pt-3 border-t border-gray-700/60 grid grid-cols-2 text-xs text-gray-400">
+                    <div>EV (Earned Value): <span class="font-semibold text-gray-200" id="evValueDisplay">Rp 0</span></div>
+                    <div>PV (Planned Value): <span class="font-semibold text-gray-200" id="pvValueDisplay">Rp 0</span></div>
                 </div>
+            </div>
 
-                <!-- Tabel Analisa Finansial (Mess) -->
-                <div id="messComparisonSection" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card hidden">
-                    <h2 class="text-base font-semibold text-white mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-scale-balanced text-cyan-400"></i> Analisa Finansial: Pendapatan Kontrak vs HPP Alat Berat
+            <!-- Right 1 Col: Input Progres Mingguan Terpisah / Individual Week -->
+            <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 shadow-md flex flex-col">
+                <div class="mb-4">
+                    <h2 class="text-md font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-check text-brand-500"></i>
+                        Update Progres Mingguan
                     </h2>
-                    <p class="text-xs text-slate-400 mb-4">Perbandingan tarif kontrak alat berat dengan perhitungan HPP operasional aktual (termasuk aturan minimum 200 jam/bulan).</p>
-                    <div class="overflow-x-auto rounded-xl border border-slate-700/50">
-                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                            <thead>
-                                <tr class="bg-slate-900 border-b border-slate-700 text-slate-400 font-semibold text-[11px]">
-                                    <th class="py-3 px-4">Alat Berat / Pekerjaan</th>
-                                    <th class="py-3 px-4 text-center">Volume Aktual</th>
-                                    <th class="py-3 px-4 text-right">Pendapatan Kontrak</th>
-                                    <th class="py-3 px-4 text-right">Total HPP Aktual</th>
-                                    <th class="py-3 px-4 text-right">Proyeksi Margin</th>
-                                </tr>
-                            </thead>
-                            <tbody id="messComparisonTableBody" class="divide-y divide-slate-700/50"></tbody>
-                        </table>
-                    </div>
+                    <p class="text-xs text-gray-400">Pilih minggu dan simpan data secara terpisah / per-minggu.</p>
                 </div>
 
-                <!-- Form Transaksi Keuangan (Sporthall) -->
-                <div id="sporthallTxFormWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-                        <h2 id="trxFormTitle" class="text-base font-semibold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-square-plus text-cyan-400"></i> Catat Transaksi Keuangan Baru
-                        </h2>
-                        <div class="flex items-center gap-2">
-                            <button type="button" onclick="openCategoryManagerModal()" class="text-xs bg-slate-700 hover:bg-slate-600 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5">
-                                <i class="fa-solid fa-layer-group"></i> Kelola Kategori
-                            </button>
-                            <button type="button" id="cancelEditTxBtn" onclick="resetTxForm()" class="hidden text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">
-                                <i class="fa-solid fa-xmark"></i> Batal Edit
-                            </button>
-                        </div>
-                    </div>
-                    <form id="transactionForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-                        <input type="hidden" id="editingTxId" value="">
+                <form id="singleWeekForm" onsubmit="handleSaveSingleWeek(event)" class="space-y-4 flex-1 flex flex-col justify-between">
+                    <div class="space-y-3">
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Pilih Tanggal Transaksi</label>
-                            <input type="date" id="trxDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 cursor-pointer">
-                        </div>
-                        <div><label class="block text-xs font-medium text-slate-300 mb-1">Tipe</label><select id="trxType" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></select></div>
-                        
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Kategori / Pos Pekerjaan</label>
-                            <select id="trxCategory" onchange="handleCategoryChange(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500"></select>
-                            <input type="text" id="trxCustomCategory" placeholder="Ketik Kategori Baru..." class="w-full bg-slate-900 border border-cyan-500 rounded-xl p-2.5 text-xs text-white mt-2 hidden focus:outline-none">
-                        </div>
-
-                        <div><label class="block text-xs font-medium text-slate-300 mb-1">Nominal (IDR)</label><input type="number" id="trxAmount" placeholder="350000000" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                        <div><label class="block text-xs font-medium text-slate-300 mb-1">Keterangan</label><input type="text" id="trxDesc" placeholder="Uraian" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                        <div class="flex items-end">
-                            <button type="submit" id="trxSubmitBtn" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 rounded-xl text-xs transition">Simpan Transaksi</button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Charts & SPI/CPI Section (Sporthall) -->
-                <div id="sporthallChartsWrapper" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <h3 class="text-sm font-semibold text-white mb-4">Cost Control (Realisasi per Kategori)</h3>
-                        <div class="relative h-64"><canvas id="costControlChart"></canvas></div>
-                    </div>
-                    
-                    <!-- Grafik Tren SPI & CPI (Menggantikan Cashflow) -->
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-sm font-semibold text-white">Grafik Kinerja Proyek (SPI & CPI)</h3>
-                            <span class="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full font-mono">Target = 1.0</span>
-                        </div>
-                        <div class="relative h-64"><canvas id="spiCpiChart"></canvas></div>
-                    </div>
-                </div>
-
-                <!-- Input & Tabel Progres Mingguan (Minggu 1 s.d. 32) untuk SPI & CPI -->
-                <div id="sporthallSpiCpiTableWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card space-y-4">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                        <div>
-                            <h2 class="text-base font-semibold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-chart-line text-cyan-400"></i> Input Progres Mingguan (Minggu 1 s.d. 32) & Indeks SPI / CPI
-                            </h2>
-                            <p class="text-xs text-slate-400">Masukkan persentase rencana dan aktual untuk menghitung Schedule Performance Index (SPI) dan Cost Performance Index (CPI).</p>
-                        </div>
-                        <div class="flex items-center gap-2 no-print">
-                            <button onclick="fillSampleSpiData()" class="text-xs bg-slate-700 hover:bg-slate-600 text-cyan-300 border border-slate-600 px-3 py-1.5 rounded-lg transition font-medium">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i> Isi Data Contoh
-                            </button>
-                            <button onclick="saveSpiCpiData()" class="text-xs bg-cyan-600 hover:bg-cyan-500 text-white px-3.5 py-1.5 rounded-lg transition font-semibold shadow-md">
-                                <i class="fa-solid fa-floppy-disk"></i> Simpan Progres
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="overflow-x-auto rounded-xl border border-slate-700/50 max-h-96">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead class="sticky top-0 z-10">
-                                <tr class="bg-slate-900 border-b border-slate-700 text-slate-400 font-semibold text-[11px]">
-                                    <th class="py-3 px-3 text-center w-20">Minggu</th>
-                                    <th class="py-3 px-3 text-center w-32">% Rencana (Plan)</th>
-                                    <th class="py-3 px-3 text-center w-32">% Aktual (Actual)</th>
-                                    <th class="py-3 px-3 text-right">Planned Value (PV)</th>
-                                    <th class="py-3 px-3 text-right">Earned Value (EV)</th>
-                                    <th class="py-3 px-3 text-center w-28">SPI (Jadwal)</th>
-                                    <th class="py-3 px-3 text-center w-28">CPI (Biaya)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="spiCpiTableBody" class="divide-y divide-slate-700/50"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Ledger Table (Sporthall) -->
-                <div id="sporthallLedgerWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card space-y-4">
-                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-                        <div>
-                            <h2 class="text-base font-semibold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-receipt text-cyan-400"></i> Jurnal Transaksi Keuangan (Pengeluaran Kas Real)
-                            </h2>
-                            <p class="text-xs text-slate-400">Menampilkan seluruh arus kas tunai / termin pembayaran yang memotong saldo kas proyek.</p>
-                        </div>
-
-                        <!-- Bar Filter & Sort Transaksi -->
-                        <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                            <!-- Urutan Tanggal -->
-                            <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl">
-                                <i class="fa-solid fa-arrow-down-short-wide text-slate-400 text-xs"></i>
-                                <span class="text-xs text-slate-400 font-medium">Urutan:</span>
-                                <select id="sortOrderSelect" onchange="renderTable()" class="bg-transparent text-xs text-cyan-300 font-semibold focus:outline-none cursor-pointer">
-                                    <option value="ASC">📅 Tanggal: Terlama → Terbaru</option>
-                                    <option value="DESC">📅 Tanggal: Terbaru → Terlama</option>
-                                </select>
-                            </div>
-
-                            <!-- Filter Kategori -->
-                            <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl">
-                                <i class="fa-solid fa-filter text-slate-400 text-xs"></i>
-                                <span class="text-xs text-slate-400 font-medium">Kategori:</span>
-                                <select id="filterCategorySelect" onchange="renderTable()" class="bg-transparent text-xs text-cyan-300 font-semibold focus:outline-none cursor-pointer">
-                                    <option value="ALL">Semua Kategori</option>
-                                </select>
-                            </div>
-
-                            <!-- Filter Tipe Transaksi -->
-                            <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl">
-                                <span class="text-xs text-slate-400 font-medium">Tipe:</span>
-                                <select id="filterTypeSelect" onchange="renderTable()" class="bg-transparent text-xs text-cyan-300 font-semibold focus:outline-none cursor-pointer">
-                                    <option value="ALL">Semua Tipe</option>
-                                    <option value="INCOME">Pemasukan (Cash In)</option>
-                                    <option value="EXPENSE">Pengeluaran (Cash Out)</option>
-                                </select>
-                            </div>
-
-                            <span id="txCount" class="text-xs bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl font-medium">0 Transaksi</span>
-                        </div>
-                    </div>
-
-                    <!-- Ringkasan Subtotal Hasil Filter -->
-                    <div id="filterSummaryBar" class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-900/90 p-3.5 rounded-xl border border-slate-700/60 text-xs">
-                        <div class="flex justify-between items-center px-2 border-b sm:border-b-0 sm:border-r border-slate-800 pb-2 sm:pb-0">
-                            <span class="text-slate-400">Total Pemasukan Filter:</span>
-                            <span id="filterSubtotalIncome" class="font-bold font-mono text-emerald-400 text-sm">Rp 0</span>
-                        </div>
-                        <div class="flex justify-between items-center px-2 border-b sm:border-b-0 sm:border-r border-slate-800 pb-2 sm:pb-0">
-                            <span class="text-slate-400">Total Pengeluaran Filter:</span>
-                            <span id="filterSubtotalExpense" class="font-bold font-mono text-red-400 text-sm">Rp 0</span>
-                        </div>
-                        <div class="flex justify-between items-center px-2">
-                            <span class="text-slate-400">Saldo Bersih (Net):</span>
-                            <span id="filterSubtotalNet" class="font-bold font-mono text-cyan-400 text-sm">Rp 0</span>
-                        </div>
-                    </div>
-
-                    <!-- Tabel Jurnal -->
-                    <div class="overflow-x-auto rounded-xl border border-slate-700/50">
-                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                            <thead>
-                                <tr class="bg-slate-900 border-b border-slate-700 text-slate-400 font-semibold text-[11px]">
-                                    <th class="py-3 px-4">Tanggal</th>
-                                    <th class="py-3 px-4">Tipe</th>
-                                    <th class="py-3 px-4">Kategori Pekerjaan</th>
-                                    <th class="py-3 px-4">Keterangan</th>
-                                    <th class="py-3 px-4 text-right">Nominal (IDR)</th>
-                                    <th class="py-3 px-4 text-center no-print">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="transactionTableBody" class="divide-y divide-slate-700/50"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 2: MANAJEMEN PRE-ORDER (PO) / ALAT BERAT -->
-            <section id="tab-po" class="space-y-6 hidden">
-                <!-- MODUL PRE-ORDER MULTI-ITEM -->
-                <div id="module-po" class="space-y-6">
-                    <!-- Form Pembuatan / Edit PO -->
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 no-print">
-                        <div class="flex justify-between items-center">
-                            <h2 id="poFormTitle" class="text-base font-semibold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-file-circle-plus text-cyan-400"></i> Buat Pre-Order (PO) Baru
-                            </h2>
-                            <button type="button" id="cancelEditPoBtn" onclick="resetPoForm()" class="hidden text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">
-                                <i class="fa-solid fa-xmark"></i> Batal Edit
-                            </button>
-                        </div>
-                        <form id="poForm" class="space-y-4">
-                            <input type="hidden" id="editingPoId" value="">
-
-                            <!-- Header PO: Nomor PO, Vendor, Tanggal PO -->
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-900/60 p-4 rounded-xl border border-slate-700/50">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-300 mb-1">Nomor PO</label>
-                                    <input type="text" id="poNumber" placeholder="PO/2026/001" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-300 mb-1">Nama Vendor / Supplier</label>
-                                    <input type="text" id="poVendor" placeholder="PT. Vendor Jaya Utama" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-300 mb-1">Pilih Tanggal PO</label>
-                                    <input type="date" id="poDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer focus:outline-none focus:border-cyan-500">
-                                </div>
-                            </div>
-
-                            <!-- Dynamic Multi-Item List -->
-                            <div class="space-y-2">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Rincian Item Barang / Material / Pajak / Diskon</label>
-                                        <p class="text-[10px] text-slate-400">* Gunakan tanda minus (-) untuk Pajak Potongan / Diskon (misal: -500000)</p>
-                                    </div>
-                                    <button type="button" onclick="addPoItemRow()" class="text-xs bg-cyan-600/20 text-cyan-400 hover:bg-cyan-600/30 border border-cyan-500/30 px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5">
-                                        <i class="fa-solid fa-plus"></i> Tambah Item
-                                    </button>
-                                </div>
-                                <div class="overflow-x-auto rounded-xl border border-slate-700/50">
-                                    <table class="w-full text-left border-collapse text-xs">
-                                        <thead>
-                                            <tr class="bg-slate-900 border-b border-slate-700 text-slate-400">
-                                                <th class="py-2.5 px-3 min-w-[150px]">Nama Barang / Pajak / Diskon</th>
-                                                <th class="py-2.5 px-3 min-w-[130px]">Spesifikasi</th>
-                                                <th class="py-2.5 px-3 w-24">Volume/Qty</th>
-                                                <th class="py-2.5 px-3 w-36 text-right">Harga Total (IDR)</th>
-                                                <th class="py-2.5 px-3 min-w-[130px]">Status Item</th>
-                                                <th class="py-2.5 px-3 min-w-[150px]">Keterangan</th>
-                                                <th class="py-2.5 px-3 w-10 text-center">Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="poItemsContainer" class="divide-y divide-slate-700/50"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <!-- PO Total Footer -->
-                            <div class="flex flex-col sm:flex-row justify-between items-center bg-slate-900/80 p-4 rounded-xl border border-slate-700/50 gap-4">
-                                <div class="text-xs text-slate-400">
-                                    Total Item Material: <span id="poTotalItemsCount" class="font-bold text-white">0 Item</span>
-                                </div>
-                                <div class="flex items-center gap-4">
-                                    <div class="text-right">
-                                        <p class="text-[10px] text-slate-400 uppercase">Total Keseluruhan PO</p>
-                                        <p id="poGrandTotalDisplay" class="text-lg font-bold text-emerald-400 font-mono">Rp 0</p>
-                                    </div>
-                                    <button type="submit" id="poSubmitBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs shadow-md shadow-cyan-600/20 transition">
-                                        Simpan PO Baru
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Tabel Ringkasan PO (Daftar Pre-Order Ringkas) -->
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 print-card">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                            <div>
-                                <h3 class="text-sm font-semibold text-white">Daftar Pre-Order (PO) Proyek</h3>
-                                <p class="text-xs text-slate-400">Daftar PO terdaftar dan progres pengerjaan material.</p>
-                            </div>
-                            <div class="flex items-center gap-2 no-print">
-                                <span class="text-xs text-slate-400">Filter Status Item:</span>
-                                <select id="filterPoStatus" onchange="renderPOTable()" class="bg-slate-900 border border-slate-700 rounded-lg py-1 px-2.5 text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
-                                    <option value="ALL">Semua Status</option>
-                                    <option value="BELUM_PROSES">🟡 Ada Item Belum Diproses</option>
-                                    <option value="DALAM_PROSES">🔵 Ada Item Dalam Proses</option>
-                                    <option value="SELESAI">🟢 Semua Item Selesai</option>
-                                </select>
-                                <span id="poCount" class="text-xs bg-slate-700 text-slate-300 px-3 py-1 rounded-full">0 Dokumen PO</span>
-                            </div>
-                        </div>
-
-                        <div class="overflow-x-auto rounded-xl border border-slate-700/50">
-                            <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                                <thead>
-                                    <tr class="bg-slate-900 border-b border-slate-700 text-slate-400 font-semibold text-[11px]">
-                                        <th class="py-3 px-4 w-10 text-center no-print"></th>
-                                        <th class="py-3 px-4">Nomor PO</th>
-                                        <th class="py-3 px-4">Nama Vendor / Supplier</th>
-                                        <th class="py-3 px-4">Tanggal</th>
-                                        <th class="py-3 px-4 text-center">Jumlah Item</th>
-                                        <th class="py-3 px-4 text-center">Progres Status Item</th>
-                                        <th class="py-3 px-4 text-right">Total Nilai PO</th>
-                                        <th class="py-3 px-4 text-center no-print">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="poTableBody" class="divide-y divide-slate-700/50"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- MODUL OPERASIONAL ALAT BERAT -->
-                <div id="module-heavy" class="space-y-6 hidden">
-                    <div class="flex flex-wrap gap-2 border-b border-slate-700 pb-3 no-print">
-                        <button onclick="switchHeavySubTab('exca')" id="subnav-exca" class="px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-600 text-white transition"><i class="fa-solid fa-truck-monster"></i> HM Excavator</button>
-                        <button onclick="switchHeavySubTab('compact')" id="subnav-compact" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-700 transition"><i class="fa-solid fa-compact-disc"></i> HM Compact</button>
-                        <button onclick="switchHeavySubTab('dt')" id="subnav-dt" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-700 transition"><i class="fa-solid fa-truck-moving"></i> Ritase DT</button>
-                    </div>
-
-                    <!-- EXCAVATOR -->
-                    <div id="heavy-exca" class="space-y-6">
-                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
-                            <h3 class="text-sm font-bold text-white mb-3">Input Daily Log HM & Fuel Excavator</h3>
-                            <form id="excaForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                                <div><label class="block text-xs text-slate-300 mb-1">Pilih Tanggal</label><input type="date" id="excaDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer"></div>
-                                <div><label class="block text-xs text-slate-300 mb-1">HM Awal</label><input type="number" step="0.1" id="excaHmAwal" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div><label class="block text-xs text-slate-300 mb-1">HM Akhir</label><input type="number" step="0.1" id="excaHmAkhir" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div><label class="block text-xs text-slate-300 mb-1">Volume Fuel (Liter)</label><input type="number" step="0.1" id="excaFuelVol" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div><label class="block text-xs text-slate-300 mb-1">Harga Fuel (IDR/L)</label><input type="number" id="excaFuelPrice" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div class="lg:col-span-5 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs">Simpan Record Excavator</button></div>
-                            </form>
-                        </div>
-                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 print-card">
-                            <h3 class="text-sm font-semibold text-white">Log Operasional Excavator</h3>
-                            <div class="overflow-x-auto rounded-xl border border-slate-700/50">
-                                <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">HM Awal</th><th class="py-2.5 px-4 text-center">HM Akhir</th><th class="py-2.5 px-4 text-center">Total Jam</th><th class="py-2.5 px-4 text-center">Fuel (L)</th><th class="py-2.5 px-4 text-center">Konsumsi (L/Jam)</th><th class="py-2.5 px-4 text-right">Total Biaya Fuel</th><th class="py-2.5 px-4 text-center no-print">Aksi</th></tr></thead>
-                                    <tbody id="excaTableBody" class="divide-y divide-slate-700/50"></tbody>
-                                </table>
-                            </div>
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900 p-4 rounded-xl text-xs font-mono">
-                                <div>Total Jam: <span id="sumExcaHours" class="text-cyan-400 font-bold">0.0 Jam</span></div>
-                                <div>Total Fuel: <span id="sumExcaFuel" class="text-amber-400 font-bold">0.0 Liter</span></div>
-                                <div>Total Biaya: <span id="sumExcaCost" class="text-emerald-400 font-bold">Rp 0</span></div>
-                                <div>Rata-rata Konsumsi: <span id="avgExcaCons" class="text-purple-400 font-bold">0.00 L/Jam</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- COMPACT -->
-                    <div id="heavy-compact" class="space-y-6 hidden">
-                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
-                            <h3 class="text-sm font-bold text-white mb-3">Input Daily Log HM & Fuel Compact</h3>
-                            <form id="compactForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                                <div><label class="block text-xs text-slate-300 mb-1">Pilih Tanggal</label><input type="date" id="compactDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer"></div>
-                                <div><label class="block text-xs text-slate-300 mb-1">HM Awal</label><input type="number" step="0.1" id="compactHmAwal" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div><label class="block text-xs text-slate-300 mb-1">HM Akhir</label><input type="number" step="0.1" id="compactHmAkhir" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div><label class="block text-xs text-slate-300 mb-1">Volume Fuel (Liter)</label><input type="number" step="0.1" id="compactFuelVol" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div><label class="block text-xs text-slate-300 mb-1">Harga Fuel (IDR/L)</label><input type="number" id="compactFuelPrice" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div class="lg:col-span-5 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs">Simpan Record Compact</button></div>
-                            </form>
-                        </div>
-                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 print-card">
-                            <h3 class="text-sm font-semibold text-white">Log Operasional Compact Roller</h3>
-                            <div class="overflow-x-auto rounded-xl border border-slate-700/50">
-                                <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">HM Awal</th><th class="py-2.5 px-4 text-center">HM Akhir</th><th class="py-2.5 px-4 text-center">Total Jam</th><th class="py-2.5 px-4 text-center">Fuel (L)</th><th class="py-2.5 px-4 text-center">Konsumsi (L/Jam)</th><th class="py-2.5 px-4 text-right">Total Biaya Fuel</th><th class="py-2.5 px-4 text-center no-print">Aksi</th></tr></thead>
-                                    <tbody id="compactTableBody" class="divide-y divide-slate-700/50"></tbody>
-                                </table>
-                            </div>
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900 p-4 rounded-xl text-xs font-mono">
-                                <div>Total Jam: <span id="sumCompactHours" class="text-cyan-400 font-bold">0.0 Jam</span></div>
-                                <div>Total Fuel: <span id="sumCompactFuel" class="text-amber-400 font-bold">0.0 Liter</span></div>
-                                <div>Total Biaya: <span id="sumCompactCost" class="text-emerald-400 font-bold">Rp 0</span></div>
-                                <div>Rata-rata Konsumsi: <span id="avgCompactCons" class="text-purple-400 font-bold">0.00 L/Jam</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- DUMP TRUCK -->
-                    <div id="heavy-dt" class="space-y-6 hidden">
-                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
-                            <h3 class="text-sm font-bold text-white mb-3">Input Daily Log Ritase Dump Truck</h3>
-                            <form id="dtForm" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                <div><label class="block text-xs text-slate-300 mb-1">Pilih Tanggal</label><input type="date" id="dtDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer"></div>
-                                <div><label class="block text-xs text-slate-300 mb-1">Jumlah Ritase (Rit)</label><input type="number" id="dtRitase" required min="1" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div><label class="block text-xs text-slate-300 mb-1">HPP / Rit Vendor (IDR)</label><input type="number" id="dtPrice" placeholder="50000" required min="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div class="sm:col-span-3 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs">Simpan Record Ritase</button></div>
-                            </form>
-                        </div>
-                        <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 print-card">
-                            <h3 class="text-sm font-semibold text-white">Log Ritase Dump Truck</h3>
-                            <div class="overflow-x-auto rounded-xl border border-slate-700/50">
-                                <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                                    <thead><tr class="bg-slate-900 border-b border-slate-700 text-slate-400 text-[11px]"><th class="py-2.5 px-4">Tanggal</th><th class="py-2.5 px-4 text-center">Jumlah Rit</th><th class="py-2.5 px-4 text-center">Konversi Jam (8 Rit/J)</th><th class="py-2.5 px-4 text-right">HPP Vendor</th><th class="py-2.5 px-4 text-center no-print">Aksi</th></tr></thead>
-                                    <tbody id="dtTableBody" class="divide-y divide-slate-700/50"></tbody>
-                                </table>
-                            </div>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-slate-900 p-4 rounded-xl text-xs font-mono">
-                                <div>Total Ritase: <span id="sumDtRitase" class="text-cyan-400 font-bold">0 Rit</span></div>
-                                <div>Total Jam DT: <span id="sumDtHours" class="text-cyan-400 font-bold">0.00 Jam</span></div>
-                                <div>Total HPP DT: <span id="sumDtCost" class="text-amber-400 font-bold">Rp 0</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 3: KONTROL PEMBAYARAN & HUTANG PO -->
-            <section id="tab-po-payment" class="space-y-6 hidden">
-                <!-- Ringkasan Statistik Pembayaran & Kewajiban -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Total Nilai Komitmen PO</p>
-                        <h3 id="payKpiTotalPo" class="text-xl font-bold text-white mt-2">Rp 0</h3>
-                        <p class="text-[10px] text-slate-400 mt-1">Akumulasi seluruh PO terdaftar</p>
-                    </div>
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Total Realisasi Terbayar (Kas Out)</p>
-                        <h3 id="payKpiTotalPaid" class="text-xl font-bold text-emerald-400 mt-2">Rp 0</h3>
-                        <p class="text-[10px] text-emerald-400 mt-1">DP + Pelunasan memotong Kas</p>
-                    </div>
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Sisa Hutang Ke Vendor</p>
-                        <h3 id="payKpiRemainingDebt" class="text-xl font-bold text-red-400 mt-2">Rp 0</h3>
-                        <p class="text-[10px] text-red-300 mt-1">Kewajiban kas yang harus disiapkan</p>
-                    </div>
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
-                        <p class="text-xs text-slate-400 font-semibold uppercase">Status Pelunasan PO</p>
-                        <h3 id="payKpiRatio" class="text-xl font-bold text-cyan-400 mt-2">0 / 0 PO Lunas</h3>
-                        <p id="payKpiRatioPct" class="text-[10px] text-cyan-300 mt-1">0.0% Terbayar</p>
-                    </div>
-                </div>
-
-                <!-- Tabel Kontrol & Pelunasan Pembayaran PO -->
-                <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 print-card">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                        <div>
-                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-wallet text-amber-400"></i> Daftar Kewajiban & Update Pembayaran PO
-                            </h3>
-                            <p class="text-xs text-slate-400">Pilih status pembayaran dan update nominal DP / pelunasan untuk masing-masing PO.</p>
-                        </div>
-                        <div class="flex items-center gap-2 no-print">
-                            <span class="text-xs text-slate-400">Filter Pembayaran:</span>
-                            <select id="filterPaymentStatus" onchange="renderPaymentControlTable()" class="bg-slate-900 border border-slate-700 rounded-lg py-1 px-2.5 text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
-                                <option value="ALL">Semua Status Bayar</option>
-                                <option value="LUNAS">🟢 Lunas</option>
-                                <option value="DP">🔵 DP (Bayar Sebagian)</option>
-                                <option value="TEMPO">🟡 Tempo</option>
-                                <option value="BELUM_BAYAR">🔴 Belum Dibayar</option>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">Pilih Minggu Progres</label>
+                            <select id="selectWeekNum" onchange="loadSelectedWeekData()" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-500">
+                                <!-- Generated JS 1 to 32 -->
                             </select>
                         </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">Kumulatif Rencana (%)</label>
+                                <input type="number" step="0.01" min="0" max="100" id="inputPlanPct" required class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-500" placeholder="0.00">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">Kumulatif Aktual (%)</label>
+                                <input type="number" step="0.01" min="0" max="100" id="inputActualPct" required class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-500" placeholder="0.00">
+                            </div>
+                        </div>
+
+                        <!-- Real-time Preview calculations -->
+                        <div class="bg-gray-900/80 p-3 rounded-lg border border-gray-700 space-y-1 text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Nilai SPI Hasil:</span>
+                                <span id="previewSPI" class="font-bold text-blue-400">1.00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Nilai CPI Hasil:</span>
+                                <span id="previewCPI" class="font-bold text-emerald-400">1.00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Status Minggu Ini:</span>
+                                <span id="previewStatus" class="font-medium text-gray-300">Belum diisi</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="overflow-x-auto rounded-xl border border-slate-700/50">
-                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
-                            <thead>
-                                <tr class="bg-slate-900 border-b border-slate-700 text-slate-400 font-semibold text-[11px]">
-                                    <th class="py-3 px-4">Nomor PO</th>
-                                    <th class="py-3 px-4">Nama Vendor / Supplier</th>
-                                    <th class="py-3 px-4">Tanggal PO</th>
-                                    <th class="py-3 px-4 text-center">Status Pembayaran</th>
-                                    <th class="py-3 px-4 text-right">Total Nilai PO</th>
-                                    <th class="py-3 px-4 text-right">Telah Dibayar (Kas Out)</th>
-                                    <th class="py-3 px-4 text-right">Sisa Hutang</th>
-                                    <th class="py-3 px-4 text-center no-print">Update Bayar</th>
-                                </tr>
-                            </thead>
-                            <tbody id="paymentTableBody" class="divide-y divide-slate-700/50"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- MODAL UPDATE PEMBAYARAN PO -->
-        <div id="paymentModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-            <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-                <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-money-bill-wave text-emerald-400"></i> Update Pembayaran PO
-                    </h3>
-                    <button onclick="closePaymentModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-                </div>
-
-                <form id="updatePaymentForm" onsubmit="savePaymentUpdate(event)" class="space-y-4">
-                    <input type="hidden" id="modalPoId" value="">
-                    <div>
-                        <p class="text-xs text-slate-400">Nomor PO: <strong id="modalPoNum" class="text-cyan-400"></strong></p>
-                        <p class="text-xs text-slate-400">Vendor: <strong id="modalPoVendor" class="text-white"></strong></p>
-                        <p class="text-xs text-slate-400">Total PO: <strong id="modalPoTotal" class="text-emerald-400"></strong></p>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Status Pembayaran Baru</label>
-                        <select id="modalPayStatus" onchange="handleModalPayStatusChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 cursor-pointer font-semibold">
-                            <option value="LUNAS">🟢 Lunas (Memotong Kas 100%)</option>
-                            <option value="DP">🔵 DP / Uang Muka (Memotong Kas Sebagian)</option>
-                            <option value="TEMPO">🟡 Tempo (Belum Potong Kas)</option>
-                            <option value="BELUM_BAYAR">🔴 Belum Dibayar (Belum Potong Kas)</option>
-                        </select>
-                    </div>
-
-                    <div id="modalDpAmountWrapper">
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Nominal Pembayaran / DP (IDR)</label>
-                        <input type="number" id="modalPaidAmount" placeholder="5000000" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-cyan-200 font-mono focus:outline-none focus:border-cyan-500">
-                    </div>
-
-                    <div class="pt-2 border-t border-slate-700 flex justify-end gap-2">
-                        <button type="button" onclick="closePaymentModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold px-4 py-2 rounded-xl text-xs transition">Batal</button>
-                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-md">Simpan Pembayaran</button>
-                    </div>
+                    <button type="submit" class="w-full mt-4 bg-brand-600 hover:bg-brand-700 text-white font-medium py-2.5 px-4 rounded-lg text-sm transition flex items-center justify-center space-x-2 shadow-lg shadow-brand-600/20">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span id="btnSaveWeekText">Simpan Minggu Ini</span>
+                    </button>
                 </form>
             </div>
         </div>
 
-        <!-- MODAL KELOLA KATEGORI -->
-        <div id="categoryModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-            <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-                <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-layer-group text-cyan-400"></i> Kelola Kategori / Pos Pekerjaan
+        <!-- Section 2: Quick Overview Table for 32 Weeks SPI/CPI Data -->
+        <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-md overflow-hidden">
+            <div class="p-4 border-b border-gray-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <div>
+                    <h3 class="text-md font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-table-list text-brand-500"></i>
+                        Rincian Rekapitulasi Minggu 1 - 32
                     </h3>
-                    <button onclick="closeCategoryManagerModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                    <p class="text-xs text-gray-400">Klik tombol "Edit" pada baris untuk mengubah data minggu terkait secara cepat</p>
                 </div>
-
-                <!-- Form Tambah Kategori Baru -->
-                <div class="space-y-2">
-                    <label class="block text-xs font-medium text-slate-300">Tambah Kategori Pekerjaan Baru:</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="newCategoryInput" placeholder="Misal: Pekerjaan Struktur / Overhead" class="flex-grow bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
-                        <button onclick="addNewCategoryFromModal()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold px-4 py-2.5 rounded-xl text-xs transition flex-shrink-0">
-                            <i class="fa-solid fa-plus"></i> Tambah
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Daftar Kategori Yang Ada -->
-                <div class="space-y-2 pt-2">
-                    <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider">Daftar Kategori Terdaftar:</label>
-                    <div id="categoryListContainer" class="max-h-60 overflow-y-auto space-y-1.5 pr-1"></div>
-                </div>
-
-                <div class="pt-2 border-t border-slate-700 flex justify-end">
-                    <button onclick="closeCategoryManagerModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold px-4 py-2 rounded-xl text-xs transition">
-                        Selesai
-                    </button>
-                </div>
+            </div>
+            <div class="overflow-x-auto custom-scrollbar max-h-60">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-gray-900 text-gray-400 uppercase sticky top-0 z-10">
+                        <tr>
+                            <th class="p-3">Minggu</th>
+                            <th class="p-3 text-right">% Rencana</th>
+                            <th class="p-3 text-right">% Aktual</th>
+                            <th class="p-3 text-right">PV (Rp)</th>
+                            <th class="p-3 text-right">EV (Rp)</th>
+                            <th class="p-3 text-right">SPI</th>
+                            <th class="p-3 text-right">CPI</th>
+                            <th class="p-3 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="weekSummaryTableBody" class="divide-y divide-gray-700/60 text-gray-300">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Footer -->
-        <footer class="bg-slate-800 border-t border-slate-700 py-4 text-center text-xs text-slate-500 no-print">
-            Dashboard Cost Control Proyek &copy; 2026 PT. Orecon Putra Perkasa - All Rights Reserved
-        </footer>
+        <!-- Section 3: Cost Control & PO Management -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Item PO Form (1 Col) -->
+            <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 shadow-md">
+                <h3 class="text-md font-bold text-white mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-file-invoice-dollar text-brand-500"></i>
+                    Input Item PO Baru
+                </h3>
+                <form id="poItemForm" onsubmit="handlePOItemSubmit(event)" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Nomor / Ref PO</label>
+                        <input type="text" id="poRefNo" required placeholder="PO/OPP/2026/001" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Deskripsi Item / Material</label>
+                        <input type="text" id="poItemDesc" required placeholder="Semen, Besi 12mm, BBM, Dll" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">Volume / Qty</label>
+                            <input type="number" step="any" id="poQty" required placeholder="100" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">Satuan</label>
+                            <input type="text" id="poUnit" required placeholder="Zak, Ton, Ltr" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Harga Satuan (Rp)</label>
+                        <input type="number" step="any" id="poUnitPrice" required placeholder="150000" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Kategori Expense</label>
+                        <select id="poCategory" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-500">
+                            <option value="Material">Material</option>
+                            <option value="Alat Berat / Rental">Alat Berat / Rental</option>
+                            <option value="Upah / Subkon">Upah / Subkon</option>
+                            <option value="Operasional Site">Operasional Site</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Tambah Item PO</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- List PO Items Table (2 Cols) -->
+            <div class="lg:col-span-2 bg-gray-800 rounded-xl border border-gray-700 shadow-md flex flex-col overflow-hidden">
+                <div class="p-4 border-b border-gray-700 flex items-center justify-between">
+                    <h3 class="text-md font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-brand-500"></i>
+                        Daftar Transaksi Purchase Order & Actual Cost
+                    </h3>
+                    <span class="text-xs text-gray-400" id="poCountText">0 items</span>
+                </div>
+                <div class="flex-1 overflow-x-auto custom-scrollbar p-1">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-gray-900 text-gray-400 uppercase">
+                            <tr>
+                                <th class="p-3">Ref PO</th>
+                                <th class="p-3">Item / Deskripsi</th>
+                                <th class="p-3">Kategori</th>
+                                <th class="p-3 text-right">Vol</th>
+                                <th class="p-3 text-right">Harga Satuan</th>
+                                <th class="p-3 text-right">Total Biaya</th>
+                                <th class="p-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="poTableBody" class="divide-y divide-gray-700/60 text-gray-300">
+                            <!-- Populated JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Section 4: Log Alat Berat & Payment Control -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Log Alat Berat -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-md p-5 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-md font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-truck-monster text-amber-500"></i>
+                            Log Alat Berat (HM & Fuel)
+                        </h3>
+                        <button onclick="openEquipmentModal()" class="text-xs bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Log Alat
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-gray-900 text-gray-400 uppercase">
+                                <tr>
+                                    <th class="p-2.5">Alat</th>
+                                    <th class="p-2.5 text-right">HM Kerja</th>
+                                    <th class="p-2.5 text-right">Fuel (L)</th>
+                                    <th class="p-2.5 text-right">Total (Rp)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="equipmentTableBody" class="divide-y divide-gray-700/60 text-gray-300">
+                                <!-- Populated JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Control -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-md p-5 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-md font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-credit-card text-emerald-500"></i>
+                            Payment Control & Termyn
+                        </h3>
+                        <button onclick="openPaymentModal()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Catat Bayar
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-gray-900 text-gray-400 uppercase">
+                                <tr>
+                                    <th class="p-2.5">Tanggal</th>
+                                    <th class="p-2.5">Keterangan</th>
+                                    <th class="p-2.5 text-right">Nominal</th>
+                                    <th class="p-2.5 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentTableBody" class="divide-y divide-gray-700/60 text-gray-300">
+                                <!-- Populated JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 border-t border-gray-700 py-4 mt-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-gray-400">
+            &copy; 2026 PT. Orecon Putra Perkasa. Integrated Cost Control & EVM System.
+        </div>
+    </footer>
+
+    <!-- MODAL: Config Webhook Google Sheets -->
+    <div id="configModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-gray-800 border border-gray-700 rounded-xl w-full max-w-md p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-cloud text-brand-500"></i> Pengaturan Webhook AppScript
+            </h3>
+            <p class="text-xs text-gray-400 mb-4">Masukkan Webhook URL Google Apps Script milik Anda untuk otomatisasi sync data ke Google Sheets.</p>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Apps Script Webhook URL</label>
+                    <input type="url" id="webhookUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Nilai BAC / Total RAP Proyek (Rp)</label>
+                    <input type="number" id="bacInput" placeholder="1000000000" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-brand-500">
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end space-x-2">
+                <button onclick="closeConfigModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded-lg">Batal</button>
+                <button onclick="saveConfigSettings()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs rounded-lg">Simpan Setting</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-800 border border-slate-700 text-slate-200 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 no-print">
-        <i id="toastIcon" class="fa-solid fa-circle-info text-cyan-400"></i>
-        <span id="toastMsg" class="text-xs sm:text-sm font-medium">Notifikasi</span>
+    <!-- MODAL: Log Alat Berat -->
+    <div id="equipmentModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-gray-800 border border-gray-700 rounded-xl w-full max-w-md p-6 shadow-2xl">
+            <h3 class="text-md font-bold text-white mb-3">Tambah Log Alat Berat</h3>
+            <form onsubmit="handleEquipmentSubmit(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1">Nama / Unit Alat</label>
+                    <input type="text" id="eqName" required placeholder="Excavator PC200" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-xs">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs text-gray-300 mb-1">Jam Kerja (HM)</label>
+                        <input type="number" step="any" id="eqHM" required placeholder="8" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-300 mb-1">Konsumsi Fuel (Liter)</label>
+                        <input type="number" step="any" id="eqFuel" required placeholder="60" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-xs">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1">Total Biaya Operasional (Rp)</label>
+                    <input type="number" step="any" id="eqCost" required placeholder="1200000" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-xs">
+                </div>
+                <div class="mt-4 flex justify-end space-x-2">
+                    <button type="button" onclick="closeEquipmentModal()" class="px-4 py-2 bg-gray-700 text-white text-xs rounded-lg">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs rounded-lg">Simpan Log</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- JavaScript Application Logic -->
+    <!-- MODAL: Payment Control -->
+    <div id="paymentModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-gray-800 border border-gray-700 rounded-xl w-full max-w-md p-6 shadow-2xl">
+            <h3 class="text-md font-bold text-white mb-3">Pencatatan Pembayaran</h3>
+            <form onsubmit="handlePaymentSubmit(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1">Tanggal</label>
+                    <input type="date" id="payDate" required class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1">Keterangan Pembayaran</label>
+                    <input type="text" id="payDesc" required placeholder="Termyn 1 / DP Subkon A" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1">Nominal (Rp)</label>
+                    <input type="number" step="any" id="payAmount" required placeholder="50000000" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1">Status</label>
+                    <select id="payStatus" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-xs">
+                        <option value="Lunas">Lunas</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                </div>
+                <div class="mt-4 flex justify-end space-x-2">
+                    <button type="button" onclick="closePaymentModal()" class="px-4 py-2 bg-gray-700 text-white text-xs rounded-lg">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded-lg">Simpan Pembayaran</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyZ6hO4VBQqFv-PSQizTSTbUQSuCMgYPvuYGZl4aoKoqZGelGeZko-xygCSjerhm2mx/exec';
-
-        const projectsData = {
-            sporthall: {
-                name: "Proyek Sporthall Indoor",
-                contractValue: 10802640000
-            },
-            mess: {
-                name: "Penataan Lahan Mess",
-                contractValue: 0
-            }
+        // --- DATA STATE & DEFAULTS ---
+        const DEFAULT_BAC = 1000000000; // Rp 1 Miliar default RAP
+        
+        let appConfig = JSON.parse(localStorage.getItem('opp_config')) || {
+            webhookUrl: '',
+            bac: DEFAULT_BAC
         };
 
-        const defaultTypes = [
-            { id: 'INCOME', name: 'Pemasukan (Termin / Cash In)', behavior: 'INCOME' },
-            { id: 'EXPENSE', name: 'Pengeluaran (Biaya / Cash Out)', behavior: 'EXPENSE' }
-        ];
-
-        let currentProjectId = localStorage.getItem('orecon_active_project') || 'sporthall';
-        document.getElementById('projectSelect').value = currentProjectId;
-
-        let transactionTypes = defaultTypes;
-        let savedCompanyLogo = localStorage.getItem('orecon_v3_logo') || '';
-
-        let transactions = [];
-        let customCategoriesList = JSON.parse(localStorage.getItem(`orecon_custom_cats_${currentProjectId}`)) || [];
-        
-        let purchaseOrders = [];
-        let excaLogs = [];
-        let compactLogs = [];
-        let dtLogs = [];
-        let spiCpiWeeks = []; // Data progres minggu 1 s.d 32
-        let currentContractValue = projectsData[currentProjectId].contractValue;
-
-        let costControlChartInstance = null;
-        let spiCpiChartInstance = null;
-
-        function getCloudKey(type) {
-            return `${currentProjectId}_${type}`;
-        }
-
-        async function fetchCloudData(type) {
-            try {
-                const res = await fetch(`${WEB_APP_URL}?projKey=${getCloudKey(type)}`);
-                const data = await res.json();
-                return Array.isArray(data) ? data : [];
-            } catch (err) {
-                console.error("Gagal mengambil data:", err);
-                return [];
-            }
-        }
-
-        async function saveCloudData(type, payload) {
-            showToast('Menyimpan data ke Google Sheets...', 'info');
-            try {
-                const bodyObj = {
-                    action: 'save',
-                    projKey: getCloudKey(type),
-                    payload: payload
-                };
-                
-                await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify(bodyObj)
-                });
-                showToast('Berhasil tersimpan di Cloud!', 'success');
-            } catch (err) {
-                console.error("Gagal menyimpan:", err);
-                showToast('Gagal terhubung ke Google Sheets', 'error');
-            }
-        }
-
-        async function deleteCloudData(type, id) {
-            showToast('Menghapus data di Cloud...', 'info');
-            try {
-                const bodyObj = { action: 'delete', projKey: getCloudKey(type), id: id };
-                await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify(bodyObj)
-                });
-                showToast('Data terhapus!', 'info');
-            } catch (err) {
-                console.error("Gagal menghapus:", err);
-            }
-        }
-
-        async function switchProject(projId) {
-            currentProjectId = projId;
-            localStorage.setItem('orecon_active_project', projId);
-            currentContractValue = projectsData[projId].contractValue;
-            customCategoriesList = JSON.parse(localStorage.getItem(`orecon_custom_cats_${currentProjectId}`)) || [];
-
-            const navPoText = document.getElementById('nav-po-text');
-            const navPoIcon = document.getElementById('nav-po-icon');
-            const navPoPayment = document.getElementById('nav-po-payment');
-            
-            const kpiSporthall = document.getElementById('kpi-grid-sporthall');
-            const kpiMess = document.getElementById('kpi-grid-mess');
-            const messComparison = document.getElementById('messComparisonSection');
-            const sporthallTx = document.getElementById('sporthallTxFormWrapper');
-            const sporthallCharts = document.getElementById('sporthallChartsWrapper');
-            const sporthallSpiTable = document.getElementById('sporthallSpiCpiTableWrapper');
-            const sporthallLedger = document.getElementById('sporthallLedgerWrapper');
-            const headerContractWrapper = document.getElementById('headerContractWrapper');
-
-            if (projId === 'mess') {
-                navPoText.innerText = "Alat Berat & Ritase DT";
-                navPoIcon.className = "fa-solid fa-truck-monster w-4 text-center";
-                navPoPayment.classList.add('hidden');
-                kpiSporthall.classList.add('hidden');
-                kpiMess.classList.remove('hidden');
-                messComparison.classList.remove('hidden');
-                sporthallTx.classList.add('hidden');
-                sporthallCharts.classList.add('hidden');
-                sporthallSpiTable.classList.add('hidden');
-                sporthallLedger.classList.add('hidden');
-                headerContractWrapper.classList.add('hidden');
-            } else {
-                navPoText.innerText = "Manajemen Pre-Order (PO)";
-                navPoIcon.className = "fa-solid fa-file-invoice-dollar w-4 text-center";
-                navPoPayment.classList.remove('hidden');
-                kpiSporthall.classList.remove('hidden');
-                kpiMess.classList.add('hidden');
-                messComparison.classList.add('hidden');
-                sporthallTx.classList.remove('hidden');
-                sporthallCharts.classList.remove('hidden');
-                sporthallSpiTable.classList.remove('hidden');
-                sporthallLedger.classList.remove('hidden');
-                headerContractWrapper.classList.remove('hidden');
-                document.getElementById('headerContractVal').innerText = formatIDR(currentContractValue);
-            }
-
-            document.getElementById('pageTitle').innerText = projectsData[projId].name;
-            
-            await syncDataFromCloud();
-        }
-
-        async function syncDataFromCloud() {
-            showToast('Mengambil data terbaru dari Google Sheets...', 'info');
-            transactions = await fetchCloudData('transactions');
-            purchaseOrders = await fetchCloudData('po');
-            excaLogs = await fetchCloudData('exca');
-            compactLogs = await fetchCloudData('compact');
-            dtLogs = await fetchCloudData('dt');
-            
-            const cloudSpi = await fetchCloudData('spicpi_weeks');
-            initSpiCpiWeeks(cloudSpi);
-
-            transactions.forEach(t => {
-                if (t.category && !customCategoriesList.includes(t.category)) {
-                    customCategoriesList.push(t.category);
-                }
-            });
-            localStorage.setItem(`orecon_custom_cats_${currentProjectId}`, JSON.stringify(customCategoriesList));
-
-            populateFormDropdowns();
-            updateDashboard();
-            
-            if (!document.getElementById('tab-po').classList.contains('hidden')) {
-                renderTabTwoContent();
-            } else if (!document.getElementById('tab-po-payment').classList.contains('hidden')) {
-                renderPaymentControlTable();
-            }
-            showToast('Data telah diperbarui!', 'success');
-        }
-
-        function initSpiCpiWeeks(cloudData) {
-            spiCpiWeeks = [];
+        // Initialize 32 weeks empty structure or load from storage
+        let weeklyData = JSON.parse(localStorage.getItem('opp_weekly_data'));
+        if (!weeklyData || weeklyData.length !== 32) {
+            weeklyData = [];
             for (let i = 1; i <= 32; i++) {
-                const existing = cloudData.find(w => Number(w.week) === i);
-                if (existing) {
-                    spiCpiWeeks.push(existing);
-                } else {
-                    // Default curve or 0
-                    spiCpiWeeks.push({
-                        week: i,
-                        planPct: Math.min(100, Number((i * 3.125).toFixed(2))), // contoh kurva S linear
-                        actualPct: i <= 8 ? Number((i * 3.0).toFixed(2)) : 0
-                    });
-                }
-            }
-            renderSpiCpiTable();
-        }
-
-        function switchTab(tabId) {
-            const dashboardTab = document.getElementById('tab-dashboard');
-            const poTab = document.getElementById('tab-po');
-            const poPaymentTab = document.getElementById('tab-po-payment');
-            
-            const navDashboard = document.getElementById('nav-dashboard');
-            const navPo = document.getElementById('nav-po');
-            const navPoPayment = document.getElementById('nav-po-payment');
-
-            [navDashboard, navPo, navPoPayment].forEach(btn => {
-                btn.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition text-slate-300 hover:bg-slate-700/60 hover:text-white";
-            });
-
-            dashboardTab.classList.add('hidden');
-            poTab.classList.add('hidden');
-            poPaymentTab.classList.add('hidden');
-
-            if (tabId === 'dashboard') {
-                dashboardTab.classList.remove('hidden');
-                navDashboard.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
-            } else if (tabId === 'po') {
-                poTab.classList.remove('hidden');
-                navPo.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
-                renderTabTwoContent();
-            } else if (tabId === 'po-payment') {
-                poPaymentTab.classList.remove('hidden');
-                navPoPayment.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition bg-cyan-600 text-white shadow-md shadow-cyan-600/20";
-                renderPaymentControlTable();
-            }
-        }
-
-        function renderTabTwoContent() {
-            if (currentProjectId === 'mess') {
-                document.getElementById('module-po').classList.add('hidden');
-                document.getElementById('module-heavy').classList.remove('hidden');
-                renderExcaTable();
-                renderCompactTable();
-                renderDtTable();
-            } else {
-                document.getElementById('module-po').classList.remove('hidden');
-                document.getElementById('module-heavy').classList.add('hidden');
-                renderPOTable();
-            }
-        }
-
-        function switchHeavySubTab(sub) {
-            ['exca', 'compact', 'dt'].forEach(s => {
-                document.getElementById(`heavy-${s}`).classList.add('hidden');
-                document.getElementById(`subnav-${s}`).className = "px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-700 transition";
-            });
-            document.getElementById(`heavy-${sub}`).classList.remove('hidden');
-            document.getElementById(`subnav-${sub}`).className = "px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-600 text-white transition";
-        }
-
-        function handleCategoryChange(val) {
-            const customInput = document.getElementById('trxCustomCategory');
-            if (val === '__ADD_NEW__') {
-                customInput.classList.remove('hidden');
-                customInput.required = true;
-                customInput.focus();
-            } else {
-                customInput.classList.add('hidden');
-                customInput.required = false;
-                customInput.value = '';
-            }
-        }
-
-        // ================= KELOLA KATEGORI MODAL LOGIC =================
-        function openCategoryManagerModal() {
-            renderModalCategoryList();
-            document.getElementById('categoryModal').classList.remove('hidden');
-        }
-
-        function closeCategoryManagerModal() {
-            document.getElementById('categoryModal').classList.add('hidden');
-            document.getElementById('newCategoryInput').value = '';
-        }
-
-        function renderModalCategoryList() {
-            const container = document.getElementById('categoryListContainer');
-            container.innerHTML = '';
-
-            if (customCategoriesList.length === 0) {
-                container.innerHTML = `<div class="text-xs text-slate-500 italic p-3 text-center">Belum ada kategori tersimpan. Silakan tambah kategori baru di atas.</div>`;
-                return;
-            }
-
-            customCategoriesList.forEach((cat, idx) => {
-                container.innerHTML += `
-                    <div class="flex justify-between items-center bg-slate-900/80 p-2.5 rounded-xl border border-slate-700/60 text-xs">
-                        <span class="text-white font-medium">${cat}</span>
-                        <button onclick="deleteCategoryFromModal(${idx})" class="text-red-400 hover:text-red-300 p-1" title="Hapus Kategori"><i class="fa-solid fa-trash-can"></i></button>
-                    </div>
-                `;
-            });
-        }
-
-        function addNewCategoryFromModal() {
-            const input = document.getElementById('newCategoryInput');
-            const catName = input.value.trim();
-            if (!catName) {
-                alert('Nama kategori tidak boleh kosong!');
-                return;
-            }
-            if (customCategoriesList.includes(catName)) {
-                alert('Kategori ini sudah ada!');
-                return;
-            }
-
-            customCategoriesList.push(catName);
-            localStorage.setItem(`orecon_custom_cats_${currentProjectId}`, JSON.stringify(customCategoriesList));
-            input.value = '';
-
-            populateFormDropdowns();
-            renderModalCategoryList();
-            updateDashboard();
-            showToast(`Kategori "${catName}" berhasil ditambahkan!`, 'success');
-        }
-
-        function deleteCategoryFromModal(idx) {
-            const catName = customCategoriesList[idx];
-            if (confirm(`Apakah Anda yakin ingin menghapus kategori "${catName}"?`)) {
-                customCategoriesList.splice(idx, 1);
-                localStorage.setItem(`orecon_custom_cats_${currentProjectId}`, JSON.stringify(customCategoriesList));
-
-                populateFormDropdowns();
-                renderModalCategoryList();
-                updateDashboard();
-                showToast(`Kategori "${catName}" dihapus!`, 'info');
-            }
-        }
-
-        // ================= EDIT TRANSAKSI KEUANGAN LOGIC =================
-        function editTransaction(txId) {
-            const tx = transactions.find(t => t.id === txId);
-            if (!tx) return;
-
-            document.getElementById('editingTxId').value = tx.id;
-            document.getElementById('trxDate').value = tx.date || '';
-            document.getElementById('trxType').value = tx.type || 'EXPENSE';
-            document.getElementById('trxAmount').value = tx.amount || '';
-            document.getElementById('trxDesc').value = tx.desc || '';
-
-            const catSelect = document.getElementById('trxCategory');
-            const customInput = document.getElementById('trxCustomCategory');
-            
-            if (customCategoriesList.includes(tx.category)) {
-                catSelect.value = tx.category;
-                customInput.classList.add('hidden');
-                customInput.required = false;
-            } else {
-                catSelect.value = '__ADD_NEW__';
-                customInput.value = tx.category;
-                customInput.classList.remove('hidden');
-                customInput.required = true;
-            }
-
-            document.getElementById('trxFormTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Transaksi Keuangan`;
-            document.getElementById('trxSubmitBtn').innerText = "Perbarui Transaksi";
-            document.getElementById('trxSubmitBtn').className = "w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-md";
-            document.getElementById('cancelEditTxBtn').classList.remove('hidden');
-
-            document.getElementById('sporthallTxFormWrapper').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function resetTxForm() {
-            document.getElementById('editingTxId').value = '';
-            document.getElementById('transactionForm').reset();
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('trxDate').value = today;
-            document.getElementById('trxCustomCategory').classList.add('hidden');
-            document.getElementById('trxCustomCategory').required = false;
-
-            document.getElementById('trxFormTitle').innerHTML = `<i class="fa-solid fa-square-plus text-cyan-400"></i> Catat Transaksi Keuangan Baru`;
-            document.getElementById('trxSubmitBtn').innerText = "Simpan Transaksi";
-            document.getElementById('trxSubmitBtn').className = "w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 rounded-xl text-xs transition";
-            document.getElementById('cancelEditTxBtn').classList.add('hidden');
-        }
-
-        // Transactions Form Submit
-        document.getElementById('transactionForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const editingId = document.getElementById('editingTxId').value;
-            const selectedDate = document.getElementById('trxDate').value;
-            const categorySelectVal = document.getElementById('trxCategory').value;
-            const customCatVal = document.getElementById('trxCustomCategory').value.trim();
-
-            let finalCategory = categorySelectVal;
-            if (categorySelectVal === '__ADD_NEW__') {
-                if (!customCatVal) {
-                    alert('Harap isi nama kategori kustom!');
-                    return;
-                }
-                finalCategory = customCatVal;
-                if (!customCategoriesList.includes(finalCategory)) {
-                    customCategoriesList.push(finalCategory);
-                    localStorage.setItem(`orecon_custom_cats_${currentProjectId}`, JSON.stringify(customCategoriesList));
-                }
-            }
-
-            if (editingId) {
-                const numericId = Number(editingId);
-                const index = transactions.findIndex(t => t.id === numericId);
-                if (index !== -1) {
-                    transactions[index] = {
-                        ...transactions[index],
-                        date: selectedDate,
-                        type: document.getElementById('trxType').value,
-                        category: finalCategory,
-                        amount: parseFloat(document.getElementById('trxAmount').value),
-                        desc: document.getElementById('trxDesc').value
-                    };
-                    await saveCloudData('transactions', transactions[index]);
-                    showToast('Transaksi berhasil diperbarui!', 'success');
-                }
-            } else {
-                const newTx = {
-                    id: Date.now(),
-                    date: selectedDate,
-                    type: document.getElementById('trxType').value,
-                    category: finalCategory,
-                    amount: parseFloat(document.getElementById('trxAmount').value),
-                    desc: document.getElementById('trxDesc').value
-                };
-                transactions.push(newTx);
-                await saveCloudData('transactions', newTx);
-                showToast('Transaksi baru tersimpan!', 'success');
-            }
-
-            populateFormDropdowns();
-            updateDashboard();
-            resetTxForm();
-        });
-
-        // ================= PO ITEM ROW MANAGEMENT =================
-        function addPoItemRow(itemData = null) {
-            const container = document.getElementById('poItemsContainer');
-            const rowId = 'po-item-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-            
-            const tr = document.createElement('tr');
-            tr.id = rowId;
-            tr.className = "border-b border-slate-700/40 p-2";
-            
-            const name = itemData ? itemData.itemName : '';
-            const specs = itemData ? itemData.specs : '';
-            const volume = itemData ? itemData.volume : '';
-            const price = itemData ? itemData.price : '';
-            const status = itemData ? itemData.status : 'BELUM_PROSES';
-            const note = itemData ? itemData.note : '';
-
-            tr.innerHTML = `
-                <td class="p-2"><input type="text" value="${name}" placeholder="Material / Diskon / Pajak PPh" required class="po-item-name w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
-                <td class="p-2"><input type="text" value="${specs}" placeholder="WF 250 / PPh 22 (1.5%)" class="po-item-specs w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
-                <td class="p-2"><input type="text" value="${volume}" placeholder="10 Ton / 1 Ls" class="po-item-volume w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
-                <td class="p-2"><input type="number" step="any" value="${price}" placeholder="15000000 / -500000" required oninput="calculatePoTotals()" class="po-item-price w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white text-right font-mono focus:outline-none focus:border-cyan-500"></td>
-                <td class="p-2">
-                    <select class="po-item-status w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500">
-                        <option value="BELUM_PROSES" ${status === 'BELUM_PROSES' ? 'selected' : ''}>🟡 Belum Diproses</option>
-                        <option value="DALAM_PROSES" ${status === 'DALAM_PROSES' ? 'selected' : ''}>🔵 Dalam Proses</option>
-                        <option value="SELESAI" ${status === 'SELESAI' ? 'selected' : ''}>🟢 Selesai</option>
-                    </select>
-                </td>
-                <td class="p-2"><input type="text" value="${note}" placeholder="Catatan / Keterangan tambahan" class="po-item-note w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500"></td>
-                <td class="p-2 text-center">
-                    <button type="button" onclick="removePoItemRow('${rowId}')" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
-                </td>
-            `;
-            container.appendChild(tr);
-            calculatePoTotals();
-        }
-
-        function removePoItemRow(rowId) {
-            const container = document.getElementById('poItemsContainer');
-            if (container.children.length <= 1) {
-                alert('Minimal harus ada 1 item di dalam PO!');
-                return;
-            }
-            const row = document.getElementById(rowId);
-            if (row) row.remove();
-            calculatePoTotals();
-        }
-
-        function calculatePoTotals() {
-            const rows = document.querySelectorAll('#poItemsContainer tr');
-            let grandTotal = 0;
-            let totalItems = rows.length;
-
-            rows.forEach(row => {
-                const price = parseFloat(row.querySelector('.po-item-price').value) || 0;
-                grandTotal += price;
-            });
-
-            document.getElementById('poTotalItemsCount').innerText = totalItems + ' Item';
-            
-            const displayEl = document.getElementById('poGrandTotalDisplay');
-            displayEl.innerText = formatIDR(grandTotal);
-            if (grandTotal < 0) {
-                displayEl.className = "text-lg font-bold text-amber-400 font-mono";
-            } else {
-                displayEl.className = "text-lg font-bold text-emerald-400 font-mono";
-            }
-        }
-
-        // Edit PO Handler
-        function editPO(poId) {
-            const po = purchaseOrders.find(p => p.id === poId);
-            if (!po) return;
-
-            document.getElementById('editingPoId').value = po.id;
-            document.getElementById('poNumber').value = po.poNumber || '';
-            document.getElementById('poVendor').value = po.vendor || '';
-            document.getElementById('poDate').value = po.date || '';
-
-            document.getElementById('poFormTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Pre-Order (PO): ${po.poNumber || po.id}`;
-            document.getElementById('poSubmitBtn').innerText = "Perbarui Data PO";
-            document.getElementById('poSubmitBtn').className = "bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs shadow-md transition";
-            document.getElementById('cancelEditPoBtn').classList.remove('hidden');
-
-            const container = document.getElementById('poItemsContainer');
-            container.innerHTML = '';
-            
-            const itemsArray = po.items || [{ itemName: po.itemName || '', specs: po.specs || '', volume: po.volume || '', price: po.total || 0, status: po.status || 'BELUM_PROSES', note: '' }];
-            itemsArray.forEach(item => addPoItemRow(item));
-
-            document.getElementById('poForm').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function resetPoForm() {
-            document.getElementById('editingPoId').value = '';
-            document.getElementById('poForm').reset();
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('poDate').value = today;
-
-            document.getElementById('poFormTitle').innerHTML = `<i class="fa-solid fa-file-circle-plus text-cyan-400"></i> Buat Pre-Order (PO) Baru`;
-            document.getElementById('poSubmitBtn').innerText = "Simpan PO Baru";
-            document.getElementById('poSubmitBtn').className = "bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs shadow-md transition";
-            document.getElementById('cancelEditPoBtn').classList.add('hidden');
-
-            document.getElementById('poItemsContainer').innerHTML = '';
-            addPoItemRow();
-        }
-
-        // Form Submit PO
-        document.getElementById('poForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const editingId = document.getElementById('editingPoId').value;
-            const selectedDate = document.getElementById('poDate').value;
-            const poNum = document.getElementById('poNumber').value.trim();
-            const vendorName = document.getElementById('poVendor').value.trim();
-
-            const rows = document.querySelectorAll('#poItemsContainer tr');
-            const itemsList = [];
-            let totalAmount = 0;
-
-            rows.forEach(row => {
-                const price = parseFloat(row.querySelector('.po-item-price').value) || 0;
-
-                itemsList.push({
-                    itemName: row.querySelector('.po-item-name').value.trim(),
-                    specs: row.querySelector('.po-item-specs').value.trim(),
-                    volume: row.querySelector('.po-item-volume').value.trim(),
-                    price: price,
-                    status: row.querySelector('.po-item-status').value,
-                    note: row.querySelector('.po-item-note').value.trim()
+                weeklyData.push({
+                    week: i,
+                    planPct: 0,
+                    actualPct: 0,
+                    updatedAt: null
                 });
-                totalAmount += price;
-            });
-
-            const poCategoryName = "Pengadaan PO";
-            if (!customCategoriesList.includes(poCategoryName)) {
-                customCategoriesList.push(poCategoryName);
-                localStorage.setItem(`orecon_custom_cats_${currentProjectId}`, JSON.stringify(customCategoriesList));
             }
+        }
 
-            if (editingId) {
-                const numericId = Number(editingId);
-                const index = purchaseOrders.findIndex(p => p.id === numericId);
-                if (index !== -1) {
-                    const existingPo = purchaseOrders[index];
-                    const payStatus = existingPo.paymentStatus || 'BELUM_BAYAR';
-                    let paidAmount = Number(existingPo.paidAmount) || 0;
-                    if (payStatus === 'LUNAS') paidAmount = totalAmount;
+        let poItems = JSON.parse(localStorage.getItem('opp_po_items')) || [];
+        let equipmentLogs = JSON.parse(localStorage.getItem('opp_equipment')) || [];
+        let paymentLogs = JSON.parse(localStorage.getItem('opp_payments')) || [];
 
-                    const remainingDebt = totalAmount - paidAmount;
+        let chartInstance = null;
 
-                    purchaseOrders[index] = {
-                        ...existingPo,
-                        poNumber: poNum,
-                        vendor: vendorName,
-                        date: selectedDate,
-                        items: itemsList,
-                        total: totalAmount,
-                        paymentStatus: payStatus,
-                        paidAmount: paidAmount,
-                        remainingDebt: remainingDebt > 0 ? remainingDebt : 0
-                    };
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            initWeekDropdown();
+            renderAll();
+            initChart();
+            loadSelectedWeekData();
+        };
 
-                    const txIndex = transactions.findIndex(t => t.poRefId === numericId);
-                    if (txIndex !== -1) {
-                        transactions[txIndex].amount = paidAmount;
-                        transactions[txIndex].date = selectedDate;
-                        transactions[txIndex].desc = `Pengadaan ${poNum} (${vendorName}) - Status: ${payStatus}`;
-                        await saveCloudData('transactions', transactions[txIndex]);
-                    }
+        // Helper: Format Rupiah
+        function formatRp(num) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num || 0);
+        }
 
-                    await saveCloudData('po', purchaseOrders[index]);
-                    showToast(`PO ${poNum} berhasil diperbarui!`, 'success');
-                }
+        // --- WEEK DROPDOWN & INPUT SPI/CPI LOGIC ---
+        function initWeekDropdown() {
+            const select = document.getElementById('selectWeekNum');
+            select.innerHTML = '';
+            for (let i = 1; i <= 32; i++) {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = `Minggu ke-${i}`;
+                select.appendChild(opt);
+            }
+        }
+
+        function loadSelectedWeekData() {
+            const weekNum = parseInt(document.getElementById('selectWeekNum').value);
+            const wData = weeklyData.find(w => w.week === weekNum) || { planPct: 0, actualPct: 0 };
+            
+            document.getElementById('inputPlanPct').value = wData.planPct || 0;
+            document.getElementById('inputActualPct').value = wData.actualPct || 0;
+
+            calculatePreview();
+        }
+
+        function selectWeekForEdit(weekNum) {
+            document.getElementById('selectWeekNum').value = weekNum;
+            loadSelectedWeekData();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Realtime Preview calculation
+        document.getElementById('inputPlanPct').addEventListener('input', calculatePreview);
+        document.getElementById('inputActualPct').addEventListener('input', calculatePreview);
+
+        function calculatePreview() {
+            const plan = parseFloat(document.getElementById('inputPlanPct').value) || 0;
+            const actual = parseFloat(document.getElementById('inputActualPct').value) || 0;
+            
+            const totalActualCost = calculateTotalActualCost();
+            const bac = appConfig.bac || DEFAULT_BAC;
+
+            const pv = (plan / 100) * bac;
+            const ev = (actual / 100) * bac;
+
+            const spi = pv > 0 ? (ev / pv) : (actual > 0 ? 1 : 1);
+            const cpi = totalActualCost > 0 ? (ev / totalActualCost) : (ev > 0 ? 1 : 1);
+
+            document.getElementById('previewSPI').textContent = spi.toFixed(2);
+            document.getElementById('previewCPI').textContent = cpi.toFixed(2);
+
+            let statusStr = "Normal";
+            if (spi < 1 && cpi < 1) statusStr = "Terlambat & Over Budget";
+            else if (spi < 1) statusStr = "Terlambat (Behind Schedule)";
+            else if (cpi < 1) statusStr = "Over Budget";
+            else if (spi >= 1 && cpi >= 1) statusStr = "Sesuai Target / Bagus";
+
+            document.getElementById('previewStatus').textContent = statusStr;
+        }
+
+        // --- SAVE INDIVIDUAL WEEK DATA ---
+        function handleSaveSingleWeek(e) {
+            e.preventDefault();
+            const weekNum = parseInt(document.getElementById('selectWeekNum').value);
+            const plan = parseFloat(document.getElementById('inputPlanPct').value) || 0;
+            const actual = parseFloat(document.getElementById('inputActualPct').value) || 0;
+
+            // Update local memory
+            const idx = weeklyData.findIndex(w => w.week === weekNum);
+            const updatedWeekPayload = {
+                week: weekNum,
+                planPct: plan,
+                actualPct: actual,
+                updatedAt: new Date().toISOString()
+            };
+
+            if (idx !== -1) {
+                weeklyData[idx] = updatedWeekPayload;
             } else {
-                const newPoId = Date.now();
-                const newPO = {
-                    id: newPoId,
-                    poNumber: poNum,
-                    vendor: vendorName,
-                    date: selectedDate,
-                    items: itemsList,
-                    total: totalAmount,
-                    paymentStatus: 'TEMPO',
-                    paidAmount: 0,
-                    remainingDebt: totalAmount
-                };
-
-                purchaseOrders.push(newPO);
-
-                const autoTx = {
-                    id: newPoId + 1,
-                    date: selectedDate,
-                    type: 'EXPENSE',
-                    category: poCategoryName,
-                    amount: 0,
-                    desc: `Pengadaan ${poNum} (${vendorName}) - Status: TEMPO`,
-                    poRefId: newPoId
-                };
-
-                transactions.push(autoTx);
-                await saveCloudData('po', newPO);
-                await saveCloudData('transactions', autoTx);
-                showToast(`PO ${poNum} berhasil dibuat (Status: TEMPO)!`, 'success');
+                weeklyData.push(updatedWeekPayload);
             }
 
-            populateFormDropdowns();
+            // Save to LocalStorage
+            localStorage.setItem('opp_weekly_data', JSON.stringify(weeklyData));
+
+            // Sync single week to Cloud/Google Apps Script
+            saveCloudSingleWeek(updatedWeekPayload);
+
+            // Re-render UI & Chart
+            renderAll();
+            showToast(`Data Minggu ke-${weekNum} berhasil diperbarui!`);
+        }
+
+        // --- CALCULATION HELPERS ---
+        function calculateTotalActualCost() {
+            const totalPO = poItems.reduce((acc, item) => acc + (item.totalPrice || 0), 0);
+            const totalEq = equipmentLogs.reduce((acc, item) => acc + (item.cost || 0), 0);
+            return totalPO + totalEq;
+        }
+
+        // --- RENDER FUNCTION ---
+        function renderAll() {
+            const bac = appConfig.bac || DEFAULT_BAC;
+            const totalActualCost = calculateTotalActualCost();
+
+            // Total RAP & AC Cards
+            document.getElementById('cardTotalRAP').textContent = formatRp(bac);
+            document.getElementById('cardTotalActual').textContent = formatRp(totalActualCost);
+
+            const margin = bac - totalActualCost;
+            document.getElementById('cardRAPMargin').textContent = `Sisa Anggaran: ${formatRp(margin)}`;
+
+            // Find Latest Week Data with entries
+            let latestWeek = weeklyData.filter(w => w.planPct > 0 || w.actualPct > 0).slice(-1)[0];
+            if (!latestWeek) latestWeek = weeklyData[0];
+
+            const pvLatest = (latestWeek.planPct / 100) * bac;
+            const evLatest = (latestWeek.actualPct / 100) * bac;
+
+            const latestSPI = pvLatest > 0 ? (evLatest / pvLatest) : 1;
+            const latestCPI = totalActualCost > 0 ? (evLatest / totalActualCost) : 1;
+
+            document.getElementById('cardLatestSPI').textContent = latestSPI.toFixed(2);
+            document.getElementById('cardLatestCPI').textContent = latestCPI.toFixed(2);
+
+            document.getElementById('pvValueDisplay').textContent = formatRp(pvLatest);
+            document.getElementById('evValueDisplay').textContent = formatRp(evLatest);
+
+            // Badge SPI Status
+            const badgeSPI = document.getElementById('badgeSPI');
+            if (latestSPI >= 1) {
+                badgeSPI.className = "text-xs px-2 py-0.5 rounded font-semibold bg-emerald-900/80 text-emerald-300";
+                badgeSPI.textContent = "On Schedule";
+            } else {
+                badgeSPI.className = "text-xs px-2 py-0.5 rounded font-semibold bg-rose-900/80 text-rose-300";
+                badgeSPI.textContent = "Delay";
+            }
+
+            // Badge CPI Status
+            const badgeCPI = document.getElementById('badgeCPI');
+            if (latestCPI >= 1) {
+                badgeCPI.className = "text-xs px-2 py-0.5 rounded font-semibold bg-emerald-900/80 text-emerald-300";
+                badgeCPI.textContent = "Under Budget";
+            } else {
+                badgeCPI.className = "text-xs px-2 py-0.5 rounded font-semibold bg-rose-900/80 text-rose-300";
+                badgeCPI.textContent = "Over Budget";
+            }
+
+            // Render Table Summary 32 Weeks
+            renderWeekTable();
+
+            // Render PO Table
             renderPOTable();
-            updateDashboard();
-            resetPoForm();
-        });
 
-        function getStatusBadge(status) {
-            switch(status) {
-                case 'SELESAI':
-                    return `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🟢 Selesai</span>`;
-                case 'DALAM_PROSES':
-                    return `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🔵 Dalam Proses</span>`;
-                default:
-                    return `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🟡 Belum Diproses</span>`;
+            // Render Equipment & Payment Tables
+            renderEquipmentTable();
+            renderPaymentTable();
+
+            // Update Chart
+            if (chartInstance) {
+                updateChartData();
             }
         }
 
-        function getPaymentStatusBadge(status) {
-            switch(status) {
-                case 'LUNAS':
-                    return `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟢 Lunas</span>`;
-                case 'DP':
-                    return `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔵 Bayar DP</span>`;
-                case 'TEMPO':
-                    return `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟡 Tempo</span>`;
-                default:
-                    return `<span class="bg-red-500/10 text-red-400 border border-red-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔴 Belum Bayar</span>`;
-            }
+        function renderWeekTable() {
+            const tbody = document.getElementById('weekSummaryTableBody');
+            tbody.innerHTML = '';
+
+            const bac = appConfig.bac || DEFAULT_BAC;
+            const totalActualCost = calculateTotalActualCost();
+
+            weeklyData.forEach(w => {
+                const pv = (w.planPct / 100) * bac;
+                const ev = (w.actualPct / 100) * bac;
+                const spi = pv > 0 ? (ev / pv) : (w.actualPct > 0 ? 1 : 1);
+                const cpi = totalActualCost > 0 ? (ev / totalActualCost) : (ev > 0 ? 1 : 1);
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-750 transition";
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-gray-200">Minggu ${w.week}</td>
+                    <td class="p-3 text-right">${w.planPct.toFixed(2)}%</td>
+                    <td class="p-3 text-right font-medium ${w.actualPct >= w.planPct ? 'text-emerald-400' : 'text-amber-400'}">${w.actualPct.toFixed(2)}%</td>
+                    <td class="p-3 text-right text-gray-400">${formatRp(pv)}</td>
+                    <td class="p-3 text-right text-gray-400">${formatRp(ev)}</td>
+                    <td class="p-3 text-right font-bold ${spi >= 1 ? 'text-blue-400' : 'text-rose-400'}">${spi.toFixed(2)}</td>
+                    <td class="p-3 text-right font-bold ${cpi >= 1 ? 'text-emerald-400' : 'text-rose-400'}">${cpi.toFixed(2)}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="selectWeekForEdit(${w.week})" class="px-2 py-1 bg-gray-700 hover:bg-brand-600 text-gray-200 hover:text-white rounded text-xs transition">
+                            <i class="fa-solid fa-pen-to-square"></i> Edit
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
-        function togglePoDetail(poId) {
-            const detailRow = document.getElementById(`po-detail-${poId}`);
-            const icon = document.getElementById(`po-icon-${poId}`);
-            if (detailRow.classList.contains('hidden')) {
-                detailRow.classList.remove('hidden');
-                if (icon) icon.className = "fa-solid fa-chevron-down text-cyan-400";
-            } else {
-                detailRow.classList.add('hidden');
-                if (icon) icon.className = "fa-solid fa-chevron-right text-slate-400";
-            }
+        // --- PO MANAGEMENT LOGIC ---
+        function handlePOItemSubmit(e) {
+            e.preventDefault();
+            const refNo = document.getElementById('poRefNo').value;
+            const desc = document.getElementById('poItemDesc').value;
+            const qty = parseFloat(document.getElementById('poQty').value) || 0;
+            const unit = document.getElementById('poUnit').value;
+            const unitPrice = parseFloat(document.getElementById('poUnitPrice').value) || 0;
+            const category = document.getElementById('poCategory').value;
+
+            const newItem = {
+                id: Date.now(),
+                refNo,
+                desc,
+                qty,
+                unit,
+                unitPrice,
+                totalPrice: qty * unitPrice,
+                category
+            };
+
+            poItems.push(newItem);
+            localStorage.setItem('opp_po_items', JSON.stringify(poItems));
+            
+            // Sync cloud
+            saveCloudData('po_item', newItem);
+
+            // Reset form
+            document.getElementById('poItemForm').reset();
+            renderAll();
+            showToast('Item PO berhasil ditambahkan');
+        }
+
+        function deletePOItem(id) {
+            poItems = poItems.filter(item => item.id !== id);
+            localStorage.setItem('opp_po_items', JSON.stringify(poItems));
+            renderAll();
+            showToast('Item PO dihapus');
         }
 
         function renderPOTable() {
             const tbody = document.getElementById('poTableBody');
+            document.getElementById('poCountText').textContent = `${poItems.length} Transaksi`;
             tbody.innerHTML = '';
-            
-            const filterVal = document.getElementById('filterPoStatus') ? document.getElementById('filterPoStatus').value : 'ALL';
-            
-            const filteredPOs = purchaseOrders.filter(p => {
-                if (filterVal === 'ALL') return true;
-                const itemsArray = p.items || [{ status: p.status || 'BELUM_PROSES' }];
-                if (filterVal === 'SELESAI') {
-                    return itemsArray.every(it => (it.status || 'BELUM_PROSES') === 'SELESAI');
-                }
-                return itemsArray.some(it => (it.status || 'BELUM_PROSES') === filterVal);
-            });
 
-            document.getElementById('poCount').innerText = filteredPOs.length + ' Dokumen PO';
-
-            if (filteredPOs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-500 italic">Belum ada dokumen Pre-Order (PO) yang sesuai filter.</td></tr>`;
+            if (poItems.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-500">Belum ada data PO.</td></tr>`;
                 return;
             }
 
-            filteredPOs.forEach(po => {
-                const itemsArray = po.items || [{ itemName: po.itemName || '-', specs: po.specs || '-', volume: po.volume || '-', price: po.total || 0, status: po.status || 'BELUM_PROSES', note: '' }];
-                const itemsCount = itemsArray.length;
-
-                const finishedCount = itemsArray.filter(it => (it.status || 'BELUM_PROSES') === 'SELESAI').length;
-                let progressBadge = '';
-                if (finishedCount === itemsCount) {
-                    progressBadge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟢 Semua Selesai (${finishedCount}/${itemsCount})</span>`;
-                } else if (finishedCount > 0) {
-                    progressBadge = `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔵 ${finishedCount}/${itemsCount} Selesai</span>`;
-                } else {
-                    progressBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟡 Dalam Proses / Belum</span>`;
-                }
-
-                tbody.innerHTML += `
-                    <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition cursor-pointer" onclick="togglePoDetail(${po.id})">
-                        <td class="py-3.5 px-4 text-center no-print">
-                            <i id="po-icon-${po.id}" class="fa-solid fa-chevron-down text-cyan-400 text-xs"></i>
-                        </td>
-                        <td class="py-3.5 px-4 font-bold text-cyan-400 font-mono">${po.poNumber || 'PO-' + po.id.toString().slice(-4)}</td>
-                        <td class="py-3.5 px-4 font-semibold text-white">${po.vendor || '-'}</td>
-                        <td class="py-3.5 px-4 font-mono text-slate-300 text-xs">${po.date}</td>
-                        <td class="py-3.5 px-4 text-center"><span class="bg-slate-700 text-cyan-300 px-2.5 py-0.5 rounded-full text-[11px] font-semibold">${itemsCount} Item</span></td>
-                        <td class="py-3.5 px-4 text-center">${progressBadge}</td>
-                        <td class="py-3.5 px-4 text-right font-mono font-bold ${po.total < 0 ? 'text-amber-400' : 'text-emerald-400'}">${formatIDR(po.total)}</td>
-                        <td class="py-3.5 px-4 text-center no-print" onclick="event.stopPropagation()">
-                            <button onclick="editPO(${po.id})" title="Edit PO" class="text-amber-400 hover:text-amber-300 p-1 mr-1"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button onclick="deletePO(${po.id})" title="Hapus PO" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
-                        </td>
-                    </tr>
-                    
-                    <tr id="po-detail-${po.id}" class="bg-slate-900/90 border-b border-slate-700/80">
-                        <td colspan="8" class="p-4">
-                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
-                                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                                        <i class="fa-solid fa-list-check text-cyan-400"></i> Rincian Barang / Material - ${po.poNumber || 'PO-' + po.id}
-                                    </h4>
-                                    <span class="text-xs text-slate-400">Vendor: <strong class="text-cyan-300 font-semibold">${po.vendor || '-'}</strong> | Tanggal PO: <strong class="text-slate-200">${po.date}</strong></span>
-                                </div>
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-left text-xs border-collapse">
-                                        <thead>
-                                            <tr class="text-slate-500 border-b border-slate-800">
-                                                <th class="py-1.5 px-2">No</th>
-                                                <th class="py-1.5 px-2">Nama Barang / Uraian</th>
-                                                <th class="py-1.5 px-2">Spesifikasi</th>
-                                                <th class="py-1.5 px-2 text-center">Volume / Qty</th>
-                                                <th class="py-1.5 px-2 text-right">Harga Total Item</th>
-                                                <th class="py-1.5 px-2 text-center">Status Item</th>
-                                                <th class="py-1.5 px-2">Keterangan</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="divide-y divide-slate-800/60 text-slate-300">
-                                            ${itemsArray.map((it, idx) => `
-                                                <tr>
-                                                    <td class="py-2 px-2 text-slate-500 font-mono">${idx + 1}</td>
-                                                    <td class="py-2 px-2 font-semibold text-white">${it.itemName}</td>
-                                                    <td class="py-2 px-2 text-slate-400">${it.specs || '-'}</td>
-                                                    <td class="py-2 px-2 text-center font-mono text-slate-200">${it.volume || '-'}</td>
-                                                    <td class="py-2 px-2 text-right font-mono ${it.price < 0 ? 'text-amber-400 font-bold' : 'text-emerald-400'}">${formatIDR(it.price)}</td>
-                                                    <td class="py-2 px-2 text-center">${getStatusBadge(it.status || 'BELUM_PROSES')}</td>
-                                                    <td class="py-2 px-2 text-slate-300 italic">${it.note || '-'}</td>
-                                                </tr>
-                                            `).join('')}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
+            poItems.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-750 transition";
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-brand-400">${item.refNo}</td>
+                    <td class="p-3 font-medium">${item.desc}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-gray-700 text-gray-300">${item.category}</span></td>
+                    <td class="p-3 text-right">${item.qty} ${item.unit}</td>
+                    <td class="p-3 text-right">${formatRp(item.unitPrice)}</td>
+                    <td class="p-3 text-right font-bold text-amber-400">${formatRp(item.totalPrice)}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="deletePOItem(${item.id})" class="text-rose-400 hover:text-rose-300 p-1">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
                 `;
+                tbody.appendChild(tr);
             });
         }
 
-        // ================= LOGIC MENU: KONTROL PEMBAYARAN PO =================
-        function renderPaymentControlTable() {
-            const tbody = document.getElementById('paymentTableBody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
+        // --- EQUIPMENT & PAYMENT MODALS ---
+        function openEquipmentModal() { document.getElementById('equipmentModal').classList.remove('hidden'); }
+        function closeEquipmentModal() { document.getElementById('equipmentModal').classList.add('hidden'); }
+        function openPaymentModal() { document.getElementById('paymentModal').classList.remove('hidden'); }
+        function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); }
 
-            const filterVal = document.getElementById('filterPaymentStatus') ? document.getElementById('filterPaymentStatus').value : 'ALL';
-            
-            let totalPoCommit = 0;
-            let totalPaidCash = 0;
-            let totalDebt = 0;
-            let paidCount = 0;
-
-            const filteredPOs = purchaseOrders.filter(p => {
-                const payStat = p.paymentStatus || 'BELUM_BAYAR';
-                if (filterVal === 'ALL') return true;
-                return payStat === filterVal;
-            });
-
-            purchaseOrders.forEach(p => {
-                const tot = Number(p.total) || 0;
-                const paid = Number(p.paidAmount) || 0;
-                const debt = Number(p.remainingDebt) || (tot - paid);
-
-                totalPoCommit += tot;
-                totalPaidCash += paid;
-                totalDebt += (debt > 0 ? debt : 0);
-
-                if (p.paymentStatus === 'LUNAS') paidCount++;
-            });
-
-            document.getElementById('payKpiTotalPo').innerText = formatIDR(totalPoCommit);
-            document.getElementById('payKpiTotalPaid').innerText = formatIDR(totalPaidCash);
-            document.getElementById('payKpiRemainingDebt').innerText = formatIDR(totalDebt);
-            document.getElementById('payKpiRatio').innerText = `${paidCount} / ${purchaseOrders.length} PO Lunas`;
-            
-            const ratioPct = purchaseOrders.length > 0 ? (paidCount / purchaseOrders.length) * 100 : 0;
-            document.getElementById('payKpiRatioPct').innerText = `${ratioPct.toFixed(1)}% Terbayar Lunas`;
-
-            if (filteredPOs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-500 italic">Belum ada PO yang sesuai filter status pembayaran.</td></tr>`;
-                return;
-            }
-
-            filteredPOs.forEach(po => {
-                const tot = Number(po.total) || 0;
-                const paid = Number(po.paidAmount) || 0;
-                const debt = Number(po.remainingDebt) || (tot - paid);
-
-                tbody.innerHTML += `
-                    <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition">
-                        <td class="py-3.5 px-4 font-bold text-cyan-400 font-mono">${po.poNumber || 'PO-' + po.id.toString().slice(-4)}</td>
-                        <td class="py-3.5 px-4 font-semibold text-white">${po.vendor || '-'}</td>
-                        <td class="py-3.5 px-4 font-mono text-slate-300 text-xs">${po.date}</td>
-                        <td class="py-3.5 px-4 text-center">${getPaymentStatusBadge(po.paymentStatus || 'BELUM_BAYAR')}</td>
-                        <td class="py-3.5 px-4 text-right font-mono font-bold text-white">${formatIDR(tot)}</td>
-                        <td class="py-3.5 px-4 text-right font-mono text-emerald-400 font-semibold">${formatIDR(paid)}</td>
-                        <td class="py-3.5 px-4 text-right font-mono font-bold ${debt > 0 ? 'text-red-400' : 'text-slate-500'}">${formatIDR(debt)}</td>
-                        <td class="py-3.5 px-4 text-center no-print">
-                            <button onclick="openPaymentModal(${po.id})" class="text-xs bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/40 border border-cyan-500/30 px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1 mx-auto">
-                                <i class="fa-solid fa-pen-to-square"></i> Edit Bayar
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        function openPaymentModal(poId) {
-            const po = purchaseOrders.find(p => p.id === poId);
-            if (!po) return;
-
-            document.getElementById('modalPoId').value = po.id;
-            document.getElementById('modalPoNum').innerText = po.poNumber || 'PO-' + po.id;
-            document.getElementById('modalPoVendor').innerText = po.vendor || '-';
-            document.getElementById('modalPoTotal').innerText = formatIDR(po.total || 0);
-
-            const status = po.paymentStatus || 'TEMPO';
-            document.getElementById('modalPayStatus').value = status;
-            document.getElementById('modalPaidAmount').value = po.paidAmount || 0;
-
-            handleModalPayStatusChange();
-            document.getElementById('paymentModal').classList.remove('hidden');
-        }
-
-        function closePaymentModal() {
-            document.getElementById('paymentModal').classList.add('hidden');
-        }
-
-        function handleModalPayStatusChange() {
-            const status = document.getElementById('modalPayStatus').value;
-            const wrapper = document.getElementById('modalDpAmountWrapper');
-            if (status === 'DP') {
-                wrapper.classList.remove('hidden');
-            } else if (status === 'LUNAS') {
-                wrapper.classList.add('hidden');
-            } else {
-                wrapper.classList.add('hidden');
-            }
-        }
-
-        async function savePaymentUpdate(e) {
+        function handleEquipmentSubmit(e) {
             e.preventDefault();
-            const poId = Number(document.getElementById('modalPoId').value);
-            const status = document.getElementById('modalPayStatus').value;
-            
-            const index = purchaseOrders.findIndex(p => p.id === poId);
-            if (index === -1) return;
-
-            const po = purchaseOrders[index];
-            let paidAmount = 0;
-
-            if (status === 'LUNAS') {
-                paidAmount = po.total;
-            } else if (status === 'DP') {
-                paidAmount = parseFloat(document.getElementById('modalPaidAmount').value) || 0;
-            } else {
-                paidAmount = 0;
-            }
-
-            const remainingDebt = po.total - paidAmount;
-
-            purchaseOrders[index] = {
-                ...po,
-                paymentStatus: status,
-                paidAmount: paidAmount,
-                remainingDebt: remainingDebt > 0 ? remainingDebt : 0
+            const log = {
+                id: Date.now(),
+                name: document.getElementById('eqName').value,
+                hm: parseFloat(document.getElementById('eqHM').value) || 0,
+                fuel: parseFloat(document.getElementById('eqFuel').value) || 0,
+                cost: parseFloat(document.getElementById('eqCost').value) || 0
             };
-
-            const txIndex = transactions.findIndex(t => t.poRefId === poId);
-            if (txIndex !== -1) {
-                transactions[txIndex].amount = paidAmount;
-                transactions[txIndex].desc = `Pengadaan ${po.poNumber || po.id} (${po.vendor}) - Status: ${status}`;
-                await saveCloudData('transactions', transactions[txIndex]);
-            }
-
-            await saveCloudData('po', purchaseOrders[index]);
-            showToast(`Status pembayaran PO ${po.poNumber} berhasil diperbarui!`, 'success');
-
-            closePaymentModal();
-            renderPaymentControlTable();
-            updateDashboard();
+            equipmentLogs.push(log);
+            localStorage.setItem('opp_equipment', JSON.stringify(equipmentLogs));
+            closeEquipmentModal();
+            renderAll();
+            showToast('Log alat berat tersimpan');
         }
 
-        // ================= SPI & CPI MINGGUAN LOGIC (MINGGU 1 S.D 32) =================
-        function renderSpiCpiTable() {
-            const tbody = document.getElementById('spiCpiTableBody');
-            if (!tbody) return;
+        function renderEquipmentTable() {
+            const tbody = document.getElementById('equipmentTableBody');
             tbody.innerHTML = '';
-
-            let totalRealExpense = 0;
-            transactions.forEach(t => {
-                if (t.type !== 'INCOME') totalRealExpense += Number(t.amount);
-            });
-            // Total biaya aktual terpakai saat ini (AC) dibagi merata atau diestimasi per minggu untuk CPI
-            const acTotal = totalRealExpense > 0 ? totalRealExpense : 1; 
-
-            spiCpiWeeks.forEach((w, index) => {
-                const planPct = Number(w.planPct) || 0;
-                const actualPct = Number(w.actualPct) || 0;
-
-                const pv = (planPct / 100) * currentContractValue;
-                const ev = (actualPct / 100) * currentContractValue;
-
-                // SPI = EV / PV
-                const spi = pv > 0 ? (ev / pv) : 1.0;
-                
-                // CPI = EV / AC (proporsional per minggu)
-                const acEstimated = (actualPct / 100) * acTotal;
-                const cpi = acEstimated > 0 ? (ev / acEstimated) : 1.0;
-
-                tbody.innerHTML += `
-                    <tr class="border-b border-slate-700/40 hover:bg-slate-700/30 transition">
-                        <td class="py-2.5 px-3 text-center font-mono font-bold text-cyan-400">Minggu ${w.week}</td>
-                        <td class="py-2.5 px-3 text-center">
-                            <input type="number" step="0.01" min="0" max="100" value="${planPct}" onchange="updateWeekProgress(${w.week}, 'planPct', this.value)" class="w-24 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-center text-white font-mono focus:outline-none focus:border-cyan-500">
-                        </td>
-                        <td class="py-2.5 px-3 text-center">
-                            <input type="number" step="0.01" min="0" max="100" value="${actualPct}" onchange="updateWeekProgress(${w.week}, 'actualPct', this.value)" class="w-24 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-center text-cyan-300 font-mono font-bold focus:outline-none focus:border-cyan-500">
-                        </td>
-                        <td class="py-2.5 px-3 text-right font-mono text-slate-300">${formatIDR(pv)}</td>
-                        <td class="py-2.5 px-3 text-right font-mono text-emerald-400 font-semibold">${formatIDR(ev)}</td>
-                        <td class="py-2.5 px-3 text-center font-mono font-bold ${spi >= 1 ? 'text-emerald-400' : 'text-red-400'}">${spi.toFixed(2)}</td>
-                        <td class="py-2.5 px-3 text-center font-mono font-bold ${cpi >= 1 ? 'text-cyan-400' : 'text-amber-400'}">${cpi.toFixed(2)}</td>
-                    </tr>
+            equipmentLogs.forEach(eq => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2.5 font-medium">${eq.name}</td>
+                    <td class="p-2.5 text-right">${eq.hm} HM</td>
+                    <td class="p-2.5 text-right">${eq.fuel} L</td>
+                    <td class="p-2.5 text-right text-amber-400 font-semibold">${formatRp(eq.cost)}</td>
                 `;
+                tbody.appendChild(tr);
             });
         }
 
-        function updateWeekProgress(weekNum, field, val) {
-            const item = spiCpiWeeks.find(w => w.week === weekNum);
-            if (item) {
-                item[field] = parseFloat(val) || 0;
-                renderSpiCpiTable();
-                renderSpiCpiChart();
-            }
+        function handlePaymentSubmit(e) {
+            e.preventDefault();
+            const pay = {
+                id: Date.now(),
+                date: document.getElementById('payDate').value,
+                desc: document.getElementById('payDesc').value,
+                amount: parseFloat(document.getElementById('payAmount').value) || 0,
+                status: document.getElementById('payStatus').value
+            };
+            paymentLogs.push(pay);
+            localStorage.setItem('opp_payments', JSON.stringify(paymentLogs));
+            closePaymentModal();
+            renderAll();
+            showToast('Pembayaran dicatat');
         }
 
-        async function saveSpiCpiData() {
-            showToast('Menyimpan data SPI & CPI mingguan ke Cloud...', 'info');
-            for (let w of spiCpiWeeks) {
-                await saveCloudData('spicpi_weeks', w);
-            }
-            showToast('Progres Mingguan SPI & CPI berhasil disimpan!', 'success');
-            renderSpiCpiChart();
+        function renderPaymentTable() {
+            const tbody = document.getElementById('paymentTableBody');
+            tbody.innerHTML = '';
+            paymentLogs.forEach(pay => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2.5 text-gray-400">${pay.date}</td>
+                    <td class="p-2.5 font-medium">${pay.desc}</td>
+                    <td class="p-2.5 text-right font-semibold text-emerald-400">${formatRp(pay.amount)}</td>
+                    <td class="p-2.5 text-center"><span class="px-2 py-0.5 text-xs rounded ${pay.status === 'Lunas' ? 'bg-emerald-900/80 text-emerald-300' : 'bg-amber-900/80 text-amber-300'}">${pay.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
-        function fillSampleSpiData() {
-            spiCpiWeeks = [];
-            for (let i = 1; i <= 32; i++) {
-                // Kurva S Sederhana
-                let plan = Math.min(100, Number((i * 3.125).toFixed(2)));
-                let actual = i <= 24 ? Math.min(100, Number((i * 3.0).toFixed(2))) : 0;
-                spiCpiWeeks.push({ week: i, planPct: plan, actualPct: actual });
-            }
-            renderSpiCpiTable();
-            renderSpiCpiChart();
-            showToast('Contoh data minggu 1 s.d 32 dimuat!', 'success');
-        }
+        // --- CHART.JS SPI & CPI ---
+        function initChart() {
+            const ctx = document.getElementById('spicpiChart').getContext('2d');
+            const labels = weeklyData.map(w => `M${w.week}`);
+            
+            const bac = appConfig.bac || DEFAULT_BAC;
+            const totalActualCost = calculateTotalActualCost();
 
-        function renderSpiCpiChart() {
-            const ctxEl = document.getElementById('spiCpiChart');
-            if (!ctxEl) return;
-            const ctx = ctxEl.getContext('2d');
-
-            const labels = spiCpiWeeks.map(w => 'M' + w.week);
-            const spiData = spiCpiWeeks.map(w => {
-                const pv = ((Number(w.planPct) || 0) / 100) * currentContractValue;
-                const ev = ((Number(w.actualPct) || 0) / 100) * currentContractValue;
-                return pv > 0 ? Number((ev / pv).toFixed(2)) : 1.0;
+            const spiData = weeklyData.map(w => {
+                const pv = (w.planPct / 100) * bac;
+                const ev = (w.actualPct / 100) * bac;
+                return pv > 0 ? (ev / pv).toFixed(2) : 1;
             });
 
-            let totalRealExpense = 0;
-            transactions.forEach(t => { if (t.type !== 'INCOME') totalRealExpense += Number(t.amount); });
-            const acTotal = totalRealExpense > 0 ? totalRealExpense : 1;
-
-            const cpiData = spiCpiWeeks.map(w => {
-                const actualPct = Number(w.actualPct) || 0;
-                const ev = (actualPct / 100) * currentContractValue;
-                const acEstimated = (actualPct / 100) * acTotal;
-                return acEstimated > 0 ? Number((ev / acEstimated).toFixed(2)) : 1.0;
+            const cpiData = weeklyData.map(w => {
+                const ev = (w.actualPct / 100) * bac;
+                return totalActualCost > 0 ? (ev / totalActualCost).toFixed(2) : 1;
             });
 
-            if (spiCpiChartInstance) spiCpiChartInstance.destroy();
-            spiCpiChartInstance = new Chart(ctx, {
+            chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'SPI (Jadwal)', data: spiData, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.2, borderWidth: 2 },
-                        { label: 'CPI (Biaya)', data: cpiData, borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.1)', tension: 0.2, borderWidth: 2 }
+                        {
+                            label: 'SPI (Schedule)',
+                            data: spiData,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'CPI (Cost)',
+                            data: cpiData,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Target Baseline (1.0)',
+                            data: Array(32).fill(1.0),
+                            borderColor: 'rgba(156, 163, 175, 0.5)',
+                            borderWidth: 1.5,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
                     scales: {
-                        y: { 
-                            ticks: { color: '#94a3b8' },
-                            grid: { color: 'rgba(51, 65, 85, 0.4)' },
-                            suggestedMin: 0.5,
-                            suggestedMax: 1.5
+                        y: {
+                            min: 0,
+                            max: 2,
+                            grid: { color: 'rgba(75, 85, 99, 0.3)' },
+                            ticks: { color: '#9ca3af' }
                         },
-                        x: { 
-                            ticks: { color: '#94a3b8', font: { size: 9 }, maxTicksLimit: 16 },
-                            grid: { display: false }
+                        x: {
+                            grid: { color: 'rgba(75, 85, 99, 0.2)' },
+                            ticks: { color: '#9ca3af', font: { size: 10 } }
                         }
                     }
                 }
             });
         }
 
-        // OPERASIONAL ALAT BERAT & HELPER LOGIC
-        document.getElementById('excaForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const selectedDate = document.getElementById('excaDate').value;
-            const hmAwal = parseFloat(document.getElementById('excaHmAwal').value) || 0;
-            const hmAkhir = parseFloat(document.getElementById('excaHmAkhir').value) || 0;
-            const fuelVol = parseFloat(document.getElementById('excaFuelVol').value) || 0;
-            const fuelPrice = parseFloat(document.getElementById('excaFuelPrice').value) || 0;
-            const totalHours = hmAkhir - hmAwal;
+        function updateChartData() {
+            const bac = appConfig.bac || DEFAULT_BAC;
+            const totalActualCost = calculateTotalActualCost();
 
-            const log = {
-                id: Date.now(),
-                date: selectedDate,
-                hmAwal, hmAkhir,
-                totalHours: totalHours,
-                fuelVol, fuelPrice,
-                totalCost: (fuelVol * fuelPrice)
+            const spiData = weeklyData.map(w => {
+                const pv = (w.planPct / 100) * bac;
+                const ev = (w.actualPct / 100) * bac;
+                return pv > 0 ? (ev / pv).toFixed(2) : 1;
+            });
+
+            const cpiData = weeklyData.map(w => {
+                const ev = (w.actualPct / 100) * bac;
+                return totalActualCost > 0 ? (ev / totalActualCost).toFixed(2) : 1;
+            });
+
+            chartInstance.data.datasets[0].data = spiData;
+            chartInstance.data.datasets[1].data = cpiData;
+            chartInstance.update();
+        }
+
+        // --- CONFIG MODAL & GOOGLE APPS SCRIPT WEBHOOK ---
+        function openConfigModal() {
+            document.getElementById('webhookUrlInput').value = appConfig.webhookUrl || '';
+            document.getElementById('bacInput').value = appConfig.bac || DEFAULT_BAC;
+            document.getElementById('configModal').classList.remove('hidden');
+        }
+
+        function closeConfigModal() {
+            document.getElementById('configModal').classList.add('hidden');
+        }
+
+        function saveConfigSettings() {
+            appConfig.webhookUrl = document.getElementById('webhookUrlInput').value.trim();
+            appConfig.bac = parseFloat(document.getElementById('bacInput').value) || DEFAULT_BAC;
+
+            localStorage.setItem('opp_config', JSON.stringify(appConfig));
+            closeConfigModal();
+            renderAll();
+            showToast('Pengaturan berhasil disimpan');
+        }
+
+        // Cloud Save for Individual Week Payload
+        function saveCloudSingleWeek(singleWeekData) {
+            if (!appConfig.webhookUrl) return;
+
+            const payload = {
+                action: 'save_single_week',
+                weekData: singleWeekData
             };
-            excaLogs.push(log);
-            renderExcaTable();
-            updateDashboard();
-            this.reset();
-            document.getElementById('excaDate').value = selectedDate;
-            await saveCloudData('exca', log);
-        });
 
-        document.getElementById('compactForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const selectedDate = document.getElementById('compactDate').value;
-            const hmAwal = parseFloat(document.getElementById('compactHmAwal').value) || 0;
-            const hmAkhir = parseFloat(document.getElementById('compactHmAkhir').value) || 0;
-            const fuelVol = parseFloat(document.getElementById('compactFuelVol').value) || 0;
-            const fuelPrice = parseFloat(document.getElementById('compactFuelPrice').value) || 0;
-            const totalHours = hmAkhir - hmAwal;
+            fetch(appConfig.webhookUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                console.log("Cloud synced single week successfully");
+            }).catch(err => console.error("Cloud sync error:", err));
+        }
 
-            const log = {
-                id: Date.now(),
-                date: selectedDate,
-                hmAwal, hmAkhir,
-                totalHours: totalHours,
-                fuelVol, fuelPrice,
-                totalCost: (fuelVol * fuelPrice)
+        function saveCloudData(type, payloadData) {
+            if (!appConfig.webhookUrl) return;
+
+            const payload = {
+                action: type,
+                data: payloadData
             };
-            compactLogs.push(log);
-            renderCompactTable();
-            updateDashboard();
-            this.reset();
-            document.getElementById('compactDate').value = selectedDate;
-            await saveCloudData('compact', log);
-        });
 
-        document.getElementById('dtForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const selectedDate = document.getElementById('dtDate').value;
-            const log = {
-                id: Date.now(),
-                date: selectedDate,
-                ritase: parseInt(document.getElementById('dtRitase').value) || 0,
-                price: parseFloat(document.getElementById('dtPrice').value) || 0,
-                totalCost: (parseInt(document.getElementById('dtRitase').value) || 0) * (parseFloat(document.getElementById('dtPrice').value) || 0)
-            };
-            dtLogs.push(log);
-            renderDtTable();
-            updateDashboard();
-            this.reset();
-            document.getElementById('dtDate').value = selectedDate;
-            await saveCloudData('dt', log);
-        });
-
-        // Delete Handlers
-        async function deleteTransaction(id) {
-            if (confirm('Hapus transaksi ini?')) {
-                transactions = transactions.filter(t => t.id !== id);
-                updateDashboard();
-                await deleteCloudData('transactions', id);
-            }
-        }
-        async function deletePO(id) {
-            if (confirm('Hapus PO ini beserta catatan pengeluarannya di Dashboard?')) {
-                const relatedTx = transactions.find(t => t.poRefId === id);
-                if (relatedTx) {
-                    transactions = transactions.filter(t => t.poRefId !== id);
-                    await deleteCloudData('transactions', relatedTx.id);
-                }
-
-                purchaseOrders = purchaseOrders.filter(p => p.id !== id);
-                renderPOTable();
-                updateDashboard();
-                await deleteCloudData('po', id);
-            }
-        }
-        async function deleteExcaLog(id) {
-            if (confirm('Hapus log Exca ini?')) {
-                excaLogs = excaLogs.filter(l => l.id !== id);
-                renderExcaTable();
-                updateDashboard();
-                await deleteCloudData('exca', id);
-            }
-        }
-        async function deleteCompactLog(id) {
-            if (confirm('Hapus log Compact ini?')) {
-                compactLogs = compactLogs.filter(l => l.id !== id);
-                renderCompactTable();
-                updateDashboard();
-                await deleteCloudData('compact', id);
-            }
-        }
-        async function deleteDtLog(id) {
-            if (confirm('Hapus log Ritase DT ini?')) {
-                dtLogs = dtLogs.filter(l => l.id !== id);
-                renderDtTable();
-                updateDashboard();
-                await deleteCloudData('dt', id);
-            }
+            fetch(appConfig.webhookUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(err => console.error("Cloud error:", err));
         }
 
-        // Render Functions Alat Berat
-        function renderExcaTable() {
-            const tbody = document.getElementById('excaTableBody');
-            tbody.innerHTML = '';
-            let sumH = 0, sumF = 0, sumC = 0;
-            excaLogs.forEach(l => {
-                const hours = Number(l.totalHours) || 0;
-                const fuel = Number(l.fuelVol) || 0;
-                const cost = Number(l.totalCost) || 0;
-                const cons = hours > 0 ? (fuel / hours) : 0;
-
-                sumH += hours; sumF += fuel; sumC += cost;
-
-                tbody.innerHTML += `
-                    <tr class="border-b border-slate-700/40">
-                        <td class="py-2.5 px-4 font-mono text-slate-300">${l.date}</td>
-                        <td class="py-2.5 px-4 text-center font-mono">${Number(l.hmAwal).toFixed(1)}</td>
-                        <td class="py-2.5 px-4 text-center font-mono">${Number(l.hmAkhir).toFixed(1)}</td>
-                        <td class="py-2.5 px-4 text-center font-semibold text-cyan-400 font-mono">${hours.toFixed(1)} Jam</td>
-                        <td class="py-2.5 px-4 text-center font-mono text-amber-400">${fuel.toFixed(1)} L</td>
-                        <td class="py-2.5 px-4 text-center font-mono text-purple-300">${cons > 0 ? cons.toFixed(2) + ' L/J' : '-'}</td>
-                        <td class="py-2.5 px-4 text-right font-mono text-emerald-400">${formatIDR(cost)}</td>
-                        <td class="py-2.5 px-4 text-center no-print"><button onclick="deleteExcaLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
-                    </tr>`;
-            });
-            const avgCons = sumH > 0 ? (sumF / sumH) : 0;
-            document.getElementById('sumExcaHours').innerText = sumH.toFixed(1) + ' Jam';
-            document.getElementById('sumExcaFuel').innerText = sumF.toFixed(1) + ' Liter';
-            document.getElementById('sumExcaCost').innerText = formatIDR(sumC);
-            document.getElementById('avgExcaCons').innerText = avgCons.toFixed(2) + ' L/Jam';
-        }
-
-        function renderCompactTable() {
-            const tbody = document.getElementById('compactTableBody');
-            tbody.innerHTML = '';
-            let sumH = 0, sumF = 0, sumC = 0;
-            compactLogs.forEach(l => {
-                const hours = Number(l.totalHours) || 0;
-                const fuel = Number(l.fuelVol) || 0;
-                const cost = Number(l.totalCost) || 0;
-                const cons = hours > 0 ? (fuel / hours) : 0;
-
-                sumH += hours; sumF += fuel; sumC += cost;
-
-                tbody.innerHTML += `
-                    <tr class="border-b border-slate-700/40">
-                        <td class="py-2.5 px-4 font-mono text-slate-300">${l.date}</td>
-                        <td class="py-2.5 px-4 text-center font-mono">${Number(l.hmAwal).toFixed(1)}</td>
-                        <td class="py-2.5 px-4 text-center font-mono">${Number(l.hmAkhir).toFixed(1)}</td>
-                        <td class="py-2.5 px-4 text-center font-semibold text-cyan-400 font-mono">${hours.toFixed(1)} Jam</td>
-                        <td class="py-2.5 px-4 text-center font-mono text-amber-400">${fuel.toFixed(1)} L</td>
-                        <td class="py-2.5 px-4 text-center font-mono text-purple-300">${cons > 0 ? cons.toFixed(2) + ' L/J' : '-'}</td>
-                        <td class="py-2.5 px-4 text-right font-mono text-emerald-400">${formatIDR(cost)}</td>
-                        <td class="py-2.5 px-4 text-center no-print"><button onclick="deleteCompactLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
-                    </tr>`;
-            });
-            const avgCons = sumH > 0 ? (sumF / sumH) : 0;
-            document.getElementById('sumCompactHours').innerText = sumH.toFixed(1) + ' Jam';
-            document.getElementById('sumCompactFuel').innerText = sumF.toFixed(1) + ' Liter';
-            document.getElementById('sumCompactCost').innerText = formatIDR(sumC);
-            document.getElementById('avgCompactCons').innerText = avgCons.toFixed(2) + ' L/Jam';
-        }
-
-        function renderDtTable() {
-            const tbody = document.getElementById('dtTableBody');
-            tbody.innerHTML = '';
-            let sumR = 0, sumC = 0, sumH = 0;
-            dtLogs.forEach(l => {
-                const rit = Number(l.ritase) || 0;
-                const hours = rit / 8;
-                sumR += rit;
-                sumH += hours;
-                sumC += Number(l.totalCost) || 0;
-                
-                tbody.innerHTML += `
-                    <tr class="border-b border-slate-700/40">
-                        <td class="py-2.5 px-4 font-mono text-slate-300">${l.date}</td>
-                        <td class="py-2.5 px-4 text-center font-bold text-cyan-400 font-mono">${rit} Rit</td>
-                        <td class="py-2.5 px-4 text-center font-mono text-slate-300">${hours.toFixed(2)} Jam</td>
-                        <td class="py-2.5 px-4 text-right font-mono text-amber-400">${formatIDR(l.totalCost)}</td>
-                        <td class="py-2.5 px-4 text-center no-print"><button onclick="deleteDtLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
-                    </tr>`;
-            });
-            document.getElementById('sumDtRitase').innerText = sumR + ' Rit';
-            document.getElementById('sumDtHours').innerText = sumH.toFixed(2) + ' Jam';
-            document.getElementById('sumDtCost').innerText = formatIDR(sumC);
-        }
-
-        function updateDashboard() {
-            if (currentProjectId === 'mess') {
-                renderMessDashboard();
-            } else {
-                renderSporthallDashboard();
-            }
-        }
-
-        function calculateMonthlyHpp(logs, ratePerHour) {
-            const monthlyHours = {};
-            logs.forEach(l => {
-                if (!l.date) return;
-                const d = new Date(l.date);
-                let year = d.getFullYear();
-                let month = d.getMonth() + 1;
-                if (d.getDate() >= 26) {
-                    month += 1;
-                    if (month > 12) { month = 1; year += 1; }
-                }
-                const periodKey = `${year}-${String(month).padStart(2, '0')}`;
-                monthlyHours[periodKey] = (monthlyHours[periodKey] || 0) + (Number(l.totalHours) || 0);
-            });
-
-            let totalHppAlat = 0;
-            Object.values(monthlyHours).forEach(hours => {
-                const billableHours = hours < 200 ? 200 : hours;
-                totalHppAlat += billableHours * ratePerHour;
-            });
-
-            if (Object.keys(monthlyHours).length === 0 && logs.length > 0) {
-                let totalH = logs.reduce((acc, l) => acc + (Number(l.totalHours) || 0), 0);
-                totalHppAlat = (totalH < 200 ? 200 : totalH) * ratePerHour;
-            }
-
-            return totalHppAlat;
-        }
-
-        function renderMessDashboard() {
-            let totalExcaHours = 0, totalExcaFuelVol = 0, totalExcaFuelCost = 0;
-            excaLogs.forEach(l => {
-                totalExcaHours += Number(l.totalHours) || 0;
-                totalExcaFuelVol += Number(l.fuelVol) || 0;
-                totalExcaFuelCost += Number(l.totalCost) || 0;
-            });
-
-            let totalCompactHours = 0, totalCompactFuelVol = 0, totalCompactFuelCost = 0;
-            compactLogs.forEach(l => {
-                totalCompactHours += Number(l.totalHours) || 0;
-                totalCompactFuelVol += Number(l.fuelVol) || 0;
-                totalCompactFuelCost += Number(l.totalCost) || 0;
-            });
-
-            let totalDtRit = 0, totalDtVendorHpp = 0;
-            dtLogs.forEach(l => {
-                totalDtRit += Number(l.ritase) || 0;
-                totalDtVendorHpp += Number(l.totalCost) || 0;
-            });
-
-            const totalDtHours = totalDtRit / 8;
-            const combinedHours = totalExcaHours + totalCompactHours;
-            const combinedFuelVol = totalExcaFuelVol + totalCompactFuelVol;
-            const combinedFuelCost = totalExcaFuelCost + totalCompactFuelCost;
-
-            document.getElementById('messKpiTotalHours').innerText = combinedHours.toFixed(1) + ' Jam';
-            document.getElementById('messKpiFuelSummary').innerText = `Fuel: ${combinedFuelVol.toFixed(1)} L (${formatIDR(combinedFuelCost)})`;
-
-            const excaRevenue = totalExcaHours * 669500;
-            const compactRevenue = totalCompactHours * 571000;
-            const dtRevenue = totalDtHours * 566300;
-            const totalRevenue = excaRevenue + compactRevenue + dtRevenue;
-
-            const excaHppAlat = calculateMonthlyHpp(excaLogs, 250000);
-            const compactHppAlat = calculateMonthlyHpp(compactLogs, 210000);
-
-            const excaHpp = excaHppAlat + totalExcaFuelCost;
-            const compactHpp = compactHppAlat + totalCompactFuelCost;
-            const dtHpp = totalDtVendorHpp;
-            const totalHpp = excaHpp + compactHpp + dtHpp;
-
-            const totalMargin = totalRevenue - totalHpp;
-            const marginPct = totalRevenue > 0 ? (totalMargin / totalRevenue) * 100 : 0;
-
-            document.getElementById('messKpiRevenue').innerText = formatIDR(totalRevenue);
-            document.getElementById('messKpiHpp').innerText = formatIDR(totalHpp);
-            
-            const marginEl = document.getElementById('messKpiMargin');
-            const marginPctEl = document.getElementById('messKpiMarginPct');
-            marginEl.innerText = formatIDR(totalMargin);
-            marginPctEl.innerText = `${marginPct.toFixed(1)}% dari Pendapatan`;
-
-            if (totalMargin >= 0) {
-                marginEl.className = "text-2xl font-bold text-cyan-400 mt-2";
-                marginPctEl.className = "text-xs text-cyan-400 mt-1";
-            } else {
-                marginEl.className = "text-2xl font-bold text-red-400 mt-2";
-                marginPctEl.className = "text-xs text-red-400 mt-1";
-            }
-
-            const tbody = document.getElementById('messComparisonTableBody');
-            tbody.innerHTML = '';
-
-            const items = [
-                { name: 'Excavator (Rp 669.500/Jam Inc. Fuel)', vol: totalExcaHours.toFixed(1) + ' Jam', rev: excaRevenue, hpp: excaHpp },
-                { name: 'Compact Roller (Rp 571.000/Jam Inc. Fuel)', vol: totalCompactHours.toFixed(1) + ' Jam', rev: compactRevenue, hpp: compactHpp },
-                { name: 'Dump Truck (Rp 566.300/Jam @ 8 Rit/Jam)', vol: `${totalDtRit} Rit (${totalDtHours.toFixed(2)} Jam)`, rev: dtRevenue, hpp: dtHpp }
-            ];
-
-            items.forEach(item => {
-                const margin = item.rev - item.hpp;
-                tbody.innerHTML += `
-                    <tr class="border-b border-slate-700/40">
-                        <td class="py-3 px-4 font-semibold text-white">${item.name}</td>
-                        <td class="py-3 px-4 text-center font-mono">${item.vol}</td>
-                        <td class="py-3 px-4 text-right font-mono text-emerald-400">${formatIDR(item.rev)}</td>
-                        <td class="py-3 px-4 text-right font-mono text-amber-400">${formatIDR(item.hpp)}</td>
-                        <td class="py-3 px-4 text-right font-mono font-bold ${margin >= 0 ? 'text-cyan-400' : 'text-red-400'}">${formatIDR(margin)}</td>
-                    </tr>
-                `;
-            });
-        }
-
-        function renderSporthallDashboard() {
-            let totalIncome = 0, totalRealExpense = 0;
-            transactions.forEach(t => {
-                if (t.type === 'INCOME') totalIncome += Number(t.amount);
-                else totalRealExpense += Number(t.amount); // RAP / Uang Terbayar
-            });
-
-            let totalPoDebt = 0;
-            purchaseOrders.forEach(p => {
-                const poTot = Number(p.total) || 0;
-                const paid = Number(p.paidAmount) || 0;
-                const debt = Number(p.remainingDebt) || (poTot - paid);
-                totalPoDebt += (debt > 0 ? debt : 0);
-            });
-
-            const totalEncumberedCosts = totalRealExpense + totalPoDebt;
-            const netMargin = currentContractValue - totalEncumberedCosts;
-            const marginPct = currentContractValue > 0 ? (netMargin / currentContractValue) * 100 : 0;
-            const netCash = totalIncome - totalRealExpense;
-
-            document.getElementById('kpiContract').innerText = formatIDR(currentContractValue);
-            document.getElementById('kpiRAP').innerText = formatIDR(totalRealExpense);
-            document.getElementById('kpiDebt').innerText = formatIDR(totalPoDebt);
-            document.getElementById('kpiDebtDesc').innerText = `Sisa kewajiban Vendor`;
-            
-            document.getElementById('kpiMargin').innerText = formatIDR(netMargin);
-            document.getElementById('kpiMarginPct').innerText = `${marginPct.toFixed(1)}% (Kontrak - RAP - Hutang)`;
-            document.getElementById('kpiCash').innerText = formatIDR(netCash);
-
-            renderTable();
-            renderCharts();
-            renderSpiCpiTable();
-            renderSpiCpiChart();
-        }
-
-        // RENDER TABEL JURNAL DENGAN SORTING TANGGAL KRONOLOGIS & FILTER
-        function renderTable() {
-            const tbody = document.getElementById('transactionTableBody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-
-            const categoryFilter = document.getElementById('filterCategorySelect') ? document.getElementById('filterCategorySelect').value : 'ALL';
-            const typeFilter = document.getElementById('filterTypeSelect') ? document.getElementById('filterTypeSelect').value : 'ALL';
-            const sortOrder = document.getElementById('sortOrderSelect') ? document.getElementById('sortOrderSelect').value : 'ASC';
-
-            let filteredTx = transactions.filter(t => {
-                const matchCat = (categoryFilter === 'ALL') || (t.category === categoryFilter);
-                const matchType = (typeFilter === 'ALL') || (t.type === typeFilter);
-                return matchCat && matchType;
-            });
-
-            filteredTx.sort((a, b) => {
-                const dateA = new Date(a.date || '1970-01-01');
-                const dateB = new Date(b.date || '1970-01-01');
-                return sortOrder === 'ASC' ? dateA - dateB : dateB - dateA;
-            });
-
-            document.getElementById('txCount').innerText = filteredTx.length + ' Transaksi';
-
-            let subtotalIncome = 0;
-            let subtotalExpense = 0;
-
-            if (filteredTx.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 italic">Tidak ada data transaksi yang cocok dengan filter.</td></tr>`;
-            } else {
-                filteredTx.forEach(t => {
-                    const isIncome = t.type === 'INCOME';
-                    const amt = Number(t.amount) || 0;
-
-                    if (isIncome) subtotalIncome += amt;
-                    else subtotalExpense += amt;
-
-                    tbody.innerHTML += `
-                        <tr class="border-b border-slate-700/40 hover:bg-slate-700/30 transition">
-                            <td class="py-3 px-4 font-mono text-xs text-cyan-300 font-semibold">${t.date}</td>
-                            <td class="py-3 px-4"><span class="px-2 py-0.5 text-[11px] rounded-full border ${isIncome ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30'}">${isIncome ? 'Pemasukan' : 'Pengeluaran'}</span></td>
-                            <td class="py-3 px-4 font-medium text-slate-200">${t.category}</td>
-                            <td class="py-3 px-4 text-slate-400">${t.desc}</td>
-                            <td class="py-3 px-4 text-right font-mono font-semibold ${isIncome ? 'text-emerald-400' : 'text-slate-200'}">${isIncome ? '+' : '-'} ${formatIDR(amt)}</td>
-                            <td class="py-3 px-4 text-center no-print">
-                                <button onclick="editTransaction(${t.id})" title="Edit Transaksi" class="text-amber-400 hover:text-amber-300 p-1 mr-1"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button onclick="deleteTransaction(${t.id})" title="Hapus Transaksi" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
-
-            const netFiltered = subtotalIncome - subtotalExpense;
-            document.getElementById('filterSubtotalIncome').innerText = formatIDR(subtotalIncome);
-            document.getElementById('filterSubtotalExpense').innerText = formatIDR(subtotalExpense);
-            
-            const netEl = document.getElementById('filterSubtotalNet');
-            netEl.innerText = formatIDR(netFiltered);
-            netEl.className = `font-bold font-mono text-sm ${netFiltered >= 0 ? 'text-cyan-400' : 'text-amber-400'}`;
-        }
-
-        function renderCharts() {
-            const actuals = {};
-            customCategoriesList.forEach(cat => actuals[cat] = 0);
-
-            transactions.forEach(t => {
-                if (t.type !== 'INCOME') {
-                    actuals[t.category] = (actuals[t.category] || 0) + Number(t.amount);
-                }
-            });
-
-            const ctxCostEl = document.getElementById('costControlChart');
-            if (ctxCostEl) {
-                const ctxCost = ctxCostEl.getContext('2d');
-                if (costControlChartInstance) costControlChartInstance.destroy();
-                costControlChartInstance = new Chart(ctxCost, {
-                    type: 'bar',
-                    data: {
-                        labels: customCategoriesList,
-                        datasets: [
-                            { label: 'Realisasi Pengeluaran Kas', data: customCategoriesList.map(c => actuals[c] || 0), backgroundColor: 'rgba(14, 165, 233, 0.7)' }
-                        ]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#94a3b8', font: { size: 9 } } }, y: { ticks: { color: '#94a3b8' } } } }
-                });
-            }
-        }
-
-        function populateFormDropdowns() {
-            const typeSelect = document.getElementById('trxType');
-            const categorySelect = document.getElementById('trxCategory');
-            const filterCategorySelect = document.getElementById('filterCategorySelect');
-            if (!typeSelect || !categorySelect) return;
-            
-            typeSelect.innerHTML = '';
-            transactionTypes.forEach(t => typeSelect.innerHTML += `<option value="${t.id}">${t.name}</option>`);
-            
-            categorySelect.innerHTML = '';
-            
-            if (filterCategorySelect) {
-                const curFilterVal = filterCategorySelect.value;
-                filterCategorySelect.innerHTML = `<option value="ALL">Semua Kategori</option>`;
-                customCategoriesList.forEach(cat => {
-                    filterCategorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
-                });
-                filterCategorySelect.value = customCategoriesList.includes(curFilterVal) ? curFilterVal : 'ALL';
-            }
-
-            if (customCategoriesList.length > 0) {
-                customCategoriesList.forEach(cat => {
-                    categorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
-                });
-            } else {
-                categorySelect.innerHTML += `<option value="" disabled selected>Belum ada kategori (Buat Baru...)</option>`;
-            }
-
-            categorySelect.innerHTML += `<option value="__ADD_NEW__" class="text-cyan-400 font-bold">+ Tambah Kategori Baru...</option>`;
-        }
-
-        function formatIDR(val) {
-            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
-        }
-
-        function showToast(msg, type = 'info') {
+        // Toast Helper
+        function showToast(msg) {
             const toast = document.getElementById('toast');
-            document.getElementById('toastMsg').innerText = msg;
-            toast.className = `fixed bottom-5 right-5 z-50 bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 no-print`;
-            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+            document.getElementById('toastMsg').textContent = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
         }
-
-        function handleLogoUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                localStorage.setItem('orecon_v3_logo', evt.target.result);
-                document.getElementById('companyLogoImg').src = evt.target.result;
-                document.getElementById('companyLogoImg').classList.remove('hidden');
-                document.getElementById('companyLogoPlaceholder').classList.add('hidden');
-            };
-            reader.readAsDataURL(file);
-        }
-
-        window.onload = function() {
-            const today = new Date().toISOString().split('T')[0];
-            ['trxDate', 'poDate', 'excaDate', 'compactDate', 'dtDate'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = today;
-            });
-            if (savedCompanyLogo) {
-                document.getElementById('companyLogoImg').src = savedCompanyLogo;
-                document.getElementById('companyLogoImg').classList.remove('hidden');
-                document.getElementById('companyLogoPlaceholder').classList.add('hidden');
-            }
-            addPoItemRow();
-            switchProject(currentProjectId);
-        };
     </script>
 </body>
 </html>
