@@ -106,7 +106,10 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center gap-4">
                 <div>
                     <h2 id="pageTitle" class="text-base sm:text-lg font-bold text-white tracking-tight">Proyek Sporthall Indoor</h2>
-                    <p id="headerContractWrapper" class="text-xs text-slate-400">Nilai Kontrak Proyek: <span id="headerContractVal" class="text-cyan-400 font-semibold">Rp 10.802.640.000</span></p>
+                    <div id="headerContractWrapper" class="flex items-center gap-2 mt-1">
+                        <span class="text-xs text-slate-400">Nilai Kontrak:</span>
+                        <input type="number" id="headerContractInput" onchange="updateContractValue(this.value)" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-cyan-400 font-semibold font-mono w-40 focus:outline-none focus:border-cyan-500">
+                    </div>
                 </div>
                 <div class="flex items-center gap-2.5">
                     <button onclick="syncDataFromCloud()" title="Sinkronisasi Data" class="px-3 py-2 text-xs bg-slate-700 hover:bg-slate-600 text-cyan-300 rounded-lg transition font-medium flex items-center gap-1.5 border border-slate-600">
@@ -251,19 +254,14 @@
                     </div>
                 </div>
 
-                <!-- Input & Tabel Progres Mingguan (Minggu 1 s.d. 32) untuk SPI & CPI (Simpan Per Minggu) -->
+                <!-- Input & Tabel Progres Mingguan (Minggu 1 s.d. 32) untuk SPI & CPI (Edit & Simpan Per Minggu) -->
                 <div id="sporthallSpiCpiTableWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                         <div>
                             <h2 class="text-base font-semibold text-white flex items-center gap-2">
                                 <i class="fa-solid fa-chart-line text-cyan-400"></i> Input Progres Mingguan (Minggu 1 s.d. 32) & Indeks SPI / CPI
                             </h2>
-                            <p class="text-xs text-slate-400">Masukkan persentase rencana dan aktual per minggu lalu klik tombol <strong>Simpan</strong> pada baris minggu terkait.</p>
-                        </div>
-                        <div class="flex items-center gap-2 no-print">
-                            <button onclick="fillSampleSpiData()" class="text-xs bg-slate-700 hover:bg-slate-600 text-cyan-300 border border-slate-600 px-3 py-1.5 rounded-lg transition font-medium">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i> Muat Data Contoh
-                            </button>
+                            <p class="text-xs text-slate-400">Masukkan atau edit persentase rencana dan aktual per minggu, lalu klik tombol <strong>Simpan/Update</strong> pada baris minggu terkait.</p>
                         </div>
                     </div>
 
@@ -278,7 +276,7 @@
                                     <th class="py-3 px-3 text-right">Earned Value (EV)</th>
                                     <th class="py-3 px-3 text-center w-24">SPI</th>
                                     <th class="py-3 px-3 text-center w-24">CPI</th>
-                                    <th class="py-3 px-3 text-center w-24 no-print">Aksi</th>
+                                    <th class="py-3 px-3 text-center w-28 no-print">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="spiCpiTableBody" class="divide-y divide-slate-700/50"></tbody>
@@ -742,26 +740,21 @@
     <script>
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyZ6hO4VBQqFv-PSQizTSTbUQSuCMgYPvuYGZl4aoKoqZGelGeZko-xygCSjerhm2mx/exec';
 
-        const projectsData = {
-            sporthall: {
-                name: "Proyek Sporthall Indoor",
-                contractValue: 10802640000
-            },
-            mess: {
-                name: "Penataan Lahan Mess",
-                contractValue: 0
-            }
+        const defaultContracts = {
+            sporthall: 10802640000,
+            mess: 0
         };
-
-        const defaultTypes = [
-            { id: 'INCOME', name: 'Pemasukan (Termin / Cash In)', behavior: 'INCOME' },
-            { id: 'EXPENSE', name: 'Pengeluaran (Biaya / Cash Out)', behavior: 'EXPENSE' }
-        ];
 
         let currentProjectId = localStorage.getItem('orecon_active_project') || 'sporthall';
         document.getElementById('projectSelect').value = currentProjectId;
 
-        let transactionTypes = defaultTypes;
+        let contractValues = JSON.parse(localStorage.getItem('orecon_contract_values')) || defaultContracts;
+        let currentContractValue = contractValues[currentProjectId] !== undefined ? contractValues[currentProjectId] : defaultContracts[currentProjectId];
+
+        let transactionTypes = [
+            { id: 'INCOME', name: 'Pemasukan (Termin / Cash In)', behavior: 'INCOME' },
+            { id: 'EXPENSE', name: 'Pengeluaran (Biaya / Cash Out)', behavior: 'EXPENSE' }
+        ];
         let savedCompanyLogo = localStorage.getItem('orecon_v3_logo') || '';
 
         let transactions = [];
@@ -771,8 +764,7 @@
         let excaLogs = [];
         let compactLogs = [];
         let dtLogs = [];
-        let spiCpiWeeks = []; // Data progres minggu 1 s.d 32
-        let currentContractValue = projectsData[currentProjectId].contractValue;
+        let spiCpiWeeks = [];
 
         let costControlChartInstance = null;
         let spiCpiChartInstance = null;
@@ -831,7 +823,10 @@
         async function switchProject(projId) {
             currentProjectId = projId;
             localStorage.setItem('orecon_active_project', projId);
-            currentContractValue = projectsData[projId].contractValue;
+            
+            currentContractValue = contractValues[projId] !== undefined ? contractValues[projId] : defaultContracts[projId];
+            document.getElementById('headerContractInput').value = currentContractValue;
+
             customCategoriesList = JSON.parse(localStorage.getItem(`orecon_custom_cats_${currentProjectId}`)) || [];
 
             const navPoText = document.getElementById('nav-po-text');
@@ -871,12 +866,19 @@
                 sporthallSpiTable.classList.remove('hidden');
                 sporthallLedger.classList.remove('hidden');
                 headerContractWrapper.classList.remove('hidden');
-                document.getElementById('headerContractVal').innerText = formatIDR(currentContractValue);
             }
 
-            document.getElementById('pageTitle').innerText = projectsData[projId].name;
-            
+            document.getElementById('pageTitle').innerText = projId === 'mess' ? "Penataan Lahan Mess" : "Proyek Sporthall Indoor";
             await syncDataFromCloud();
+        }
+
+        function updateContractValue(val) {
+            const numericVal = parseFloat(val) || 0;
+            currentContractValue = numericVal;
+            contractValues[currentProjectId] = numericVal;
+            localStorage.setItem('orecon_contract_values', JSON.stringify(contractValues));
+            updateDashboard();
+            showToast('Nilai kontrak berhasil diperbarui!', 'success');
         }
 
         async function syncDataFromCloud() {
@@ -917,8 +919,8 @@
                 } else {
                     spiCpiWeeks.push({
                         week: i,
-                        planPct: Math.min(100, Number((i * 3.125).toFixed(2))),
-                        actualPct: i <= 8 ? Number((i * 3.0).toFixed(2)) : 0
+                        planPct: 0,
+                        actualPct: 0
                     });
                 }
             }
@@ -1104,7 +1106,6 @@
             document.getElementById('cancelEditTxBtn').classList.add('hidden');
         }
 
-        // Transactions Form Submit
         document.getElementById('transactionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const editingId = document.getElementById('editingTxId').value;
@@ -1228,7 +1229,6 @@
             }
         }
 
-        // Edit PO Handler
         function editPO(poId) {
             const po = purchaseOrders.find(p => p.id === poId);
             if (!po) return;
@@ -1267,7 +1267,6 @@
             addPoItemRow();
         }
 
-        // Form Submit PO
         document.getElementById('poForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const editingId = document.getElementById('editingPoId').value;
@@ -1648,7 +1647,7 @@
             updateDashboard();
         }
 
-        // ================= SPI & CPI MINGGUAN LOGIC (SIMPAN PER MINGGU) =================
+        // ================= SPI & CPI MINGGUAN LOGIC (LINKED TO CONTRACT & EDIT/SAVE PER WEEK) =================
         function renderSpiCpiTable() {
             const tbody = document.getElementById('spiCpiTableBody');
             if (!tbody) return;
@@ -1660,10 +1659,11 @@
             });
             const acTotal = totalRealExpense > 0 ? totalRealExpense : 1; 
 
-            spiCpiWeeks.forEach((w, index) => {
+            spiCpiWeeks.forEach((w) => {
                 const planPct = Number(w.planPct) || 0;
                 const actualPct = Number(w.actualPct) || 0;
 
+                // Terhubung langsung dengan currentContractValue
                 const pv = (planPct / 100) * currentContractValue;
                 const ev = (actualPct / 100) * currentContractValue;
 
@@ -1675,18 +1675,18 @@
                     <tr class="border-b border-slate-700/40 hover:bg-slate-700/30 transition">
                         <td class="py-2.5 px-3 text-center font-mono font-bold text-cyan-400">Minggu ${w.week}</td>
                         <td class="py-2.5 px-3 text-center">
-                            <input type="number" step="0.01" min="0" max="100" value="${planPct}" onchange="updateWeekProgress(${w.week}, 'planPct', this.value)" class="w-24 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-center text-white font-mono focus:outline-none focus:border-cyan-500">
+                            <input type="number" step="0.01" min="0" max="100" id="plan-input-${w.week}" value="${planPct}" oninput="handleWeeklyInputLive(${w.week})" class="w-24 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-center text-white font-mono focus:outline-none focus:border-cyan-500">
                         </td>
                         <td class="py-2.5 px-3 text-center">
-                            <input type="number" step="0.01" min="0" max="100" value="${actualPct}" onchange="updateWeekProgress(${w.week}, 'actualPct', this.value)" class="w-24 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-center text-cyan-300 font-mono font-bold focus:outline-none focus:border-cyan-500">
+                            <input type="number" step="0.01" min="0" max="100" id="actual-input-${w.week}" value="${actualPct}" oninput="handleWeeklyInputLive(${w.week})" class="w-24 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-center text-cyan-300 font-mono font-bold focus:outline-none focus:border-cyan-500">
                         </td>
-                        <td class="py-2.5 px-3 text-right font-mono text-slate-300">${formatIDR(pv)}</td>
-                        <td class="py-2.5 px-3 text-right font-mono text-emerald-400 font-semibold">${formatIDR(ev)}</td>
-                        <td class="py-2.5 px-3 text-center font-mono font-bold ${spi >= 1 ? 'text-emerald-400' : 'text-red-400'}">${spi.toFixed(2)}</td>
-                        <td class="py-2.5 px-3 text-center font-mono font-bold ${cpi >= 1 ? 'text-cyan-400' : 'text-amber-400'}">${cpi.toFixed(2)}</td>
+                        <td class="py-2.5 px-3 text-right font-mono text-slate-300" id="pv-cell-${w.week}">${formatIDR(pv)}</td>
+                        <td class="py-2.5 px-3 text-right font-mono text-emerald-400 font-semibold" id="ev-cell-${w.week}">${formatIDR(ev)}</td>
+                        <td class="py-2.5 px-3 text-center font-mono font-bold ${spi >= 1 ? 'text-emerald-400' : 'text-red-400'}" id="spi-cell-${w.week}">${spi.toFixed(2)}</td>
+                        <td class="py-2.5 px-3 text-center font-mono font-bold ${cpi >= 1 ? 'text-cyan-400' : 'text-amber-400'}" id="cpi-cell-${w.week}">${cpi.toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-center no-print">
-                            <button onclick="saveSingleWeekProgress(${w.week})" class="text-xs bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/40 border border-cyan-500/30 px-3 py-1 rounded-lg transition font-medium">
-                                Simpan
+                            <button onclick="saveSingleWeekProgress(${w.week})" class="text-xs bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-1 rounded-lg transition font-semibold shadow-sm">
+                                <i class="fa-solid fa-floppy-disk"></i> Simpan
                             </button>
                         </td>
                     </tr>
@@ -1694,11 +1694,39 @@
             });
         }
 
-        function updateWeekProgress(weekNum, field, val) {
+        function handleWeeklyInputLive(weekNum) {
+            const planVal = parseFloat(document.getElementById(`plan-input-${weekNum}`).value) || 0;
+            const actualVal = parseFloat(document.getElementById(`actual-input-${weekNum}`).value) || 0;
+
             const item = spiCpiWeeks.find(w => w.week === weekNum);
             if (item) {
-                item[field] = parseFloat(val) || 0;
+                item.planPct = planVal;
+                item.actualPct = actualVal;
             }
+
+            const pv = (planVal / 100) * currentContractValue;
+            const ev = (actualVal / 100) * currentContractValue;
+
+            let totalRealExpense = 0;
+            transactions.forEach(t => { if (t.type !== 'INCOME') totalRealExpense += Number(t.amount); });
+            const acTotal = totalRealExpense > 0 ? totalRealExpense : 1;
+            const acEstimated = (actualVal / 100) * acTotal;
+
+            const spi = pv > 0 ? (ev / pv) : 1.0;
+            const cpi = acEstimated > 0 ? (ev / acEstimated) : 1.0;
+
+            document.getElementById(`pv-cell-${weekNum}`).innerText = formatIDR(pv);
+            document.getElementById(`ev-cell-${weekNum}`).innerText = formatIDR(ev);
+            
+            const spiCell = document.getElementById(`spi-cell-${weekNum}`);
+            spiCell.innerText = spi.toFixed(2);
+            spiCell.className = `py-2.5 px-3 text-center font-mono font-bold ${spi >= 1 ? 'text-emerald-400' : 'text-red-400'}`;
+
+            const cpiCell = document.getElementById(`cpi-cell-${weekNum}`);
+            cpiCell.innerText = cpi.toFixed(2);
+            cpiCell.className = `py-2.5 px-3 text-center font-mono font-bold ${cpi >= 1 ? 'text-cyan-400' : 'text-amber-400'}`;
+
+            renderSpiCpiChart();
         }
 
         async function saveSingleWeekProgress(weekNum) {
@@ -1706,20 +1734,8 @@
             if (item) {
                 await saveCloudData('spicpi_weeks', item);
                 renderSpiCpiChart();
-                showToast(`Progres Minggu ${weekNum} berhasil disimpan!`, 'success');
+                showToast(`Progres Minggu ${weekNum} berhasil diperbarui & disimpan!`, 'success');
             }
-        }
-
-        function fillSampleSpiData() {
-            spiCpiWeeks = [];
-            for (let i = 1; i <= 32; i++) {
-                let plan = Math.min(100, Number((i * 3.125).toFixed(2)));
-                let actual = i <= 24 ? Math.min(100, Number((i * 3.0).toFixed(2))) : 0;
-                spiCpiWeeks.push({ week: i, planPct: plan, actualPct: actual });
-            }
-            renderSpiCpiTable();
-            renderSpiCpiChart();
-            showToast('Contoh data minggu 1 s.d 32 dimuat! (Klik simpan per minggu sesuai kebutuhan)', 'success');
         }
 
         function renderSpiCpiChart() {
@@ -1843,7 +1859,6 @@
             await saveCloudData('dt', log);
         });
 
-        // Delete Handlers
         async function deleteTransaction(id) {
             if (confirm('Hapus transaksi ini?')) {
                 transactions = transactions.filter(t => t.id !== id);
@@ -1890,7 +1905,6 @@
             }
         }
 
-        // Render Functions Alat Berat
         function renderExcaTable() {
             const tbody = document.getElementById('excaTableBody');
             tbody.innerHTML = '';
@@ -2134,7 +2148,6 @@
             renderSpiCpiChart();
         }
 
-        // RENDER TABEL JURNAL DENGAN SORTING TANGGAL KRONOLOGIS & FILTER
         function renderTable() {
             const tbody = document.getElementById('transactionTableBody');
             if (!tbody) return;
@@ -2280,6 +2293,7 @@
 
         window.onload = function() {
             const today = new Date().toISOString().split('T')[0];
+            ['trxDate', 'poDate', 'excaDate', 'compactDate', 'dtDate'].getElementById = ...; // aman
             ['trxDate', 'poDate', 'excaDate', 'compactDate', 'dtDate'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = today;
