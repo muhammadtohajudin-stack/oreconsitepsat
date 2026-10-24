@@ -241,7 +241,7 @@
                         <div class="relative h-64"><canvas id="costControlChart"></canvas></div>
                     </div>
                     
-                    <!-- Grafik Tren SPI & CPI (Menggantikan Cashflow) -->
+                    <!-- Grafik Tren SPI & CPI -->
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-sm font-semibold text-white">Grafik Kinerja Proyek (SPI & CPI)</h3>
@@ -251,21 +251,18 @@
                     </div>
                 </div>
 
-                <!-- Input & Tabel Progres Mingguan (Minggu 1 s.d. 32) untuk SPI & CPI -->
+                <!-- Input & Tabel Progres Mingguan (Minggu 1 s.d. 32) untuk SPI & CPI (Simpan Per Minggu) -->
                 <div id="sporthallSpiCpiTableWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                         <div>
                             <h2 class="text-base font-semibold text-white flex items-center gap-2">
                                 <i class="fa-solid fa-chart-line text-cyan-400"></i> Input Progres Mingguan (Minggu 1 s.d. 32) & Indeks SPI / CPI
                             </h2>
-                            <p class="text-xs text-slate-400">Masukkan persentase rencana dan aktual untuk menghitung Schedule Performance Index (SPI) dan Cost Performance Index (CPI).</p>
+                            <p class="text-xs text-slate-400">Masukkan persentase rencana dan aktual per minggu lalu klik tombol <strong>Simpan</strong> pada baris minggu terkait.</p>
                         </div>
                         <div class="flex items-center gap-2 no-print">
                             <button onclick="fillSampleSpiData()" class="text-xs bg-slate-700 hover:bg-slate-600 text-cyan-300 border border-slate-600 px-3 py-1.5 rounded-lg transition font-medium">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i> Isi Data Contoh
-                            </button>
-                            <button onclick="saveSpiCpiData()" class="text-xs bg-cyan-600 hover:bg-cyan-500 text-white px-3.5 py-1.5 rounded-lg transition font-semibold shadow-md">
-                                <i class="fa-solid fa-floppy-disk"></i> Simpan Progres
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Muat Data Contoh
                             </button>
                         </div>
                     </div>
@@ -279,8 +276,9 @@
                                     <th class="py-3 px-3 text-center w-32">% Aktual (Actual)</th>
                                     <th class="py-3 px-3 text-right">Planned Value (PV)</th>
                                     <th class="py-3 px-3 text-right">Earned Value (EV)</th>
-                                    <th class="py-3 px-3 text-center w-28">SPI (Jadwal)</th>
-                                    <th class="py-3 px-3 text-center w-28">CPI (Biaya)</th>
+                                    <th class="py-3 px-3 text-center w-24">SPI</th>
+                                    <th class="py-3 px-3 text-center w-24">CPI</th>
+                                    <th class="py-3 px-3 text-center w-24 no-print">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="spiCpiTableBody" class="divide-y divide-slate-700/50"></tbody>
@@ -917,10 +915,9 @@
                 if (existing) {
                     spiCpiWeeks.push(existing);
                 } else {
-                    // Default curve or 0
                     spiCpiWeeks.push({
                         week: i,
-                        planPct: Math.min(100, Number((i * 3.125).toFixed(2))), // contoh kurva S linear
+                        planPct: Math.min(100, Number((i * 3.125).toFixed(2))),
                         actualPct: i <= 8 ? Number((i * 3.0).toFixed(2)) : 0
                     });
                 }
@@ -1651,7 +1648,7 @@
             updateDashboard();
         }
 
-        // ================= SPI & CPI MINGGUAN LOGIC (MINGGU 1 S.D 32) =================
+        // ================= SPI & CPI MINGGUAN LOGIC (SIMPAN PER MINGGU) =================
         function renderSpiCpiTable() {
             const tbody = document.getElementById('spiCpiTableBody');
             if (!tbody) return;
@@ -1661,7 +1658,6 @@
             transactions.forEach(t => {
                 if (t.type !== 'INCOME') totalRealExpense += Number(t.amount);
             });
-            // Total biaya aktual terpakai saat ini (AC) dibagi merata atau diestimasi per minggu untuk CPI
             const acTotal = totalRealExpense > 0 ? totalRealExpense : 1; 
 
             spiCpiWeeks.forEach((w, index) => {
@@ -1671,10 +1667,7 @@
                 const pv = (planPct / 100) * currentContractValue;
                 const ev = (actualPct / 100) * currentContractValue;
 
-                // SPI = EV / PV
                 const spi = pv > 0 ? (ev / pv) : 1.0;
-                
-                // CPI = EV / AC (proporsional per minggu)
                 const acEstimated = (actualPct / 100) * acTotal;
                 const cpi = acEstimated > 0 ? (ev / acEstimated) : 1.0;
 
@@ -1691,6 +1684,11 @@
                         <td class="py-2.5 px-3 text-right font-mono text-emerald-400 font-semibold">${formatIDR(ev)}</td>
                         <td class="py-2.5 px-3 text-center font-mono font-bold ${spi >= 1 ? 'text-emerald-400' : 'text-red-400'}">${spi.toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-center font-mono font-bold ${cpi >= 1 ? 'text-cyan-400' : 'text-amber-400'}">${cpi.toFixed(2)}</td>
+                        <td class="py-2.5 px-3 text-center no-print">
+                            <button onclick="saveSingleWeekProgress(${w.week})" class="text-xs bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/40 border border-cyan-500/30 px-3 py-1 rounded-lg transition font-medium">
+                                Simpan
+                            </button>
+                        </td>
                     </tr>
                 `;
             });
@@ -1700,31 +1698,28 @@
             const item = spiCpiWeeks.find(w => w.week === weekNum);
             if (item) {
                 item[field] = parseFloat(val) || 0;
-                renderSpiCpiTable();
-                renderSpiCpiChart();
             }
         }
 
-        async function saveSpiCpiData() {
-            showToast('Menyimpan data SPI & CPI mingguan ke Cloud...', 'info');
-            for (let w of spiCpiWeeks) {
-                await saveCloudData('spicpi_weeks', w);
+        async function saveSingleWeekProgress(weekNum) {
+            const item = spiCpiWeeks.find(w => w.week === weekNum);
+            if (item) {
+                await saveCloudData('spicpi_weeks', item);
+                renderSpiCpiChart();
+                showToast(`Progres Minggu ${weekNum} berhasil disimpan!`, 'success');
             }
-            showToast('Progres Mingguan SPI & CPI berhasil disimpan!', 'success');
-            renderSpiCpiChart();
         }
 
         function fillSampleSpiData() {
             spiCpiWeeks = [];
             for (let i = 1; i <= 32; i++) {
-                // Kurva S Sederhana
                 let plan = Math.min(100, Number((i * 3.125).toFixed(2)));
                 let actual = i <= 24 ? Math.min(100, Number((i * 3.0).toFixed(2))) : 0;
                 spiCpiWeeks.push({ week: i, planPct: plan, actualPct: actual });
             }
             renderSpiCpiTable();
             renderSpiCpiChart();
-            showToast('Contoh data minggu 1 s.d 32 dimuat!', 'success');
+            showToast('Contoh data minggu 1 s.d 32 dimuat! (Klik simpan per minggu sesuai kebutuhan)', 'success');
         }
 
         function renderSpiCpiChart() {
@@ -2108,7 +2103,7 @@
             let totalIncome = 0, totalRealExpense = 0;
             transactions.forEach(t => {
                 if (t.type === 'INCOME') totalIncome += Number(t.amount);
-                else totalRealExpense += Number(t.amount); // RAP / Uang Terbayar
+                else totalRealExpense += Number(t.amount);
             });
 
             let totalPoDebt = 0;
