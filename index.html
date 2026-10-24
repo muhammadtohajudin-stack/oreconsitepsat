@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Cost Control & Alat Berat - PT. Orecon Putra Perkasa</title>
+    <title>Dashboard Cost Control & SPI/CPI - PT. Orecon Putra Perkasa</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -41,7 +41,7 @@
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col md:flex-row antialiased">
 
     <!-- Sidebar Navigation -->
-    <aside class="w-full md:w-64 bg-slate-800/90 backdrop-blur-md border-r border-slate-700/80 flex flex-col justify-between no-print sticky top-0 h-auto md:h-screen z-40">
+    <aside class="w-full md:w-64 bg-slate-800/95 backdrop-blur-md border-r border-slate-700/80 flex flex-col justify-between no-print sticky top-0 h-auto md:h-screen z-40">
         <div>
             <!-- Sidebar Header -->
             <div class="p-3.5 border-b border-slate-700/80 flex items-center gap-3 relative group">
@@ -102,7 +102,7 @@
     <div class="flex-grow flex flex-col justify-between min-h-screen">
 
         <!-- Top Header Bar -->
-        <header class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700/80 sticky top-0 z-30 shadow-lg no-print">
+        <header class="bg-slate-800/95 backdrop-blur-md border-b border-slate-700/80 sticky top-0 z-30 shadow-lg no-print">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center gap-4">
                 <div>
                     <h2 id="pageTitle" class="text-base sm:text-lg font-bold text-white tracking-tight">Proyek Sporthall Indoor</h2>
@@ -143,7 +143,7 @@
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Proyeksi Net Margin</p>
                         <h3 id="kpiMargin" class="text-xl font-bold text-emerald-400 mt-2">Rp 0</h3>
-                        <p id="kpiMarginPct" class="text-xs text-emerald-400 mt-1">0.0% (Kontrak - RAP - Hutang PO)</p>
+                        <p id="kpiMarginPct" class="text-xs text-emerald-400 mt-1">0.0% (Kontrak - RAP - Hutang)</p>
                     </div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Saldo Kas Aktual</p>
@@ -234,10 +234,58 @@
                     </form>
                 </div>
 
-                <!-- Charts Grid (Sporthall) -->
+                <!-- Charts & SPI/CPI Section (Sporthall) -->
                 <div id="sporthallChartsWrapper" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card"><h3 class="text-sm font-semibold text-white mb-4">Cost Control (Realisasi per Kategori)</h3><div class="relative h-64"><canvas id="costControlChart"></canvas></div></div>
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card"><h3 class="text-sm font-semibold text-white mb-4">Akumulasi Cashflow</h3><div class="relative h-64"><canvas id="cashflowChart"></canvas></div></div>
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                        <h3 class="text-sm font-semibold text-white mb-4">Cost Control (Realisasi per Kategori)</h3>
+                        <div class="relative h-64"><canvas id="costControlChart"></canvas></div>
+                    </div>
+                    
+                    <!-- Grafik Tren SPI & CPI (Menggantikan Cashflow) -->
+                    <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-sm font-semibold text-white">Grafik Kinerja Proyek (SPI & CPI)</h3>
+                            <span class="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full font-mono">Target = 1.0</span>
+                        </div>
+                        <div class="relative h-64"><canvas id="spiCpiChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Input & Tabel Progres Mingguan (Minggu 1 s.d. 32) untuk SPI & CPI -->
+                <div id="sporthallSpiCpiTableWrapper" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div>
+                            <h2 class="text-base font-semibold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-chart-line text-cyan-400"></i> Input Progres Mingguan (Minggu 1 s.d. 32) & Indeks SPI / CPI
+                            </h2>
+                            <p class="text-xs text-slate-400">Masukkan persentase rencana dan aktual untuk menghitung Schedule Performance Index (SPI) dan Cost Performance Index (CPI).</p>
+                        </div>
+                        <div class="flex items-center gap-2 no-print">
+                            <button onclick="fillSampleSpiData()" class="text-xs bg-slate-700 hover:bg-slate-600 text-cyan-300 border border-slate-600 px-3 py-1.5 rounded-lg transition font-medium">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Isi Data Contoh
+                            </button>
+                            <button onclick="saveSpiCpiData()" class="text-xs bg-cyan-600 hover:bg-cyan-500 text-white px-3.5 py-1.5 rounded-lg transition font-semibold shadow-md">
+                                <i class="fa-solid fa-floppy-disk"></i> Simpan Progres
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-xl border border-slate-700/50 max-h-96">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="sticky top-0 z-10">
+                                <tr class="bg-slate-900 border-b border-slate-700 text-slate-400 font-semibold text-[11px]">
+                                    <th class="py-3 px-3 text-center w-20">Minggu</th>
+                                    <th class="py-3 px-3 text-center w-32">% Rencana (Plan)</th>
+                                    <th class="py-3 px-3 text-center w-32">% Aktual (Actual)</th>
+                                    <th class="py-3 px-3 text-right">Planned Value (PV)</th>
+                                    <th class="py-3 px-3 text-right">Earned Value (EV)</th>
+                                    <th class="py-3 px-3 text-center w-28">SPI (Jadwal)</th>
+                                    <th class="py-3 px-3 text-center w-28">CPI (Biaya)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="spiCpiTableBody" class="divide-y divide-slate-700/50"></tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Ledger Table (Sporthall) -->
@@ -725,10 +773,11 @@
         let excaLogs = [];
         let compactLogs = [];
         let dtLogs = [];
+        let spiCpiWeeks = []; // Data progres minggu 1 s.d 32
         let currentContractValue = projectsData[currentProjectId].contractValue;
 
         let costControlChartInstance = null;
-        let cashflowChartInstance = null;
+        let spiCpiChartInstance = null;
 
         function getCloudKey(type) {
             return `${currentProjectId}_${type}`;
@@ -796,6 +845,7 @@
             const messComparison = document.getElementById('messComparisonSection');
             const sporthallTx = document.getElementById('sporthallTxFormWrapper');
             const sporthallCharts = document.getElementById('sporthallChartsWrapper');
+            const sporthallSpiTable = document.getElementById('sporthallSpiCpiTableWrapper');
             const sporthallLedger = document.getElementById('sporthallLedgerWrapper');
             const headerContractWrapper = document.getElementById('headerContractWrapper');
 
@@ -808,6 +858,7 @@
                 messComparison.classList.remove('hidden');
                 sporthallTx.classList.add('hidden');
                 sporthallCharts.classList.add('hidden');
+                sporthallSpiTable.classList.add('hidden');
                 sporthallLedger.classList.add('hidden');
                 headerContractWrapper.classList.add('hidden');
             } else {
@@ -819,6 +870,7 @@
                 messComparison.classList.add('hidden');
                 sporthallTx.classList.remove('hidden');
                 sporthallCharts.classList.remove('hidden');
+                sporthallSpiTable.classList.remove('hidden');
                 sporthallLedger.classList.remove('hidden');
                 headerContractWrapper.classList.remove('hidden');
                 document.getElementById('headerContractVal').innerText = formatIDR(currentContractValue);
@@ -836,6 +888,9 @@
             excaLogs = await fetchCloudData('exca');
             compactLogs = await fetchCloudData('compact');
             dtLogs = await fetchCloudData('dt');
+            
+            const cloudSpi = await fetchCloudData('spicpi_weeks');
+            initSpiCpiWeeks(cloudSpi);
 
             transactions.forEach(t => {
                 if (t.category && !customCategoriesList.includes(t.category)) {
@@ -853,6 +908,24 @@
                 renderPaymentControlTable();
             }
             showToast('Data telah diperbarui!', 'success');
+        }
+
+        function initSpiCpiWeeks(cloudData) {
+            spiCpiWeeks = [];
+            for (let i = 1; i <= 32; i++) {
+                const existing = cloudData.find(w => Number(w.week) === i);
+                if (existing) {
+                    spiCpiWeeks.push(existing);
+                } else {
+                    // Default curve or 0
+                    spiCpiWeeks.push({
+                        week: i,
+                        planPct: Math.min(100, Number((i * 3.125).toFixed(2))), // contoh kurva S linear
+                        actualPct: i <= 8 ? Number((i * 3.0).toFixed(2)) : 0
+                    });
+                }
+            }
+            renderSpiCpiTable();
         }
 
         function switchTab(tabId) {
@@ -1578,6 +1651,134 @@
             updateDashboard();
         }
 
+        // ================= SPI & CPI MINGGUAN LOGIC (MINGGU 1 S.D 32) =================
+        function renderSpiCpiTable() {
+            const tbody = document.getElementById('spiCpiTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            let totalRealExpense = 0;
+            transactions.forEach(t => {
+                if (t.type !== 'INCOME') totalRealExpense += Number(t.amount);
+            });
+            // Total biaya aktual terpakai saat ini (AC) dibagi merata atau diestimasi per minggu untuk CPI
+            const acTotal = totalRealExpense > 0 ? totalRealExpense : 1; 
+
+            spiCpiWeeks.forEach((w, index) => {
+                const planPct = Number(w.planPct) || 0;
+                const actualPct = Number(w.actualPct) || 0;
+
+                const pv = (planPct / 100) * currentContractValue;
+                const ev = (actualPct / 100) * currentContractValue;
+
+                // SPI = EV / PV
+                const spi = pv > 0 ? (ev / pv) : 1.0;
+                
+                // CPI = EV / AC (proporsional per minggu)
+                const acEstimated = (actualPct / 100) * acTotal;
+                const cpi = acEstimated > 0 ? (ev / acEstimated) : 1.0;
+
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-700/40 hover:bg-slate-700/30 transition">
+                        <td class="py-2.5 px-3 text-center font-mono font-bold text-cyan-400">Minggu ${w.week}</td>
+                        <td class="py-2.5 px-3 text-center">
+                            <input type="number" step="0.01" min="0" max="100" value="${planPct}" onchange="updateWeekProgress(${w.week}, 'planPct', this.value)" class="w-24 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-center text-white font-mono focus:outline-none focus:border-cyan-500">
+                        </td>
+                        <td class="py-2.5 px-3 text-center">
+                            <input type="number" step="0.01" min="0" max="100" value="${actualPct}" onchange="updateWeekProgress(${w.week}, 'actualPct', this.value)" class="w-24 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-center text-cyan-300 font-mono font-bold focus:outline-none focus:border-cyan-500">
+                        </td>
+                        <td class="py-2.5 px-3 text-right font-mono text-slate-300">${formatIDR(pv)}</td>
+                        <td class="py-2.5 px-3 text-right font-mono text-emerald-400 font-semibold">${formatIDR(ev)}</td>
+                        <td class="py-2.5 px-3 text-center font-mono font-bold ${spi >= 1 ? 'text-emerald-400' : 'text-red-400'}">${spi.toFixed(2)}</td>
+                        <td class="py-2.5 px-3 text-center font-mono font-bold ${cpi >= 1 ? 'text-cyan-400' : 'text-amber-400'}">${cpi.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateWeekProgress(weekNum, field, val) {
+            const item = spiCpiWeeks.find(w => w.week === weekNum);
+            if (item) {
+                item[field] = parseFloat(val) || 0;
+                renderSpiCpiTable();
+                renderSpiCpiChart();
+            }
+        }
+
+        async function saveSpiCpiData() {
+            showToast('Menyimpan data SPI & CPI mingguan ke Cloud...', 'info');
+            for (let w of spiCpiWeeks) {
+                await saveCloudData('spicpi_weeks', w);
+            }
+            showToast('Progres Mingguan SPI & CPI berhasil disimpan!', 'success');
+            renderSpiCpiChart();
+        }
+
+        function fillSampleSpiData() {
+            spiCpiWeeks = [];
+            for (let i = 1; i <= 32; i++) {
+                // Kurva S Sederhana
+                let plan = Math.min(100, Number((i * 3.125).toFixed(2)));
+                let actual = i <= 24 ? Math.min(100, Number((i * 3.0).toFixed(2))) : 0;
+                spiCpiWeeks.push({ week: i, planPct: plan, actualPct: actual });
+            }
+            renderSpiCpiTable();
+            renderSpiCpiChart();
+            showToast('Contoh data minggu 1 s.d 32 dimuat!', 'success');
+        }
+
+        function renderSpiCpiChart() {
+            const ctxEl = document.getElementById('spiCpiChart');
+            if (!ctxEl) return;
+            const ctx = ctxEl.getContext('2d');
+
+            const labels = spiCpiWeeks.map(w => 'M' + w.week);
+            const spiData = spiCpiWeeks.map(w => {
+                const pv = ((Number(w.planPct) || 0) / 100) * currentContractValue;
+                const ev = ((Number(w.actualPct) || 0) / 100) * currentContractValue;
+                return pv > 0 ? Number((ev / pv).toFixed(2)) : 1.0;
+            });
+
+            let totalRealExpense = 0;
+            transactions.forEach(t => { if (t.type !== 'INCOME') totalRealExpense += Number(t.amount); });
+            const acTotal = totalRealExpense > 0 ? totalRealExpense : 1;
+
+            const cpiData = spiCpiWeeks.map(w => {
+                const actualPct = Number(w.actualPct) || 0;
+                const ev = (actualPct / 100) * currentContractValue;
+                const acEstimated = (actualPct / 100) * acTotal;
+                return acEstimated > 0 ? Number((ev / acEstimated).toFixed(2)) : 1.0;
+            });
+
+            if (spiCpiChartInstance) spiCpiChartInstance.destroy();
+            spiCpiChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'SPI (Jadwal)', data: spiData, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.2, borderWidth: 2 },
+                        { label: 'CPI (Biaya)', data: cpiData, borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.1)', tension: 0.2, borderWidth: 2 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(51, 65, 85, 0.4)' },
+                            suggestedMin: 0.5,
+                            suggestedMax: 1.5
+                        },
+                        x: { 
+                            ticks: { color: '#94a3b8', font: { size: 9 }, maxTicksLimit: 16 },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
         // OPERASIONAL ALAT BERAT & HELPER LOGIC
         document.getElementById('excaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -1910,7 +2111,6 @@
                 else totalRealExpense += Number(t.amount); // RAP / Uang Terbayar
             });
 
-            // Hitung Total Sisa Hutang PO untuk kewajiban Vendor
             let totalPoDebt = 0;
             purchaseOrders.forEach(p => {
                 const poTot = Number(p.total) || 0;
@@ -1919,7 +2119,6 @@
                 totalPoDebt += (debt > 0 ? debt : 0);
             });
 
-            // KALKULASI POIN 1: Proyeksi Net Margin = Nilai Kontrak - (Realisasi Pengeluaran RAP + Sisa Hutang PO)
             const totalEncumberedCosts = totalRealExpense + totalPoDebt;
             const netMargin = currentContractValue - totalEncumberedCosts;
             const marginPct = currentContractValue > 0 ? (netMargin / currentContractValue) * 100 : 0;
@@ -1931,11 +2130,13 @@
             document.getElementById('kpiDebtDesc').innerText = `Sisa kewajiban Vendor`;
             
             document.getElementById('kpiMargin').innerText = formatIDR(netMargin);
-            document.getElementById('kpiMarginPct').innerText = `${marginPct.toFixed(1)}% (Kontrak - RAP - Hutang PO)`;
+            document.getElementById('kpiMarginPct').innerText = `${marginPct.toFixed(1)}% (Kontrak - RAP - Hutang)`;
             document.getElementById('kpiCash').innerText = formatIDR(netCash);
 
             renderTable();
             renderCharts();
+            renderSpiCpiTable();
+            renderSpiCpiChart();
         }
 
         // RENDER TABEL JURNAL DENGAN SORTING TANGGAL KRONOLOGIS & FILTER
@@ -2004,14 +2205,10 @@
             const actuals = {};
             customCategoriesList.forEach(cat => actuals[cat] = 0);
 
-            let cInc = 0, cExp = 0;
-
             transactions.forEach(t => {
                 if (t.type !== 'INCOME') {
                     actuals[t.category] = (actuals[t.category] || 0) + Number(t.amount);
                 }
-                if (t.type === 'INCOME') cInc += Number(t.amount);
-                else cExp += Number(t.amount);
             });
 
             const ctxCostEl = document.getElementById('costControlChart');
@@ -2027,23 +2224,6 @@
                         ]
                     },
                     options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#94a3b8', font: { size: 9 } } }, y: { ticks: { color: '#94a3b8' } } } }
-                });
-            }
-
-            const ctxCashEl = document.getElementById('cashflowChart');
-            if (ctxCashEl) {
-                const ctxCash = ctxCashEl.getContext('2d');
-                if (cashflowChartInstance) cashflowChartInstance.destroy();
-                cashflowChartInstance = new Chart(ctxCash, {
-                    type: 'line',
-                    data: {
-                        labels: ['Awal', 'Saat Ini'],
-                        datasets: [
-                            { label: 'Kas Masuk', data: [0, cInc], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true },
-                            { label: 'Kas Keluar', data: [0, cExp], borderColor: '#f87171', backgroundColor: 'rgba(244, 63, 94, 0.1)', fill: true }
-                        ]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false }
                 });
             }
         }
