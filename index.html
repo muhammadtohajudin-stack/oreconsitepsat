@@ -143,7 +143,7 @@
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Proyeksi Net Margin</p>
                         <h3 id="kpiMargin" class="text-xl font-bold text-emerald-400 mt-2">Rp 0</h3>
-                        <p id="kpiMarginPct" class="text-xs text-emerald-400 mt-1">0.0% (Kontrak - RAP)</p>
+                        <p id="kpiMarginPct" class="text-xs text-emerald-400 mt-1">0.0% (Kontrak - RAP - Hutang PO)</p>
                     </div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Saldo Kas Aktual</p>
@@ -1910,7 +1910,7 @@
                 else totalRealExpense += Number(t.amount); // RAP / Uang Terbayar
             });
 
-            // Hitung Total Sisa Hutang PO untuk kartu KPI Hutang
+            // Hitung Total Sisa Hutang PO untuk kewajiban Vendor
             let totalPoDebt = 0;
             purchaseOrders.forEach(p => {
                 const poTot = Number(p.total) || 0;
@@ -1919,8 +1919,9 @@
                 totalPoDebt += (debt > 0 ? debt : 0);
             });
 
-            // REVISI RUMUS: Proyeksi Net Margin = Nilai Kontrak - Realisasi Pengeluaran RAP (tanpa memperhitungkan hutang PO)
-            const netMargin = currentContractValue - totalRealExpense;
+            // KALKULASI POIN 1: Proyeksi Net Margin = Nilai Kontrak - (Realisasi Pengeluaran RAP + Sisa Hutang PO)
+            const totalEncumberedCosts = totalRealExpense + totalPoDebt;
+            const netMargin = currentContractValue - totalEncumberedCosts;
             const marginPct = currentContractValue > 0 ? (netMargin / currentContractValue) * 100 : 0;
             const netCash = totalIncome - totalRealExpense;
 
@@ -1930,7 +1931,7 @@
             document.getElementById('kpiDebtDesc').innerText = `Sisa kewajiban Vendor`;
             
             document.getElementById('kpiMargin').innerText = formatIDR(netMargin);
-            document.getElementById('kpiMarginPct').innerText = `${marginPct.toFixed(1)}% (Kontrak - RAP)`;
+            document.getElementById('kpiMarginPct').innerText = `${marginPct.toFixed(1)}% (Kontrak - RAP - Hutang PO)`;
             document.getElementById('kpiCash').innerText = formatIDR(netCash);
 
             renderTable();
