@@ -281,7 +281,7 @@
                                     <th class="py-3 px-3 text-center w-24">% Actual</th>
                                     <th class="py-3 px-3 text-right">Planned Value (PV)</th>
                                     <th class="py-3 px-3 text-right">Earned Value (EV)</th>
-                                    <th class="py-3 px-3 text-right">Actual Cost Kumulatif (AC)</th>
+                                    <th class="py-3 px-3 text-right">Actual Cost Kas (AC)</th>
                                     <th class="py-3 px-3 text-center w-20">SPI</th>
                                     <th class="py-3 px-3 text-center w-20">CPI</th>
                                 </tr>
@@ -627,7 +627,7 @@
                             <select id="filterPaymentStatus" onchange="renderPaymentControlTable()" class="bg-slate-900 border border-slate-700 rounded-lg py-1 px-2.5 text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
                                 <option value="ALL">Semua Status Bayar</option>
                                 <option value="LUNAS">🟢 Lunas</option>
-                                <option value="DP">🔵 DP (Bayار Sebagian)</option>
+                                <option value="DP">🔵 DP (Bayar Sebagian)</option>
                                 <option value="TEMPO">🟡 Tempo</option>
                                 <option value="BELUM_BAYAR">🔴 Belum Dibayar</option>
                             </select>
@@ -1662,18 +1662,21 @@
             updateDashboard();
         }
 
-        // ================= SPI & CPI MINGGUAN LOGIC (AC KUMULATIF) =================
+        // ================= SPI & CPI MINGGUAN LOGIC (AC KAS AKUMULATIF BERJALAN) =================
         
         function calculateCumulativeActualCost(endDate) {
             if (!endDate) return 0;
             let totalAC = 0;
 
+            // Hanya menghitung transaksi pengeluaran (Cash Out) aktual s.d. tanggal akhir minggu
             transactions.forEach(t => {
                 if (t.type !== 'INCOME' && t.date && t.date <= endDate) {
                     totalAC += Number(t.amount) || 0;
                 }
             });
 
+            // Hanya menghitung PO yang sudah terbayar (DP / Lunas) s.d. tanggal akhir minggu
+            // Tanpa memperhitung kan hutang / sisa kewajiban vendor
             purchaseOrders.forEach(p => {
                 const paid = Number(p.paidAmount) || 0;
                 if (paid > 0 && p.date && p.date <= endDate) {
@@ -1698,11 +1701,25 @@
 
                 const pv = (planPct / 100) * currentContractValue;
                 const ev = (actualPct / 100) * currentContractValue;
-                // Menggunakan Actual Cost Kumulatif berdasarkan tanggal akhir minggu berjalan
-                const ac = calculateCumulativeActualCost(w.endDate);
 
-                const spi = pv > 0 ? (ev / pv) : 1.0;
-                const cpi = ac > 0 ? (ev / ac) : (ev > 0 ? 1.0 : 1.0);
+                // Logika Penyesuaian:
+                // Jika actualPct == 0 (artinya belum ada pengerjaan minggu tersebut/minggu belum berjalan)
+                // Maka AC dan CPI diset 0 / tidak dihitung agar beriringan dengan progres aktual.
+                let ac = 0;
+                let spi = 1.0;
+                let cpi = 1.0;
+
+                if (pv > 0) {
+                    spi = ev / pv;
+                }
+
+                if (actualPct > 0 && w.endDate) {
+                    ac = calculateCumulativeActualCost(w.endDate);
+                    cpi = ac > 0 ? (ev / ac) : 1.0;
+                } else {
+                    ac = 0;
+                    cpi = 0; // Berhenti / belum ada pengerjaan
+                }
 
                 tbody.innerHTML += `
                     <tr class="border-b border-slate-700/40 hover:bg-slate-700/35 transition">
@@ -1721,9 +1738,9 @@
                         </td>
                         <td class="py-2 px-2 text-right font-mono text-slate-300 text-xs">${formatIDR(pv)}</td>
                         <td class="py-2 px-2 text-right font-mono text-emerald-400 font-semibold text-xs">${formatIDR(ev)}</td>
-                        <td class="py-2 px-2 text-right font-mono text-amber-400 font-semibold text-xs">${formatIDR(ac)}</td>
+                        <td class="py-2 px-2 text-right font-mono text-amber-400 font-semibold text-xs">${ac > 0 ? formatIDR(ac) : 'Rp 0'}</td>
                         <td class="py-2 px-2 text-center font-mono font-bold ${spi >= 1 ? 'text-emerald-400' : 'text-red-400'}">${spi.toFixed(2)}</td>
-                        <td class="py-2 px-2 text-center font-mono font-bold ${cpi >= 1 ? 'text-cyan-400' : 'text-amber-400'}">${cpi.toFixed(2)}</td>
+                        <td class="py-2 px-2 text-center font-mono font-bold ${cpi > 0 ? (cpi >= 1 ? 'text-cyan-400' : 'text-amber-400') : 'text-slate-500'}">${cpi > 0 ? cpi.toFixed(2) : '-'}</td>
                     </tr>
                 `;
             });
@@ -1748,10 +1765,15 @@
                 const actualPct = Number(w.actualPct) || 0;
                 const pv = (planPct / 100) * currentContractValue;
                 const ev = (actualPct / 100) * currentContractValue;
-                const ac = calculateCumulativeActualCost(w.endDate);
+                
+                let ac = 0;
+                let spi = pv > 0 ? (ev / pv) : 1.0;
+                let cpi = 0;
 
-                const spi = pv > 0 ? (ev / pv) : 1.0;
-                const cpi = ac > 0 ? (ev / ac) : (ev > 0 ? 1.0 : 1.0);
+                if (actualPct > 0 && w.endDate) {
+                    ac = calculateCumulativeActualCost(w.endDate);
+                    cpi = ac > 0 ? (ev / ac) : 1.0;
+                }
 
                 const row = document.querySelector(`#spiCpiTableBody tr:nth-child(${w.week})`);
                 if (row) {
@@ -1759,11 +1781,11 @@
                     if (cells.length >= 10) {
                         cells[5].innerText = formatIDR(pv);
                         cells[6].innerText = formatIDR(ev);
-                        cells[7].innerText = formatIDR(ac);
+                        cells[7].innerText = ac > 0 ? formatIDR(ac) : 'Rp 0';
                         cells[8].innerText = spi.toFixed(2);
                         cells[8].className = `py-2 px-2 text-center font-mono font-bold ${spi >= 1 ? 'text-emerald-400' : 'text-red-400'}`;
-                        cells[9].innerText = cpi.toFixed(2);
-                        cells[9].className = `py-2 px-2 text-center font-mono font-bold ${cpi >= 1 ? 'text-cyan-400' : 'text-amber-400'}`;
+                        cells[9].innerText = cpi > 0 ? cpi.toFixed(2) : '-';
+                        cells[9].className = `py-2 px-2 text-center font-mono font-bold ${cpi > 0 ? (cpi >= 1 ? 'text-cyan-400' : 'text-amber-400') : 'text-slate-500'}`;
                     }
                 }
             });
@@ -1792,6 +1814,7 @@
 
             const cpiData = spiCpiWeeks.map(w => {
                 const actualPct = Number(w.actualPct) || 0;
+                if (actualPct <= 0 || !w.endDate) return null; // Berhenti di minggu yang belum ada progres aktualnya
                 const ev = (actualPct / 100) * currentContractValue;
                 const ac = calculateCumulativeActualCost(w.endDate);
                 return ac > 0 ? Number((ev / ac).toFixed(2)) : 1.0;
@@ -1804,7 +1827,7 @@
                     labels: labels,
                     datasets: [
                         { label: 'SPI (Jadwal)', data: spiData, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.2, borderWidth: 2 },
-                        { label: 'CPI (Biaya Kumulatif)', data: cpiData, borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.1)', tension: 0.2, borderWidth: 2 }
+                        { label: 'CPI (Biaya Kas Real)', data: cpiData, borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.1)', tension: 0.2, borderWidth: 2, spanGaps: false }
                     ]
                 },
                 options: {
