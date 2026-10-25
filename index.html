@@ -281,7 +281,7 @@
                                     <th class="py-3 px-3 text-center w-24">% Actual</th>
                                     <th class="py-3 px-3 text-right">Planned Value (PV)</th>
                                     <th class="py-3 px-3 text-right">Earned Value (EV)</th>
-                                    <th class="py-3 px-3 text-right">Actual Cost (AC)</th>
+                                    <th class="py-3 px-3 text-right">Actual Cost Kumulatif (AC)</th>
                                     <th class="py-3 px-3 text-center w-20">SPI</th>
                                     <th class="py-3 px-3 text-center w-20">CPI</th>
                                 </tr>
@@ -627,7 +627,7 @@
                             <select id="filterPaymentStatus" onchange="renderPaymentControlTable()" class="bg-slate-900 border border-slate-700 rounded-lg py-1 px-2.5 text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
                                 <option value="ALL">Semua Status Bayar</option>
                                 <option value="LUNAS">🟢 Lunas</option>
-                                <option value="DP">🔵 DP (Bayar Sebagian)</option>
+                                <option value="DP">🔵 DP (Bayار Sebagian)</option>
                                 <option value="TEMPO">🟡 Tempo</option>
                                 <option value="BELUM_BAYAR">🔴 Belum Dibayar</option>
                             </select>
@@ -1662,21 +1662,21 @@
             updateDashboard();
         }
 
-        // ================= SPI & CPI MINGGUAN LOGIC (SAVE ALL WEEKS M1-M32) =================
+        // ================= SPI & CPI MINGGUAN LOGIC (AC KUMULATIF) =================
         
-        function calculateActualCostForPeriod(startDate, endDate) {
-            if (!startDate || !endDate) return 0;
+        function calculateCumulativeActualCost(endDate) {
+            if (!endDate) return 0;
             let totalAC = 0;
 
             transactions.forEach(t => {
-                if (t.type !== 'INCOME' && t.date >= startDate && t.date <= endDate) {
+                if (t.type !== 'INCOME' && t.date && t.date <= endDate) {
                     totalAC += Number(t.amount) || 0;
                 }
             });
 
             purchaseOrders.forEach(p => {
                 const paid = Number(p.paidAmount) || 0;
-                if (paid > 0 && p.date >= startDate && p.date <= endDate) {
+                if (paid > 0 && p.date && p.date <= endDate) {
                     const isAlreadyInTx = transactions.some(t => t.poRefId === p.id);
                     if (!isAlreadyInTx) {
                         totalAC += paid;
@@ -1698,7 +1698,8 @@
 
                 const pv = (planPct / 100) * currentContractValue;
                 const ev = (actualPct / 100) * currentContractValue;
-                const ac = calculateActualCostForPeriod(w.startDate, w.endDate);
+                // Menggunakan Actual Cost Kumulatif berdasarkan tanggal akhir minggu berjalan
+                const ac = calculateCumulativeActualCost(w.endDate);
 
                 const spi = pv > 0 ? (ev / pv) : 1.0;
                 const cpi = ac > 0 ? (ev / ac) : (ev > 0 ? 1.0 : 1.0);
@@ -1747,7 +1748,7 @@
                 const actualPct = Number(w.actualPct) || 0;
                 const pv = (planPct / 100) * currentContractValue;
                 const ev = (actualPct / 100) * currentContractValue;
-                const ac = calculateActualCostForPeriod(w.startDate, w.endDate);
+                const ac = calculateCumulativeActualCost(w.endDate);
 
                 const spi = pv > 0 ? (ev / pv) : 1.0;
                 const cpi = ac > 0 ? (ev / ac) : (ev > 0 ? 1.0 : 1.0);
@@ -1792,7 +1793,7 @@
             const cpiData = spiCpiWeeks.map(w => {
                 const actualPct = Number(w.actualPct) || 0;
                 const ev = (actualPct / 100) * currentContractValue;
-                const ac = calculateActualCostForPeriod(w.startDate, w.endDate);
+                const ac = calculateCumulativeActualCost(w.endDate);
                 return ac > 0 ? Number((ev / ac).toFixed(2)) : 1.0;
             });
 
@@ -1803,7 +1804,7 @@
                     labels: labels,
                     datasets: [
                         { label: 'SPI (Jadwal)', data: spiData, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.2, borderWidth: 2 },
-                        { label: 'CPI (Biaya Riil)', data: cpiData, borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.1)', tension: 0.2, borderWidth: 2 }
+                        { label: 'CPI (Biaya Kumulatif)', data: cpiData, borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.1)', tension: 0.2, borderWidth: 2 }
                     ]
                 },
                 options: {
