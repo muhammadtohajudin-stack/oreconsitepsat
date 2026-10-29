@@ -169,7 +169,7 @@
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Total HPP Alat Berat</p>
                         <h3 id="messKpiHpp" class="text-2xl font-bold text-amber-400 mt-2">Rp 0</h3>
-                        <p class="text-xs text-slate-400 mt-1">Min 200 Jam/Bulan + Fuel + DT</p>
+                        <p class="text-xs text-slate-400 mt-1">Min 200 Jam (26 Aug-26 Oct) + Aktual</p>
                     </div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Total Proyeksi Margin (Net)</p>
@@ -183,7 +183,7 @@
                     <h2 class="text-base font-semibold text-white mb-2 flex items-center gap-2">
                         <i class="fa-solid fa-scale-balanced text-cyan-400"></i> Analisa Finansial: Pendapatan Kontrak vs HPP Alat Berat
                     </h2>
-                    <p class="text-xs text-slate-400 mb-4">Perbandingan tarif kontrak alat berat dengan perhitungan HPP operasional aktual (termasuk aturan minimum 200 jam/bulan).</p>
+                    <p class="text-xs text-slate-400 mb-4">Perbandingan tarif kontrak alat berat dengan perhitungan HPP operasional (minimum 200 jam hanya berlaku 26 Agu s.d. 26 Okt 2026, setelahnya jam aktual).</p>
                     <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                         <table class="w-full text-left border-collapse text-xs sm:text-sm">
                             <thead>
@@ -865,7 +865,7 @@
             if (projId === 'mess') {
                 navPoText.innerText = "Alat Berat & Ritase DT";
                 navPoIcon.className = "fa-solid fa-truck-monster w-4 text-center";
-                navPoPayment.classList.add('hidden');
+                navPoPayment.classList.add('hidden'); // Sembunyikan Kontrol Pembayaran & Hutang PO
                 kpiSporthall.classList.add('hidden');
                 kpiMess.classList.remove('hidden');
                 messComparison.classList.remove('hidden');
@@ -877,7 +877,7 @@
             } else {
                 navPoText.innerText = "Manajemen Pre-Order (PO)";
                 navPoIcon.className = "fa-solid fa-file-invoice-dollar w-4 text-center";
-                navPoPayment.classList.remove('hidden');
+                navPoPayment.classList.remove('hidden'); // Tampilkan Kembali Kontrol Pembayaran & Hutang PO
                 kpiSporthall.classList.remove('hidden');
                 kpiMess.classList.add('hidden');
                 messComparison.classList.add('hidden');
@@ -1389,24 +1389,24 @@
         function getStatusBadge(status) {
             switch(status) {
                 case 'SELESAI':
-                    return `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🟢 Selesai</span>`;
+                    return `<span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🟢 Selesai</span>`;
                 case 'DALAM_PROSES':
-                    return `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🔵 Dalam Proses</span>`;
+                    return `<span class="bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🔵 Dalam Proses</span>`;
                 default:
-                    return `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🟡 Belum Diproses</span>`;
+                    return `<span class="bg-amber-500/15 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🟡 Belum Diproses</span>`;
             }
         }
 
         function getPaymentStatusBadge(status) {
             switch(status) {
                 case 'LUNAS':
-                    return `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟢 Lunas</span>`;
+                    return `<span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟢 Lunas</span>`;
                 case 'DP':
-                    return `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔵 Bayar DP</span>`;
+                    return `<span class="bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔵 Bayar DP</span>`;
                 case 'TEMPO':
-                    return `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟡 Tempo</span>`;
+                    return `<span class="bg-amber-500/15 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟡 Tempo</span>`;
                 default:
-                    return `<span class="bg-red-500/10 text-red-400 border border-red-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔴 Belum Bayar</span>`;
+                    return `<span class="bg-red-500/15 text-red-400 border border-red-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔴 Belum Bayar</span>`;
             }
         }
 
@@ -1415,10 +1415,10 @@
             const icon = document.getElementById(`po-icon-${poId}`);
             if (detailRow.classList.contains('hidden')) {
                 detailRow.classList.remove('hidden');
-                if (icon) icon.className = "fa-solid fa-chevron-down text-cyan-400";
+                if (icon) icon.className = "fa-solid fa-chevron-down text-cyan-400 text-xs";
             } else {
                 detailRow.classList.add('hidden');
-                if (icon) icon.className = "fa-solid fa-chevron-right text-slate-400";
+                if (icon) icon.className = "fa-solid fa-chevron-right text-slate-400 text-xs";
             }
         }
 
@@ -1451,11 +1451,11 @@
                 const finishedCount = itemsArray.filter(it => (it.status || 'BELUM_PROSES') === 'SELESAI').length;
                 let progressBadge = '';
                 if (finishedCount === itemsCount) {
-                    progressBadge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟢 Semua Selesai (${finishedCount}/${itemsCount})</span>`;
+                    progressBadge = `<span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟢 Semua Selesai (${finishedCount}/${itemsCount})</span>`;
                 } else if (finishedCount > 0) {
-                    progressBadge = `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔵 ${finishedCount}/${itemsCount} Selesai</span>`;
+                    progressBadge = `<span class="bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔵 ${finishedCount}/${itemsCount} Selesai</span>`;
                 } else {
-                    progressBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟡 Dalam Proses / Belum</span>`;
+                    progressBadge = `<span class="bg-amber-500/15 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟡 Dalam Proses / Belum</span>`;
                 }
 
                 tbody.innerHTML += `
@@ -1662,21 +1662,16 @@
             updateDashboard();
         }
 
-        // ================= SPI & CPI MINGGUAN LOGIC (AC KAS AKUMULATIF BERJALAN) =================
-        
         function calculateCumulativeActualCost(endDate) {
             if (!endDate) return 0;
             let totalAC = 0;
 
-            // Hanya menghitung transaksi pengeluaran (Cash Out) aktual s.d. tanggal akhir minggu
             transactions.forEach(t => {
                 if (t.type !== 'INCOME' && t.date && t.date <= endDate) {
                     totalAC += Number(t.amount) || 0;
                 }
             });
 
-            // Hanya menghitung PO yang sudah terbayar (DP / Lunas) s.d. tanggal akhir minggu
-            // Tanpa memperhitung kan hutang / sisa kewajiban vendor
             purchaseOrders.forEach(p => {
                 const paid = Number(p.paidAmount) || 0;
                 if (paid > 0 && p.date && p.date <= endDate) {
@@ -1702,9 +1697,6 @@
                 const pv = (planPct / 100) * currentContractValue;
                 const ev = (actualPct / 100) * currentContractValue;
 
-                // Logika Penyesuaian:
-                // Jika actualPct == 0 (artinya belum ada pengerjaan minggu tersebut/minggu belum berjalan)
-                // Maka AC dan CPI diset 0 / tidak dihitung agar beriringan dengan progres aktual.
                 let ac = 0;
                 let spi = 1.0;
                 let cpi = 1.0;
@@ -1718,7 +1710,7 @@
                     cpi = ac > 0 ? (ev / ac) : 1.0;
                 } else {
                     ac = 0;
-                    cpi = 0; // Berhenti / belum ada pengerjaan
+                    cpi = 0;
                 }
 
                 tbody.innerHTML += `
@@ -1814,7 +1806,7 @@
 
             const cpiData = spiCpiWeeks.map(w => {
                 const actualPct = Number(w.actualPct) || 0;
-                if (actualPct <= 0 || !w.endDate) return null; // Berhenti di minggu yang belum ada progres aktualnya
+                if (actualPct <= 0 || !w.endDate) return null;
                 const ev = (actualPct / 100) * currentContractValue;
                 const ac = calculateCumulativeActualCost(w.endDate);
                 return ac > 0 ? Number((ev / ac).toFixed(2)) : 1.0;
@@ -2058,7 +2050,25 @@
             }
         }
 
+        // FUNGSI KALKULASI HPP DENGAN BATASAN MINIMUM 200 JAM HANYA 26 AGU S.D. 26 OKT 2026
         function calculateMonthlyHpp(logs, ratePerHour) {
+            let totalHppAlat = 0;
+            const startDateLimit = new Date('2026-08-26');
+            const endDateLimit = new Date('2026-10-26');
+
+            logs.forEach(l => {
+                if (!l.date) return;
+                const logDate = new Date(l.date);
+                const hours = Number(l.totalHours) || 0;
+
+                // Cek apakah tanggal log berada dalam rentang 26 Agu s.d. 26 Okt 2026
+                if (logDate >= startDateLimit && logDate <= endDateLimit) {
+                    // Kelompokkan per bulan untuk periode khusus ini
+                    // Atau hitung per record/bulan sesuai aturan minimum 200 jam/bulan
+                }
+            });
+
+            // Implementasi perhitungan bulanan dengan ketentuan minimum 200 jam
             const monthlyHours = {};
             logs.forEach(l => {
                 if (!l.date) return;
@@ -2073,15 +2083,31 @@
                 monthlyHours[periodKey] = (monthlyHours[periodKey] || 0) + (Number(l.totalHours) || 0);
             });
 
-            let totalHppAlat = 0;
-            Object.values(monthlyHours).forEach(hours => {
-                const billableHours = hours < 200 ? 200 : hours;
+            // Terapkan aturan minimum 200 jam HANYA untuk periode yang jatuh antara 26 Agustus s.d. 26 Oktober 2026
+            Object.keys(monthlyHours).forEach(periodKey => {
+                const hours = monthlyHours[periodKey];
+                
+                // Tentukan batasan tanggal untuk periodKey ini (misal periode bulanan 26 s.d. 25)
+                const [pYear, pMonth] = periodKey.split('-').map(Number);
+                const periodStart = new Date(pYear, pMonth - 2, 26);
+                const periodEnd = new Date(pYear, pMonth - 1, 26);
+
+                // Cek irisan dengan rentang 26 Ags 2026 - 26 Okt 2026
+                const isInSpecialRange = (periodStart <= endDateLimit && periodEnd >= startDateLimit);
+
+                let billableHours = hours;
+                if (isInSpecialRange) {
+                    billableHours = hours < 200 ? 200 : hours; // Minimum 200 jam khusus rentang tsb
+                } else {
+                    billableHours = hours; // Setelah 26 Oktober dihitung jam aktual murni
+                }
+
                 totalHppAlat += billableHours * ratePerHour;
             });
 
             if (Object.keys(monthlyHours).length === 0 && logs.length > 0) {
                 let totalH = logs.reduce((acc, l) => acc + (Number(l.totalHours) || 0), 0);
-                totalHppAlat = (totalH < 200 ? 200 : totalH) * ratePerHour;
+                totalHppAlat = totalH * ratePerHour;
             }
 
             return totalHppAlat;
