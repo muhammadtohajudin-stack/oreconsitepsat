@@ -178,6 +178,34 @@
                     </div>
                 </div>
 
+                <!-- Bagian Khusus: Rincian Pengeluaran HPP (Fuel & Vendor PT. Restu Tanjung Permai) -->
+                <div id="messVendorBreakdownSection" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card hidden space-y-4">
+                    <div>
+                        <h2 class="text-base font-semibold text-white mb-1 flex items-center gap-2">
+                            <i class="fa-solid fa-file-invoice-dollar text-amber-400"></i> Rincian Pengeluaran HPP (Fuel & Vendor PT. Restu Tanjung Permai)
+                        </h2>
+                        <p class="text-xs text-slate-400">Akumulasi biaya operasional alat berat yang terdiri dari pembelian bahan bakar (BBM) dan kewajiban sewa alat kepada vendor.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-slate-900/90 border border-slate-700/60 p-4 rounded-xl">
+                            <p class="text-xs text-slate-400 uppercase font-semibold">Total Pengeluaran Fuel (BBM)</p>
+                            <h3 id="breakdownFuelCost" class="text-lg font-bold text-amber-400 font-mono mt-1.5">Rp 0</h3>
+                            <p id="breakdownFuelVol" class="text-[11px] text-slate-400 mt-1">0.0 Liter</p>
+                        </div>
+                        <div class="bg-slate-900/90 border border-slate-700/60 p-4 rounded-xl">
+                            <p class="text-xs text-slate-400 uppercase font-semibold">Bayar Sewa Alat (PT. Restu Tanjung Permai)</p>
+                            <h3 id="breakdownVendorCost" class="text-lg font-bold text-cyan-400 font-mono mt-1.5">Rp 0</h3>
+                            <p class="text-[11px] text-slate-300 mt-1">Excavator + Compact Roller (Min. 200 Jam)</p>
+                        </div>
+                        <div class="bg-slate-900/90 border border-slate-700/60 p-4 rounded-xl">
+                            <p class="text-xs text-slate-400 uppercase font-semibold">Total HPP Alat (Fuel + Vendor + DT)</p>
+                            <h3 id="breakdownTotalHpp" class="text-lg font-bold text-red-400 font-mono mt-1.5">Rp 0</h3>
+                            <p class="text-[11px] text-slate-400 mt-1">Termasuk HPP Ritase Dump Truck</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Tabel Analisa Finansial Bulanan (Mess) -->
                 <div id="messComparisonSection" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card hidden space-y-4">
                     <div>
@@ -859,6 +887,7 @@
             const kpiSporthall = document.getElementById('kpi-grid-sporthall');
             const kpiMess = document.getElementById('kpi-grid-mess');
             const messComparison = document.getElementById('messComparisonSection');
+            const messVendorBreakdown = document.getElementById('messVendorBreakdownSection');
             const sporthallTx = document.getElementById('sporthallTxFormWrapper');
             const sporthallCharts = document.getElementById('sporthallChartsWrapper');
             const sporthallSpiTable = document.getElementById('sporthallSpiCpiTableWrapper');
@@ -872,6 +901,7 @@
                 kpiSporthall.classList.add('hidden');
                 kpiMess.classList.remove('hidden');
                 messComparison.classList.remove('hidden');
+                messVendorBreakdown.classList.remove('hidden');
                 sporthallTx.classList.add('hidden');
                 sporthallCharts.classList.add('hidden');
                 sporthallSpiTable.classList.add('hidden');
@@ -884,6 +914,7 @@
                 kpiSporthall.classList.remove('hidden');
                 kpiMess.classList.add('hidden');
                 messComparison.classList.add('hidden');
+                messVendorBreakdown.classList.add('hidden');
                 sporthallTx.classList.remove('hidden');
                 sporthallCharts.classList.remove('hidden');
                 sporthallSpiTable.classList.remove('hidden');
@@ -2249,6 +2280,7 @@
                     actualHours: item.actualHours, 
                     billableHours: billableHours, 
                     fuelCost: item.fuelCost,
+                    hppAlat: hppAlat,
                     totalHpp: totalHpp
                 });
             });
@@ -2291,6 +2323,16 @@
             document.getElementById('messKpiTotalHours').innerText = combinedActual.toFixed(1) + ' Jam (Aktual)';
             document.getElementById('messKpiFuelSummary').innerText = `Fuel: ${combinedFuelVol.toFixed(1)} L (${formatIDR(combinedFuelCost)})`;
 
+            // Hitung total bayar ke vendor PT. Restu Tanjung Permai (Sewa Exca + Compact berdasarkan billable hours)
+            let totalExcaVendorSewa = excaMonthlyHpp.reduce((acc, m) => acc + m.hppAlat, 0);
+            let totalCompactVendorSewa = compactMonthlyHpp.reduce((acc, m) => acc + m.hppAlat, 0);
+            const totalVendorRestuTanjungPermai = totalExcaVendorSewa + totalCompactVendorSewa;
+
+            // Update Card Khusus Rincian HPP Vendor & Fuel
+            document.getElementById('breakdownFuelCost').innerText = formatIDR(combinedFuelCost);
+            document.getElementById('breakdownFuelVol').innerText = `${combinedFuelVol.toFixed(1)} Liter`;
+            document.getElementById('breakdownVendorCost').innerText = formatIDR(totalVendorRestuTanjungPermai);
+
             let totalExcaHpp = excaMonthlyHpp.reduce((acc, m) => acc + m.totalHpp, 0);
             let totalCompactHpp = compactMonthlyHpp.reduce((acc, m) => acc + m.totalHpp, 0);
 
@@ -2302,6 +2344,7 @@
 
             // HPP menggunakan aturan tagihan (billable)
             const totalHpp = totalExcaHpp + totalCompactHpp + totalDtVendorHpp;
+            document.getElementById('breakdownTotalHpp').innerText = formatIDR(totalHpp);
             
             const totalMargin = totalRevenue - totalHpp;
             const marginPct = totalRevenue > 0 ? (totalMargin / totalRevenue) * 100 : 0;
