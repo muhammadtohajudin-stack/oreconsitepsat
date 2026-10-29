@@ -164,12 +164,12 @@
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Total Pendapatan Kontrak</p>
                         <h3 id="messKpiRevenue" class="text-2xl font-bold text-emerald-400 mt-2">Rp 0</h3>
-                        <p class="text-xs text-slate-400 mt-1">Sesuai aturan min. jam tagihan</p>
+                        <p class="text-[10px] text-slate-400 mt-1">Sesuai total jam aktual lapangan</p>
                     </div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Total HPP Alat Berat</p>
                         <h3 id="messKpiHpp" class="text-2xl font-bold text-amber-400 mt-2">Rp 0</h3>
-                        <p class="text-xs text-slate-400 mt-1">Sesuai aturan min. jam sewa vendor</p>
+                        <p class="text-[10px] text-slate-400 mt-1">Sesuai aturan min. 200 jam sewa vendor</p>
                     </div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Total Proyeksi Margin (Net)</p>
@@ -184,7 +184,7 @@
                         <h2 class="text-base font-semibold text-white mb-1 flex items-center gap-2">
                             <i class="fa-solid fa-scale-balanced text-cyan-400"></i> Analisa Finansial Bulanan: Pendapatan vs HPP
                         </h2>
-                        <p class="text-xs text-slate-400">Rekapitulasi berdasarkan periode tanggal 26 s.d. 25 bulan berikutnya. Aturan min. 200 jam hanya berlaku untuk tagihan & sewa periode September dan Oktober.</p>
+                        <p class="text-xs text-slate-400">Rekapitulasi berdasarkan periode tanggal 26 s.d. 25 bulan berikutnya. Pendapatan proyek murni menggunakan <strong>jam aktual</strong>. Aturan min. 200 jam <strong>hanya berlaku untuk HPP Vendor</strong> (khusus periode September dan Oktober).</p>
                     </div>
                     <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                         <table class="w-full text-left border-collapse text-xs sm:text-sm">
@@ -192,7 +192,7 @@
                                 <tr class="bg-slate-900 border-b border-slate-700 text-slate-400 font-semibold text-[11px]">
                                     <th class="py-3 px-4">Bulan Periode (Cut-off 26)</th>
                                     <th class="py-3 px-4">Alat Berat / Pekerjaan</th>
-                                    <th class="py-3 px-4 text-center">Volume Tagihan / HPP</th>
+                                    <th class="py-3 px-4 text-center">Volume Jam Kerja</th>
                                     <th class="py-3 px-4 text-right">Pendapatan Kontrak</th>
                                     <th class="py-3 px-4 text-right">Total HPP Bulanan</th>
                                     <th class="py-3 px-4 text-right">Proyeksi Margin</th>
@@ -2284,26 +2284,25 @@
             const excaMonthlyHpp = calculateMonthlyHppDetails(excaLogs, 250000);
             const compactMonthlyHpp = calculateMonthlyHppDetails(compactLogs, 210000);
 
-            // Akumulasikan total jam tagihan (billable)
-            let totalExcaBillable = excaMonthlyHpp.reduce((acc, m) => acc + m.billableHours, 0);
-            let totalCompactBillable = compactMonthlyHpp.reduce((acc, m) => acc + m.billableHours, 0);
-
-            const combinedBillable = totalExcaBillable + totalCompactBillable;
+            const combinedActual = totalExcaActualHours + totalCompactActualHours;
             const combinedFuelVol = totalExcaFuelVol + totalCompactFuelVol;
             const combinedFuelCost = totalExcaFuelCost + totalCompactFuelCost;
 
-            document.getElementById('messKpiTotalHours').innerText = combinedBillable.toFixed(1) + ' Jam';
+            document.getElementById('messKpiTotalHours').innerText = combinedActual.toFixed(1) + ' Jam (Aktual)';
             document.getElementById('messKpiFuelSummary').innerText = `Fuel: ${combinedFuelVol.toFixed(1)} L (${formatIDR(combinedFuelCost)})`;
 
             let totalExcaHpp = excaMonthlyHpp.reduce((acc, m) => acc + m.totalHpp, 0);
             let totalCompactHpp = compactMonthlyHpp.reduce((acc, m) => acc + m.totalHpp, 0);
 
-            const excaRevenue = totalExcaBillable * 669500;
-            const compactRevenue = totalCompactBillable * 571000;
+            // Pendapatan MURNI menggunakan jam AKTUAL Lapangan
+            const excaRevenue = totalExcaActualHours * 669500;
+            const compactRevenue = totalCompactActualHours * 571000;
             const dtRevenue = totalDtHours * 566300;
             const totalRevenue = excaRevenue + compactRevenue + dtRevenue;
 
+            // HPP menggunakan aturan tagihan (billable)
             const totalHpp = totalExcaHpp + totalCompactHpp + totalDtVendorHpp;
+            
             const totalMargin = totalRevenue - totalHpp;
             const marginPct = totalRevenue > 0 ? (totalMargin / totalRevenue) * 100 : 0;
 
@@ -2332,16 +2331,16 @@
                 if (!allMonths[m.periodKey]) allMonths[m.periodKey] = { name: m.monthName, excaH: 0, excaAct: 0, excaRev: 0, excaHpp: 0, compH: 0, compAct: 0, compRev: 0, compHpp: 0, dtRit: 0, dtRev: 0, dtHpp: 0 };
                 allMonths[m.periodKey].excaH = m.billableHours;
                 allMonths[m.periodKey].excaAct = m.actualHours;
-                allMonths[m.periodKey].excaRev = m.billableHours * 669500;
-                allMonths[m.periodKey].excaHpp = m.totalHpp;
+                allMonths[m.periodKey].excaRev = m.actualHours * 669500; // PENDAPATAN MURNI AKTUAL
+                allMonths[m.periodKey].excaHpp = m.totalHpp;             // HPP SESUAI ATURAN TAGIHAN
             });
 
             compactMonthlyHpp.forEach(m => {
                 if (!allMonths[m.periodKey]) allMonths[m.periodKey] = { name: m.monthName, excaH: 0, excaAct: 0, excaRev: 0, excaHpp: 0, compH: 0, compAct: 0, compRev: 0, compHpp: 0, dtRit: 0, dtRev: 0, dtHpp: 0 };
                 allMonths[m.periodKey].compH = m.billableHours;
                 allMonths[m.periodKey].compAct = m.actualHours;
-                allMonths[m.periodKey].compRev = m.billableHours * 571000;
-                allMonths[m.periodKey].compHpp = m.totalHpp;
+                allMonths[m.periodKey].compRev = m.actualHours * 571000; // PENDAPATAN MURNI AKTUAL
+                allMonths[m.periodKey].compHpp = m.totalHpp;             // HPP SESUAI ATURAN TAGIHAN
             });
 
             dtLogs.forEach(l => {
@@ -2367,13 +2366,13 @@
                 if (dat.excaAct > 0) {
                     const margin = dat.excaRev - dat.excaHpp;
                     
-                    let excaVolText = `${dat.excaH.toFixed(1)} Jam`;
+                    let excaVolText = `${dat.excaAct.toFixed(1)} Jam`;
                     if (dat.excaH !== dat.excaAct) {
-                        excaVolText += `<br><span class="text-[10px] text-slate-400 font-normal">Aktual: ${dat.excaAct.toFixed(1)} Jam</span>`;
+                        excaVolText = `Pendapatan: ${dat.excaAct.toFixed(1)} Jam<br><span class="text-[10px] text-amber-400 font-normal">HPP Vendor: ${dat.excaH.toFixed(1)} Jam</span>`;
                     }
 
                     tbody.innerHTML += `
-                        <tr class="border-b border-slate-700/40">
+                        <tr class="border-b border-slate-700/40 hover:bg-slate-800/50 transition">
                             <td class="py-3 px-4 font-bold text-cyan-400">${dat.name}</td>
                             <td class="py-3 px-4 font-semibold text-white">Excavator (Rp 669.500/Jam)</td>
                             <td class="py-3 px-4 text-center font-mono">${excaVolText}</td>
@@ -2387,13 +2386,13 @@
                 if (dat.compAct > 0) {
                     const margin = dat.compRev - dat.compHpp;
 
-                    let compVolText = `${dat.compH.toFixed(1)} Jam`;
+                    let compVolText = `${dat.compAct.toFixed(1)} Jam`;
                     if (dat.compH !== dat.compAct) {
-                        compVolText += `<br><span class="text-[10px] text-slate-400 font-normal">Aktual: ${dat.compAct.toFixed(1)} Jam</span>`;
+                        compVolText = `Pendapatan: ${dat.compAct.toFixed(1)} Jam<br><span class="text-[10px] text-amber-400 font-normal">HPP Vendor: ${dat.compH.toFixed(1)} Jam</span>`;
                     }
 
                     tbody.innerHTML += `
-                        <tr class="border-b border-slate-700/40">
+                        <tr class="border-b border-slate-700/40 hover:bg-slate-800/50 transition">
                             <td class="py-3 px-4 font-bold text-cyan-400">${dat.name}</td>
                             <td class="py-3 px-4 font-semibold text-white">Compact Roller (Rp 571.000/Jam)</td>
                             <td class="py-3 px-4 text-center font-mono">${compVolText}</td>
@@ -2408,7 +2407,7 @@
                     const dtHours = dat.dtRit / 8;
                     const margin = dat.dtRev - dat.dtHpp;
                     tbody.innerHTML += `
-                        <tr class="border-b border-slate-700/40">
+                        <tr class="border-b border-slate-700/40 hover:bg-slate-800/50 transition">
                             <td class="py-3 px-4 font-bold text-cyan-400">${dat.name}</td>
                             <td class="py-3 px-4 font-semibold text-white">Dump Truck (Rp 566.300/Jam)</td>
                             <td class="py-3 px-4 text-center font-mono">${dat.dtRit} Rit (${dtHours.toFixed(2)} Jam)</td>
