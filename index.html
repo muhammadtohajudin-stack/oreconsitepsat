@@ -169,7 +169,7 @@
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Total HPP Alat Berat</p>
                         <h3 id="messKpiHpp" class="text-2xl font-bold text-amber-400 mt-2">Rp 0</h3>
-                        <p class="text-xs text-slate-400 mt-1">Min 200 Jam (26 Aug-26 Oct) + Aktual</p>
+                        <p class="text-[10px] text-slate-400 mt-1">Min 200 Jam HANYA (Sep & Okt) + Aktual</p>
                     </div>
                     <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm print-card">
                         <p class="text-xs text-slate-400 font-semibold uppercase">Total Proyeksi Margin (Net)</p>
@@ -184,7 +184,7 @@
                         <h2 class="text-base font-semibold text-white mb-1 flex items-center gap-2">
                             <i class="fa-solid fa-scale-balanced text-cyan-400"></i> Analisa Finansial Bulanan: Pendapatan Kontrak vs HPP Alat Berat
                         </h2>
-                        <p class="text-xs text-slate-400">Rekapitulasi perbandingan pendapatan dan HPP alat berat dikelompokkan secara bulanan.</p>
+                        <p class="text-xs text-slate-400">Rekapitulasi perbandingan pendapatan dan HPP alat berat dikelompokkan secara bulanan (Periode 26 s.d. 25).</p>
                     </div>
                     <div class="overflow-x-auto rounded-xl border border-slate-700/50">
                         <table class="w-full text-left border-collapse text-xs sm:text-sm">
@@ -785,6 +785,32 @@
         let costControlChartInstance = null;
         let spiCpiChartInstance = null;
 
+        // --- FUNGSI STANDARISASI PERIODE CUT-OFF BULANAN (TGL 26 S.D. 25) ---
+        function getPeriodeInfo(dateStr) {
+            if (!dateStr) return { key: '2026-00', name: 'Periode Lainnya' };
+            const d = new Date(dateStr);
+            if (isNaN(d)) return { key: '2026-00', name: 'Periode Lainnya' };
+            
+            let year = d.getFullYear();
+            let month = d.getMonth() + 1; // 1-12
+            
+            // Aturan Cut-off: Tanggal >= 26 masuk ke periode bulan berikutnya
+            if (d.getDate() >= 26) {
+                month += 1;
+                if (month > 12) {
+                    month = 1;
+                    year += 1;
+                }
+            }
+            
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            
+            return {
+                key: `${year}-${String(month).padStart(2, '0')}`,
+                name: `${months[month - 1]} ${year}`
+            };
+        }
+
         function getCloudKey(type) {
             return `${currentProjectId}_${type}`;
         }
@@ -868,7 +894,15 @@
             if (projId === 'mess') {
                 navPoText.innerText = "Alat Berat & Ritase DT";
                 navPoIcon.className = "fa-solid fa-truck-monster w-4 text-center";
-                navPoPayment.classList.add('hidden'); // Sembunyikan Kontrol Pembayaran & Hutang PO untuk Mess
+                
+                // Menghilangkan menu secara total
+                navPoPayment.classList.add('hidden');
+                
+                // Melemparkan user kembali ke dashboard jika saat ini sedang membuka menu PO di mess
+                if (!document.getElementById('tab-po-payment').classList.contains('hidden')) {
+                    switchTab('dashboard');
+                }
+
                 kpiSporthall.classList.add('hidden');
                 kpiMess.classList.remove('hidden');
                 messComparison.classList.remove('hidden');
@@ -880,7 +914,8 @@
             } else {
                 navPoText.innerText = "Manajemen Pre-Order (PO)";
                 navPoIcon.className = "fa-solid fa-file-invoice-dollar w-4 text-center";
-                navPoPayment.classList.remove('hidden'); // Tampilkan Kontrol Pembayaran & Hutang PO khusus Sporthall
+                navPoPayment.classList.remove('hidden'); 
+                
                 kpiSporthall.classList.remove('hidden');
                 kpiMess.classList.add('hidden');
                 messComparison.classList.add('hidden');
@@ -1958,37 +1993,31 @@
             }
         }
 
-        // Helper untuk mendapatkan format Nama Bulan (misal: "Agustus 2026")
-        function getMonthName(dateStr) {
-            if (!dateStr) return 'Lainnya';
-            const d = new Date(dateStr);
-            if (isNaN(d)) return 'Lainnya';
-            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            return `${months[d.getMonth()]} ${d.getFullYear()}`;
-        }
-
+        // ================= RENDERING TABEL LOG ALAT BERAT =================
         function renderExcaTable() {
             const tbody = document.getElementById('excaTableBody');
             tbody.innerHTML = '';
             let sumH = 0, sumF = 0, sumC = 0;
 
-            // Kelompokkan berdasarkan bulan
             const grouped = {};
             excaLogs.forEach(l => {
-                const mKey = getMonthName(l.date);
-                if (!grouped[mKey]) grouped[mKey] = [];
-                grouped[mKey].push(l);
+                const pInfo = getPeriodeInfo(l.date);
+                if (!grouped[pInfo.key]) grouped[pInfo.key] = { name: pInfo.name, logs: [] };
+                grouped[pInfo.key].logs.push(l);
             });
 
-            const sortedMonths = Object.keys(grouped).sort((a, b) => new Date(grouped[a][0].date) - new Date(grouped[b][0].date));
+            const sortedKeys = Object.keys(grouped).sort();
 
-            if (sortedMonths.length === 0) {
+            if (sortedKeys.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="9" class="py-6 text-center text-slate-500 italic">Belum ada record operasional excavator.</td></tr>`;
             }
 
-            sortedMonths.forEach(month => {
+            sortedKeys.forEach(key => {
+                const monthName = grouped[key].name;
+                const logs = grouped[key].logs;
+                
                 let mHours = 0, mFuel = 0, mCost = 0;
-                grouped[month].forEach(l => {
+                logs.forEach(l => {
                     mHours += Number(l.totalHours) || 0;
                     mFuel += Number(l.fuelVol) || 0;
                     mCost += Number(l.totalCost) || 0;
@@ -1996,10 +2025,9 @@
                 sumH += mHours; sumF += mFuel; sumC += mCost;
                 const mCons = mHours > 0 ? (mFuel / mHours) : 0;
 
-                // Baris Header Group Bulan
                 tbody.innerHTML += `
                     <tr class="bg-slate-900/90 border-t border-b border-slate-700">
-                        <td colspan="4" class="py-2.5 px-4 font-bold text-cyan-400 uppercase text-xs">📅 Periode: ${month}</td>
+                        <td colspan="4" class="py-2.5 px-4 font-bold text-cyan-400 uppercase text-xs">📅 Periode: ${monthName}</td>
                         <td class="py-2.5 px-4 text-center font-bold font-mono text-cyan-300 text-xs">${mHours.toFixed(1)} Jam</td>
                         <td class="py-2.5 px-4 text-center font-bold font-mono text-amber-300 text-xs">${mFuel.toFixed(1)} L</td>
                         <td class="py-2.5 px-4 text-center font-mono text-purple-300 text-xs">${mCons.toFixed(2)} L/J</td>
@@ -2008,8 +2036,7 @@
                     </tr>
                 `;
 
-                // Baris Data Detail Harian
-                grouped[month].forEach(l => {
+                logs.forEach(l => {
                     const hours = Number(l.totalHours) || 0;
                     const fuel = Number(l.fuelVol) || 0;
                     const cost = Number(l.totalCost) || 0;
@@ -2017,7 +2044,7 @@
 
                     tbody.innerHTML += `
                         <tr class="border-b border-slate-700/40 hover:bg-slate-700/30">
-                            <td class="py-2 px-4 text-slate-500 text-[10px]">↳ ${month}</td>
+                            <td class="py-2 px-4 text-slate-500 text-[10px]">↳ ${monthName}</td>
                             <td class="py-2 px-4 font-mono text-slate-300">${l.date}</td>
                             <td class="py-2 px-4 text-center font-mono">${Number(l.hmAwal).toFixed(1)}</td>
                             <td class="py-2 px-4 text-center font-mono">${Number(l.hmAkhir).toFixed(1)}</td>
@@ -2044,20 +2071,23 @@
 
             const grouped = {};
             compactLogs.forEach(l => {
-                const mKey = getMonthName(l.date);
-                if (!grouped[mKey]) grouped[mKey] = [];
-                grouped[mKey].push(l);
+                const pInfo = getPeriodeInfo(l.date);
+                if (!grouped[pInfo.key]) grouped[pInfo.key] = { name: pInfo.name, logs: [] };
+                grouped[pInfo.key].logs.push(l);
             });
 
-            const sortedMonths = Object.keys(grouped).sort((a, b) => new Date(grouped[a][0].date) - new Date(grouped[b][0].date));
+            const sortedKeys = Object.keys(grouped).sort();
 
-            if (sortedMonths.length === 0) {
+            if (sortedKeys.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="9" class="py-6 text-center text-slate-500 italic">Belum ada record operasional compact roller.</td></tr>`;
             }
 
-            sortedMonths.forEach(month => {
+            sortedKeys.forEach(key => {
+                const monthName = grouped[key].name;
+                const logs = grouped[key].logs;
+                
                 let mHours = 0, mFuel = 0, mCost = 0;
-                grouped[month].forEach(l => {
+                logs.forEach(l => {
                     mHours += Number(l.totalHours) || 0;
                     mFuel += Number(l.fuelVol) || 0;
                     mCost += Number(l.totalCost) || 0;
@@ -2067,7 +2097,7 @@
 
                 tbody.innerHTML += `
                     <tr class="bg-slate-900/90 border-t border-b border-slate-700">
-                        <td colspan="4" class="py-2.5 px-4 font-bold text-cyan-400 uppercase text-xs">📅 Periode: ${month}</td>
+                        <td colspan="4" class="py-2.5 px-4 font-bold text-cyan-400 uppercase text-xs">📅 Periode: ${monthName}</td>
                         <td class="py-2.5 px-4 text-center font-bold font-mono text-cyan-300 text-xs">${mHours.toFixed(1)} Jam</td>
                         <td class="py-2.5 px-4 text-center font-bold font-mono text-amber-300 text-xs">${mFuel.toFixed(1)} L</td>
                         <td class="py-2.5 px-4 text-center font-mono text-purple-300 text-xs">${mCons.toFixed(2)} L/J</td>
@@ -2076,7 +2106,7 @@
                     </tr>
                 `;
 
-                grouped[month].forEach(l => {
+                logs.forEach(l => {
                     const hours = Number(l.totalHours) || 0;
                     const fuel = Number(l.fuelVol) || 0;
                     const cost = Number(l.totalCost) || 0;
@@ -2084,7 +2114,7 @@
 
                     tbody.innerHTML += `
                         <tr class="border-b border-slate-700/40 hover:bg-slate-700/30">
-                            <td class="py-2 px-4 text-slate-500 text-[10px]">↳ ${month}</td>
+                            <td class="py-2 px-4 text-slate-500 text-[10px]">↳ ${monthName}</td>
                             <td class="py-2 px-4 font-mono text-slate-300">${l.date}</td>
                             <td class="py-2 px-4 text-center font-mono">${Number(l.hmAwal).toFixed(1)}</td>
                             <td class="py-2 px-4 text-center font-mono">${Number(l.hmAkhir).toFixed(1)}</td>
@@ -2111,23 +2141,27 @@
 
             const grouped = {};
             dtLogs.forEach(l => {
-                const mKey = getMonthName(l.date);
-                if (!grouped[mKey]) grouped[mKey] = [];
-                grouped[mKey].push(l);
+                const pInfo = getPeriodeInfo(l.date);
+                if (!grouped[pInfo.key]) grouped[pInfo.key] = { name: pInfo.name, logs: [] };
+                grouped[pInfo.key].logs.push(l);
             });
 
-            const sortedMonths = Object.keys(grouped).sort((a, b) => new Date(grouped[a][0].date) - new Date(grouped[b][0].date));
+            const sortedKeys = Object.keys(grouped).sort();
 
-            if (sortedMonths.length === 0) {
+            if (sortedKeys.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 italic">Belum ada record ritase dump truck.</td></tr>`;
             }
 
-            sortedMonths.forEach(month => {
+            sortedKeys.forEach(key => {
+                const monthName = grouped[key].name;
+                const logs = grouped[key].logs;
+                
                 let mRit = 0, mCost = 0;
-                grouped[month].forEach(l => {
+                logs.forEach(l => {
                     mRit += Number(l.ritase) || 0;
                     mCost += Number(l.totalCost) || 0;
                 });
+                
                 sumR += mRit;
                 const mHours = mRit / 8;
                 sumH += mHours;
@@ -2135,7 +2169,7 @@
 
                 tbody.innerHTML += `
                     <tr class="bg-slate-900/90 border-t border-b border-slate-700">
-                        <td colspan="2" class="py-2.5 px-4 font-bold text-cyan-400 uppercase text-xs">📅 Periode: ${month}</td>
+                        <td colspan="2" class="py-2.5 px-4 font-bold text-cyan-400 uppercase text-xs">📅 Periode: ${monthName}</td>
                         <td class="py-2.5 px-4 text-center font-bold font-mono text-cyan-300 text-xs">${mRit} Rit</td>
                         <td class="py-2.5 px-4 text-center font-bold font-mono text-slate-200 text-xs">${mHours.toFixed(2)} Jam</td>
                         <td class="py-2.5 px-4 text-right font-bold font-mono text-amber-400 text-xs">${formatIDR(mCost)}</td>
@@ -2143,13 +2177,13 @@
                     </tr>
                 `;
 
-                grouped[month].forEach(l => {
+                logs.forEach(l => {
                     const rit = Number(l.ritase) || 0;
                     const hours = rit / 8;
                     
                     tbody.innerHTML += `
                         <tr class="border-b border-slate-700/40 hover:bg-slate-700/30">
-                            <td class="py-2 px-4 text-slate-500 text-[10px]">↳ ${month}</td>
+                            <td class="py-2 px-4 text-slate-500 text-[10px]">↳ ${monthName}</td>
                             <td class="py-2 px-4 font-mono text-slate-300">${l.date}</td>
                             <td class="py-2 px-4 text-center font-bold text-cyan-400 font-mono">${rit} Rit</td>
                             <td class="py-2 px-4 text-center font-mono text-slate-300">${hours.toFixed(2)} Jam</td>
@@ -2172,28 +2206,19 @@
             }
         }
 
-        // FUNGSI KALKULASI HPP BULANAN DENGAN ATURAN MINIMUM 200 JAM KHUSUS 26 AGU - 26 OKT 2026
+        // ================= FUNGSI KALKULASI HPP BULANAN MESS (Minimum 200 Jam Terkunci September & Oktober) =================
         function calculateMonthlyHppDetails(logs, ratePerHour) {
             const monthlyData = {};
-            const startDateLimit = new Date('2026-08-26');
-            const endDateLimit = new Date('2026-10-26');
-
+            
             logs.forEach(l => {
                 if (!l.date) return;
-                const d = new Date(l.date);
-                let year = d.getFullYear();
-                let month = d.getMonth() + 1;
-                if (d.getDate() >= 26) {
-                    month += 1;
-                    if (month > 12) { month = 1; year += 1; }
-                }
-                const periodKey = `${year}-${String(month).padStart(2, '0')}`;
-                const mName = getMonthName(l.date);
+                const pInfo = getPeriodeInfo(l.date);
+                const periodKey = pInfo.key;
 
                 if (!monthlyData[periodKey]) {
                     monthlyData[periodKey] = {
-                        periodKey,
-                        monthName: mName,
+                        periodKey: periodKey,
+                        monthName: pInfo.name,
                         hours: 0,
                         fuelCost: 0
                     };
@@ -2205,14 +2230,14 @@
             const result = [];
             Object.keys(monthlyData).sort().forEach(key => {
                 const item = monthlyData[key];
-                const [pYear, pMonth] = key.split('-').map(Number);
-                const periodStart = new Date(pYear, pMonth - 2, 26);
-                const periodEnd = new Date(pYear, pMonth - 1, 26);
-
-                const isInSpecialRange = (periodStart <= endDateLimit && periodEnd >= startDateLimit);
                 let billableHours = item.hours;
-                if (isInSpecialRange) {
-                    billableHours = item.hours < 200 ? 200 : item.hours;
+
+                // Terapkan aturan minimum 200 jam hanya untuk Periode September 2026 (2026-09) dan Oktober 2026 (2026-10)
+                // (Ini sudah mengcover persis rentang cut-off: 26 Agu s.d 25 Okt 2026)
+                if (key === '2026-09' || key === '2026-10') {
+                    if (item.hours < 200) {
+                        billableHours = 200;
+                    }
                 }
 
                 const hppAlat = billableHours * ratePerHour;
@@ -2298,6 +2323,7 @@
 
             // Gabungkan semua bulan unik dari exca, compact, dan dt
             const allMonths = {};
+            
             excaMonthlyHpp.forEach(m => {
                 if (!allMonths[m.periodKey]) allMonths[m.periodKey] = { name: m.monthName, excaH: 0, excaRev: 0, excaHpp: 0, compH: 0, compRev: 0, compHpp: 0, dtRit: 0, dtRev: 0, dtHpp: 0 };
                 allMonths[m.periodKey].excaH = m.hours;
@@ -2313,11 +2339,13 @@
             });
 
             dtLogs.forEach(l => {
-                const mKey = getMonthName(l.date);
-                const pKey = l.date ? l.date.slice(0, 7) : '2026-00';
-                if (!allMonths[pKey]) allMonths[pKey] = { name: mKey, excaH: 0, excaRev: 0, excaHpp: 0, compH: 0, compRev: 0, compHpp: 0, dtRit: 0, dtRev: 0, dtHpp: 0 };
-                allMonths[pKey].dtRit += Number(l.ritase) || 0;
+                const pInfo = getPeriodeInfo(l.date);
+                const pKey = pInfo.key;
+                
+                if (!allMonths[pKey]) allMonths[pKey] = { name: pInfo.name, excaH: 0, excaRev: 0, excaHpp: 0, compH: 0, compRev: 0, compHpp: 0, dtRit: 0, dtRev: 0, dtHpp: 0 };
+                
                 const r = Number(l.ritase) || 0;
+                allMonths[pKey].dtRit += r;
                 allMonths[pKey].dtRev += (r / 8) * 566300;
                 allMonths[pKey].dtHpp += Number(l.totalCost) || 0;
             });
