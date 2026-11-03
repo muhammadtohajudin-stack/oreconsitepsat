@@ -961,6 +961,28 @@
             compactLogs = await fetchCloudData('compact');
             dtLogs = await fetchCloudData('dt');
             
+            // PERBAIKAN: Memastikan struktur item, total, dan riwayat PO lama tetap aman terbaca
+            purchaseOrders = purchaseOrders.map(p => {
+                let items = p.items || [];
+                // Fallback pengaman jika data PO lama tersimpan sebagai string/array tunggal
+                if (typeof items === 'string') {
+                    try { items = JSON.parse(items); } catch(e) { items = []; }
+                }
+                const calculatedTotal = items.reduce((acc, cur) => acc + (Number(cur.total) || 0), 0);
+                const poTotal = Number(p.total) > 0 ? Number(p.total) : calculatedTotal;
+                const paid = Number(p.paidAmount) || 0;
+                
+                return {
+                    ...p,
+                    items: items,
+                    total: poTotal,
+                    paidAmount: paid,
+                    remainingDebt: Number(p.remainingDebt) || (poTotal - paid),
+                    paymentStatus: p.paymentStatus || (paid >= poTotal && poTotal > 0 ? 'LUNAS' : (paid > 0 ? 'DP' : 'BELUM_BAYAR')),
+                    invoices: Array.isArray(p.invoices) ? p.invoices : []
+                };
+            });
+
             initSpiCpiWeeks(await fetchCloudData('spicpi_weeks'));
 
             transactions.forEach(t => {
@@ -978,7 +1000,7 @@
                 renderPaymentControlTable();
                 renderPaymentReminder();
             }
-            showToast('Data telah diperbarui!', 'success');
+            showToast('Data PO & transaksi berhasil dimuat!', 'success');
         }
 
         function initSpiCpiWeeks(cloudData) {
@@ -1511,18 +1533,18 @@
             tr.id = rowId;
             tr.className = "border-b border-slate-700/50 hover:bg-slate-700/20";
             tr.innerHTML = `
-                <td class="py-2.5 px-3"><input type="text" class="po-item-name w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white" placeholder="Nama Barang" value="${itemData ? itemData.name : ''}" required></td>
-                <td class="py-2.5 px-3"><input type="text" class="po-item-spec w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white" placeholder="Spesifikasi" value="${itemData ? itemData.spec : ''}"></td>
-                <td class="py-2.5 px-3"><input type="text" class="po-item-qty w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white" placeholder="10 Unit" value="${itemData ? itemData.qty : ''}"></td>
-                <td class="py-2.5 px-3"><input type="number" class="po-item-total w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white text-right font-mono" placeholder="5000000" oninput="calculatePoTotals()" value="${itemData ? itemData.total : ''}" required></td>
+                <td class="py-2.5 px-3"><input type="text" class="po-item-name w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white" placeholder="Nama Barang" value="${itemData ? (itemData.name || itemData.itemName || '') : ''}" required></td>
+                <td class="py-2.5 px-3"><input type="text" class="po-item-spec w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white" placeholder="Spesifikasi" value="${itemData ? (itemData.spec || '') : ''}"></td>
+                <td class="py-2.5 px-3"><input type="text" class="po-item-qty w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white" placeholder="10 Unit" value="${itemData ? (itemData.qty || '') : ''}"></td>
+                <td class="py-2.5 px-3"><input type="number" class="po-item-total w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white text-right font-mono" placeholder="5000000" oninput="calculatePoTotals()" value="${itemData ? (itemData.total || itemData.price || 0) : ''}" required></td>
                 <td class="py-2.5 px-3">
                     <select class="po-item-status w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white">
-                        <option value="BELUM_PROSES" ${itemData && itemData.status==='BELUM_PROSES'?'selected':''}>🟡 Belum Diproses</option>
-                        <option value="DALAM_PROSES" ${itemData && itemData.status==='DALAM_PROSES'?'selected':''}>🔵 Dalam Proses</option>
-                        <option value="SELESAI" ${itemData && itemData.status==='SELESAI'?'selected':''}>🟢 Selesai</option>
+                        <option value="BELUM_PROSES" ${itemData && (itemData.status==='BELUM_PROSES'||itemData.itemStatus==='BELUM_PROSES')?'selected':''}>🟡 Belum Diproses</option>
+                        <option value="DALAM_PROSES" ${itemData && (itemData.status==='DALAM_PROSES'||itemData.itemStatus==='DALAM_PROSES')?'selected':''}>🔵 Dalam Proses</option>
+                        <option value="SELESAI" ${itemData && (itemData.status==='SELESAI'||itemData.itemStatus==='SELESAI')?'selected':''}>🟢 Selesai</option>
                     </select>
                 </td>
-                <td class="py-2.5 px-3"><input type="text" class="po-item-desc w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white" placeholder="Catatan" value="${itemData ? itemData.desc : ''}"></td>
+                <td class="py-2.5 px-3"><input type="text" class="po-item-desc w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white" placeholder="Catatan" value="${itemData ? (itemData.desc || '') : ''}"></td>
                 <td class="py-2.5 px-3 text-center"><button type="button" onclick="document.getElementById('${rowId}').remove(); calculatePoTotals();" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash"></i></button></td>
             `;
             tbody.appendChild(tr);
@@ -1549,8 +1571,13 @@
             document.getElementById('poDate').value = po.date;
             
             document.getElementById('poItemsContainer').innerHTML = '';
-            if (po.items && po.items.length > 0) {
-                po.items.forEach(it => addPoItemRow(it));
+            let itemsToEdit = po.items || [];
+            if (typeof itemsToEdit === 'string') {
+                try { itemsToEdit = JSON.parse(itemsToEdit); } catch(e) { itemsToEdit = []; }
+            }
+
+            if (itemsToEdit.length > 0) {
+                itemsToEdit.forEach(it => addPoItemRow(it));
             } else {
                 addPoItemRow();
             }
@@ -1676,12 +1703,17 @@
             }
 
             filtered.forEach(po => {
-                let itemsHtml = po.items.map((it, idx) => `
+                let itemsList = po.items || [];
+                if (typeof itemsList === 'string') {
+                    try { itemsList = JSON.parse(itemsList); } catch(e) { itemsList = []; }
+                }
+
+                let itemsHtml = itemsList.map((it, idx) => `
                     <tr class="border-b border-slate-800/60 text-slate-300">
-                        <td class="py-2 px-3">${idx+1}. ${it.name} <span class="text-slate-500">(${it.spec || '-'})</span></td>
+                        <td class="py-2 px-3">${idx+1}. ${it.name || it.itemName || '-'} <span class="text-slate-500">(${it.spec || '-'})</span></td>
                         <td class="py-2 px-3">${it.qty || '-'}</td>
-                        <td class="py-2 px-3 text-right font-mono text-cyan-300">${formatIDR(it.total)}</td>
-                        <td class="py-2 px-3 text-center">${getStatusBadge(it.status)}</td>
+                        <td class="py-2 px-3 text-right font-mono text-cyan-300">${formatIDR(it.total || it.price || 0)}</td>
+                        <td class="py-2 px-3 text-center">${getStatusBadge(it.status || it.itemStatus || 'BELUM_PROSES')}</td>
                         <td class="py-2 px-3 text-slate-400">${it.desc || '-'}</td>
                     </tr>
                 `).join('');
@@ -1692,7 +1724,7 @@
                         <td class="py-3.5 px-4 font-bold text-cyan-400 font-mono">${po.poNumber}</td>
                         <td class="py-3.5 px-4 font-semibold text-white">${po.vendor}</td>
                         <td class="py-3.5 px-4 font-mono text-slate-300 text-xs">${po.date}</td>
-                        <td class="py-3.5 px-4 text-center font-bold">${po.items.length} Item</td>
+                        <td class="py-3.5 px-4 text-center font-bold">${itemsList.length} Item</td>
                         <td class="py-3.5 px-4 text-center">${getStatusBadge(po.status)}</td>
                         <td class="py-3.5 px-4 text-right font-mono font-bold text-emerald-400">${formatIDR(po.total)}</td>
                         <td class="py-3.5 px-4 text-center no-print" onclick="event.stopPropagation()">
@@ -2098,11 +2130,11 @@
             let totalDtVolume = 0;
             dtLogs.forEach(l => totalDtVolume += l.totalVol);
 
-            const fuelCost = totalFuelLiters * 15000; // Asumsi harga solar Rp 15.000/L
-            const vendorCost = Math.max(200, totalExcaHours) * 350000 + Math.max(200, totalCompactHours) * 300000; // Contoh HPP Vendor
+            const fuelCost = totalFuelLiters * 15000;
+            const vendorCost = Math.max(200, totalExcaHours) * 350000 + Math.max(200, totalCompactHours) * 300000;
             const dtHppTotal = dtLogs.reduce((acc, cur) => acc + cur.totalHpp, 0);
             const totalHpp = fuelCost + vendorCost + dtHppTotal;
-            const totalRevenue = totalHours * 500000 + totalDtVolume * 65000; // Contoh tarif pendapatan
+            const totalRevenue = totalHours * 500000 + totalDtVolume * 65000;
             const netMargin = totalRevenue - totalHpp;
             const marginPct = totalRevenue > 0 ? (netMargin / totalRevenue) * 100 : 0;
 
