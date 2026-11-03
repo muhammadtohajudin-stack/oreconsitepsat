@@ -668,6 +668,36 @@
                     </div>
                 </div>
 
+                <!-- CARD REMINDER: 10 Tagihan / Jatuh Tempo Terdekat -->
+                <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 print-card">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div>
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-bell text-amber-400 animate-pulse"></i> Reminder: 10 Tagihan & Jatuh Tempo Terdekat
+                            </h3>
+                            <p class="text-xs text-slate-400">Daftar PO dan tagihan yang memerlukan perhatian pembayaran berdasarkan tanggal jatuh tempo terdekat.</p>
+                        </div>
+                        <span id="reminderCountBadge" class="text-xs bg-amber-500/15 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full font-semibold">0 Tagihan Pending</span>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-xl border border-slate-700/50">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                            <thead>
+                                <tr class="bg-slate-900 border-b border-slate-700 text-slate-400 font-semibold text-[11px]">
+                                    <th class="py-3 px-4">Nomor PO</th>
+                                    <th class="py-3 px-4">Vendor / Supplier</th>
+                                    <th class="py-3 px-4">Skema Pembayaran</th>
+                                    <th class="py-3 px-4 text-center">Tgl Invoice</th>
+                                    <th class="py-3 px-4 text-center">Jatuh Tempo</th>
+                                    <th class="py-3 px-4 text-right">Sisa Hutang / Nominal</th>
+                                    <th class="py-3 px-4 text-center no-print">Update Status Bayar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reminderTableBody" class="divide-y divide-slate-700/50"></tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- Tabel Kontrol & Pelunasan Pembayaran PO -->
                 <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 print-card">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -695,7 +725,7 @@
                                 <tr class="bg-slate-900 border-b border-slate-700 text-slate-400 font-semibold text-[11px]">
                                     <th class="py-3 px-4">Nomor PO</th>
                                     <th class="py-3 px-4">Nama Vendor / Supplier</th>
-                                    <th class="py-3 px-4">Tanggal PO</th>
+                                    <th class="py-3 px-4">Skema / Info</th>
                                     <th class="py-3 px-4 text-center">Status Pembayaran</th>
                                     <th class="py-3 px-4 text-right">Total Nilai PO</th>
                                     <th class="py-3 px-4 text-right">Telah Dibayar (Kas Out)</th>
@@ -712,10 +742,10 @@
 
         <!-- MODAL UPDATE PEMBAYARAN PO -->
         <div id="paymentModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-            <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
                     <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-money-bill-wave text-emerald-400"></i> Update Pembayaran PO
+                        <i class="fa-solid fa-money-bill-wave text-emerald-400"></i> Update Skema & Pembayaran PO
                     </h3>
                     <button onclick="closePaymentModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
@@ -728,19 +758,54 @@
                         <p class="text-xs text-slate-400">Total PO: <strong id="modalPoTotal" class="text-emerald-400"></strong></p>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Status Pembayaran Baru</label>
-                        <select id="modalPayStatus" onchange="handleModalPayStatusChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 cursor-pointer font-semibold">
-                            <option value="LUNAS">🟢 Lunas (Memotong Kas 100%)</option>
-                            <option value="DP">🔵 DP / Uang Muka (Memotong Kas Sebagian)</option>
-                            <option value="TEMPO">🟡 Tempo (Belum Potong Kas)</option>
-                            <option value="BELUM_BAYAR">🔴 Belum Dibayar (Belum Potong Kas)</option>
-                        </select>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Skema Pembayaran</label>
+                            <select id="modalPaymentScheme" onchange="handleModalSchemeChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 cursor-pointer font-semibold">
+                                <option value="lunas">🟢 Langsung Lunas / Cash</option>
+                                <option value="dp">🔵 DP (Uang Muka)</option>
+                                <option value="termin">📑 Termin Pembayaran</option>
+                                <option value="tempo">🟡 Tempo (Kredit)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Status Pembayaran</label>
+                            <select id="modalPayStatus" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 cursor-pointer font-semibold">
+                                <option value="LUNAS">🟢 Lunas (Memotong Kas 100%)</option>
+                                <option value="DP">🔵 DP (Bayar Sebagian)</option>
+                                <option value="TEMPO">🟡 Tempo (Belum Potong Kas)</option>
+                                <option value="BELUM_BAYAR">🔴 Belum Dibayar</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div id="modalDpAmountWrapper">
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Nominal Pembayaran / DP (IDR)</label>
-                        <input type="number" id="modalPaidAmount" placeholder="5000000" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-cyan-200 font-mono focus:outline-none focus:border-cyan-500">
+                    <!-- Input Khusus Termin -->
+                    <div id="modalTerminWrapper" class="hidden">
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Termin Ke-</label>
+                        <input type="text" id="modalTerminNumber" placeholder="Contoh: Termin 1 dari 3" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+
+                    <!-- Input Khusus Tempo -->
+                    <div id="modalTempoWrapper" class="grid grid-cols-1 sm:grid-cols-2 gap-3 hidden">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Jangka Waktu Tempo (Hari)</label>
+                            <input type="number" id="modalTempoDays" value="30" oninput="calculateModalDueDate()" placeholder="30" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Tanggal Jatuh Tempo (Otomatis)</label>
+                            <input type="date" id="modalDueDate" readonly class="w-full bg-slate-900/60 border border-slate-700 rounded-xl p-2.5 text-xs text-amber-400 font-mono cursor-not-allowed">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Tanggal Invoice Diajukan</label>
+                            <input type="date" id="modalInvoiceDate" oninput="calculateModalDueDate()" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer focus:outline-none focus:border-cyan-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Nominal Pembayaran / Nilai (IDR)</label>
+                            <input type="number" id="modalPaidAmount" placeholder="5000000" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-cyan-200 font-mono focus:outline-none focus:border-cyan-500">
+                        </div>
                     </div>
 
                     <div class="pt-2 border-t border-slate-700 flex justify-end gap-2">
@@ -985,7 +1050,7 @@
                 const existing = cloudData.find(w => Number(w.week) === i);
                 if (existing) {
                     spiCpiWeeks.push({
-                        id: existing.id || `week_${i}`, // ID unik mingguan
+                        id: existing.id || `week_${i}`,
                         week: i,
                         startDate: existing.startDate || '',
                         endDate: existing.endDate || '',
@@ -994,7 +1059,7 @@
                     });
                 } else {
                     spiCpiWeeks.push({
-                        id: `week_${i}`, // ID unik untuk baris kosong
+                        id: `week_${i}`,
                         week: i,
                         startDate: '',
                         endDate: '',
@@ -1424,6 +1489,11 @@
                     date: selectedDate,
                     items: itemsList,
                     total: totalAmount,
+                    paymentScheme: 'tempo',
+                    terminNumber: '',
+                    tempoDays: 30,
+                    invoiceDate: selectedDate,
+                    dueDate: selectedDate,
                     paymentStatus: 'TEMPO',
                     paidAmount: 0,
                     remainingDebt: totalAmount
@@ -1471,9 +1541,22 @@
                 case 'DP':
                     return `<span class="bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔵 Bayar DP</span>`;
                 case 'TEMPO':
-                    return `<span class="bg-amber-500/15 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟡 Tempo</span>`;
+                    return `<span class="bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟡 Tempo</span>`;
                 default:
                     return `<span class="bg-red-500/15 text-red-400 border border-red-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔴 Belum Bayar</span>`;
+            }
+        }
+
+        function getSchemeBadge(po) {
+            const scheme = po.paymentScheme || 'tempo';
+            if (scheme === 'termin') {
+                return `<span class="text-cyan-300 font-medium">📑 ${po.terminNumber || 'Termin'}</span><br><span class="text-[10px] text-slate-400">Inv: ${po.invoiceDate || '-'}</span>`;
+            } else if (scheme === 'dp') {
+                return `<span class="text-cyan-400 font-medium">🔵 DP (Uang Muka)</span><br><span class="text-[10px] text-slate-400">Inv: ${po.invoiceDate || '-'}</span>`;
+            } else if (scheme === 'tempo') {
+                return `<span class="text-amber-300 font-medium">🟡 Tempo (${po.tempoDays || 30}h)</span><br><span class="text-[10px] text-slate-400">Jt: ${po.dueDate || po.invoiceDate || '-'}</span>`;
+            } else {
+                return `<span class="text-emerald-300 font-medium">🟢 Lunas / Cash</span><br><span class="text-[10px] text-slate-400">Inv: ${po.invoiceDate || '-'}</span>`;
             }
         }
 
@@ -1638,7 +1721,7 @@
                     <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition">
                         <td class="py-3.5 px-4 font-bold text-cyan-400 font-mono">${po.poNumber || 'PO-' + po.id.toString().slice(-4)}</td>
                         <td class="py-3.5 px-4 font-semibold text-white">${po.vendor || '-'}</td>
-                        <td class="py-3.5 px-4 font-mono text-slate-300 text-xs">${po.date}</td>
+                        <td class="py-3.5 px-4">${getSchemeBadge(po)}</td>
                         <td class="py-3.5 px-4 text-center">${getPaymentStatusBadge(po.paymentStatus || 'BELUM_BAYAR')}</td>
                         <td class="py-3.5 px-4 text-right font-mono font-bold text-white">${formatIDR(tot)}</td>
                         <td class="py-3.5 px-4 text-right font-mono text-emerald-400 font-semibold">${formatIDR(paid)}</td>
@@ -1651,6 +1734,93 @@
                     </tr>
                 `;
             });
+
+            // Render Card Reminder 10 Teratas
+            renderReminderCardTop10();
+        }
+
+        function renderReminderCardTop10() {
+            const reminderTbody = document.getElementById('reminderTableBody');
+            const reminderBadge = document.getElementById('reminderCountBadge');
+            if (!reminderTbody) return;
+            reminderTbody.innerHTML = '';
+
+            // Filter PO yang belum lunas (sisa hutang > 0 atau status belum lunas)
+            let pendingList = purchaseOrders.filter(p => {
+                const debt = Number(p.remainingDebt) || (Number(p.total) - Number(p.paidAmount));
+                const status = p.paymentStatus || 'TEMPO';
+                return status !== 'LUNAS' && debt > 0;
+            });
+
+            // Urutkan berdasarkan tanggal terdekat (dueDate atau invoiceDate)
+            pendingList.sort((a, b) => {
+                const dateA = new Date(a.dueDate || a.invoiceDate || a.date || '2099-12-31');
+                const dateB = new Date(b.dueDate || b.invoiceDate || b.date || '2099-12-31');
+                return dateA - dateB;
+            });
+
+            // Ambil 10 teratas
+            const top10 = pendingList.slice(0, 10);
+            reminderBadge.innerText = `${top10.length} Tagihan Pending Terdekat`;
+
+            if (top10.length === 0) {
+                reminderTbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-500 italic">🎉 Luar biasa! Tidak ada tagihan atau jatuh tempo pembayaran PO yang tertunda saat ini.</td></tr>`;
+                return;
+            }
+
+            top10.forEach(po => {
+                const debt = Number(po.remainingDebt) || (Number(po.total) - Number(po.paidAmount));
+                const invDate = po.invoiceDate || po.date || '-';
+                const dueDate = po.dueDate || po.invoiceDate || po.date || '-';
+
+                reminderTbody.innerHTML += `
+                    <tr class="border-b border-slate-700/40 hover:bg-slate-700/30 transition">
+                        <td class="py-3 px-4 font-bold text-cyan-400 font-mono">${po.poNumber || 'PO-' + po.id.toString().slice(-4)}</td>
+                        <td class="py-3 px-4 font-semibold text-white">${po.vendor || '-'}</td>
+                        <td class="py-3 px-4">${getSchemeBadge(po)}</td>
+                        <td class="py-3 px-4 text-center font-mono text-slate-300 text-xs">${invDate}</td>
+                        <td class="py-3 px-4 text-center font-mono font-bold text-amber-400 text-xs">${dueDate}</td>
+                        <td class="py-3 px-4 text-right font-mono font-bold text-red-400">${formatIDR(debt)}</td>
+                        <td class="py-3 px-4 text-center no-print">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <button onclick="quickMarkPaid(${po.id})" class="text-[11px] bg-emerald-600/20 text-emerald-300 hover:bg-emerald-600/40 border border-emerald-500/30 px-2.5 py-1 rounded-lg transition font-semibold" title="Tandai Lunas">
+                                    <i class="fa-solid fa-check"></i> Lunas
+                                </button>
+                                <button onclick="openPaymentModal(${po.id})" class="text-[11px] bg-slate-700 hover:bg-slate-600 text-slate-200 px-2.5 py-1 rounded-lg transition" title="Update Detail Pembayaran">
+                                    <i class="fa-solid fa-pen"></i> Edit
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function quickMarkPaid(poId) {
+            const index = purchaseOrders.findIndex(p => p.id === poId);
+            if (index === -1) return;
+
+            const po = purchaseOrders[index];
+            const tot = Number(po.total) || 0;
+
+            purchaseOrders[index] = {
+                ...po,
+                paymentStatus: 'LUNAS',
+                paidAmount: tot,
+                remainingDebt: 0
+            };
+
+            const txIndex = transactions.findIndex(t => t.poRefId === poId);
+            if (txIndex !== -1) {
+                transactions[txIndex].amount = tot;
+                transactions[txIndex].desc = `Pengadaan ${po.poNumber || po.id} (${po.vendor}) - Status: LUNAS`;
+                await saveCloudData('transactions', transactions[txIndex]);
+            }
+
+            await saveCloudData('po', purchaseOrders[index]);
+            showToast(`PO ${po.poNumber} ditandai Lunas!`, 'success');
+            renderPaymentControlTable();
+            updateDashboard();
         }
 
         function openPaymentModal(poId) {
@@ -1662,11 +1832,16 @@
             document.getElementById('modalPoVendor').innerText = po.vendor || '-';
             document.getElementById('modalPoTotal').innerText = formatIDR(po.total || 0);
 
-            const status = po.paymentStatus || 'TEMPO';
-            document.getElementById('modalPayStatus').value = status;
-            document.getElementById('modalPaidAmount').value = po.paidAmount || 0;
+            const scheme = po.paymentScheme || 'tempo';
+            document.getElementById('modalPaymentScheme').value = scheme;
+            document.getElementById('modalPayStatus').value = po.paymentStatus || 'TEMPO';
+            document.getElementById('modalTerminNumber').value = po.terminNumber || '';
+            document.getElementById('modalTempoDays').value = po.tempoDays || 30;
+            document.getElementById('modalInvoiceDate').value = po.invoiceDate || po.date || new Date().toISOString().split('T')[0];
+            document.getElementById('modalPaidAmount').value = po.paidAmount || (scheme === 'lunas' ? po.total : 0);
 
-            handleModalPayStatusChange();
+            handleModalSchemeChange();
+            calculateModalDueDate();
             document.getElementById('paymentModal').classList.remove('hidden');
         }
 
@@ -1674,41 +1849,75 @@
             document.getElementById('paymentModal').classList.add('hidden');
         }
 
-        function handleModalPayStatusChange() {
-            const status = document.getElementById('modalPayStatus').value;
-            const wrapper = document.getElementById('modalDpAmountWrapper');
-            if (status === 'DP') {
-                wrapper.classList.remove('hidden');
-            } else if (status === 'LUNAS') {
-                wrapper.classList.add('hidden');
+        function handleModalSchemeChange() {
+            const scheme = document.getElementById('modalPaymentScheme').value;
+            const terminWrapper = document.getElementById('modalTerminWrapper');
+            const tempoWrapper = document.getElementById('modalTempoWrapper');
+            const payStatus = document.getElementById('modalPayStatus');
+            const paidInput = document.getElementById('modalPaidAmount');
+            const poId = Number(document.getElementById('modalPoId').value);
+            const po = purchaseOrders.find(p => p.id === poId);
+            const totalPo = po ? Number(po.total) || 0 : 0;
+
+            terminWrapper.classList.add('hidden');
+            tempoWrapper.classList.add('hidden');
+
+            if (scheme === 'termin') {
+                terminWrapper.classList.remove('hidden');
+                payStatus.value = 'DP';
+            } else if (scheme === 'tempo') {
+                tempoWrapper.classList.remove('hidden');
+                payStatus.value = 'TEMPO';
+                paidInput.value = 0;
+            } else if (scheme === 'dp') {
+                payStatus.value = 'DP';
+            } else if (scheme === 'lunas') {
+                payStatus.value = 'LUNAS';
+                paidInput.value = totalPo;
+            }
+            calculateModalDueDate();
+        }
+
+        function calculateModalDueDate() {
+            const scheme = document.getElementById('modalPaymentScheme').value;
+            const invDateStr = document.getElementById('modalInvoiceDate').value;
+            if (!invDateStr) return;
+
+            const invDate = new Date(invDateStr);
+            if (scheme === 'tempo') {
+                const days = parseInt(document.getElementById('modalTempoDays').value) || 0;
+                const dueDate = new Date(invDate);
+                dueDate.setDate(dueDate.getDate() + days);
+                document.getElementById('modalDueDate').value = dueDate.toISOString().split('T')[0];
             } else {
-                wrapper.classList.add('hidden');
+                document.getElementById('modalDueDate').value = invDateStr;
             }
         }
 
         async function savePaymentUpdate(e) {
             e.preventDefault();
             const poId = Number(document.getElementById('modalPoId').value);
+            const scheme = document.getElementById('modalPaymentScheme').value;
             const status = document.getElementById('modalPayStatus').value;
+            const terminNum = document.getElementById('modalTerminNumber').value.trim();
+            const tempoDays = parseInt(document.getElementById('modalTempoDays').value) || 30;
+            const invDate = document.getElementById('modalInvoiceDate').value;
+            const dueDate = document.getElementById('modalDueDate').value;
+            const paidAmount = parseFloat(document.getElementById('modalPaidAmount').value) || 0;
             
             const index = purchaseOrders.findIndex(p => p.id === poId);
             if (index === -1) return;
 
             const po = purchaseOrders[index];
-            let paidAmount = 0;
-
-            if (status === 'LUNAS') {
-                paidAmount = po.total;
-            } else if (status === 'DP') {
-                paidAmount = parseFloat(document.getElementById('modalPaidAmount').value) || 0;
-            } else {
-                paidAmount = 0;
-            }
-
             const remainingDebt = po.total - paidAmount;
 
             purchaseOrders[index] = {
                 ...po,
+                paymentScheme: scheme,
+                terminNumber: terminNum,
+                tempoDays: tempoDays,
+                invoiceDate: invDate,
+                dueDate: dueDate,
                 paymentStatus: status,
                 paidAmount: paidAmount,
                 remainingDebt: remainingDebt > 0 ? remainingDebt : 0
@@ -1717,12 +1926,26 @@
             const txIndex = transactions.findIndex(t => t.poRefId === poId);
             if (txIndex !== -1) {
                 transactions[txIndex].amount = paidAmount;
-                transactions[txIndex].desc = `Pengadaan ${po.poNumber || po.id} (${po.vendor}) - Status: ${status}`;
+                transactions[txIndex].date = invDate || transactions[txIndex].date;
+                transactions[txIndex].desc = `Pengadaan ${po.poNumber || po.id} (${po.vendor}) - Skema: ${scheme.toUpperCase()} (${status})`;
                 await saveCloudData('transactions', transactions[txIndex]);
+            } else if (paidAmount > 0) {
+                const poCategoryName = "Pengadaan PO";
+                const newTx = {
+                    id: Date.now(),
+                    date: invDate,
+                    type: 'EXPENSE',
+                    category: poCategoryName,
+                    amount: paidAmount,
+                    desc: `Pengadaan ${po.poNumber || po.id} (${po.vendor}) - Skema: ${scheme.toUpperCase()} (${status})`,
+                    poRefId: poId
+                };
+                transactions.push(newTx);
+                await saveCloudData('transactions', newTx);
             }
 
             await saveCloudData('po', purchaseOrders[index]);
-            showToast(`Status pembayaran PO ${po.poNumber} berhasil diperbarui!`, 'success');
+            showToast(`Skema & pembayaran PO ${po.poNumber} berhasil diperbarui!`, 'success');
 
             closePaymentModal();
             renderPaymentControlTable();
@@ -1853,14 +2076,10 @@
         async function saveAllSpiCpiWeeks() {
             showToast('Menyimpan data progres ke Cloud (harap tunggu)...', 'info');
             try {
-                // Filter: Hanya simpan minggu yang sudah diisi datanya
                 const weeksToSave = spiCpiWeeks.filter(w => w.startDate || w.endDate || w.planPct > 0 || w.actualPct > 0);
-                
-                // Simpan satu per satu secara berurutan agar tidak dibatasi oleh limit Google
                 for (const w of weeksToSave) {
                     await saveCloudData('spicpi_weeks', w);
                 }
-                
                 renderSpiCpiChart();
                 showToast('Data progres mingguan berhasil tersimpan!', 'success');
             } catch (error) {
@@ -2820,7 +3039,7 @@
 
         window.onload = function() {
             const today = new Date().toISOString().split('T')[0];
-            ['trxDate', 'poDate', 'excaDate', 'compactDate', 'dtDate'].forEach(id => {
+            ['trxDate', 'poDate', 'excaDate', 'compactDate', 'dtDate', 'modalInvoiceDate'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = today;
             });
