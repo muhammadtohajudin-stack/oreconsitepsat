@@ -293,11 +293,11 @@
                                 <i class="fa-solid fa-chart-line text-cyan-400"></i> Input Progres Mingguan (Minggu 1 s.d. 32) & Indeks SPI / CPI
                             </h2>
                             <p class="text-xs text-slate-400">
-                                Isi <strong>Tanggal Mulai, Selesai, dan % Progres</strong>. Klik tombol di kanan untuk menyimpan seluruh data Minggu 1 s.d. 32 sekaligus ke Cloud.
+                                Isi <strong>Tanggal Mulai, Selesai, dan % Progres</strong>. Klik tombol di kanan untuk menyimpan seluruh data progres ke Cloud.
                             </p>
                         </div>
                         <button onclick="saveAllSpiCpiWeeks()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-md flex items-center gap-2 flex-shrink-0">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Seluruh Minggu (M1-M32)
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Data Progres
                         </button>
                     </div>
 
@@ -532,14 +532,22 @@
                     <!-- EXCAVATOR -->
                     <div id="heavy-exca" class="space-y-6">
                         <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
-                            <h3 class="text-sm font-bold text-white mb-3">Input Daily Log HM & Fuel Excavator</h3>
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 id="excaFormTitle" class="text-sm font-bold text-white">Input Daily Log HM & Fuel Excavator</h3>
+                                <button type="button" id="cancelEditExcaBtn" onclick="resetExcaForm()" class="hidden text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1 rounded-lg transition">
+                                    <i class="fa-solid fa-xmark"></i> Batal Edit
+                                </button>
+                            </div>
                             <form id="excaForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                                <input type="hidden" id="editingExcaId" value="">
                                 <div><label class="block text-xs text-slate-300 mb-1">Pilih Tanggal</label><input type="date" id="excaDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">HM Awal</label><input type="number" step="0.1" id="excaHmAwal" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">HM Akhir</label><input type="number" step="0.1" id="excaHmAkhir" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">Volume Fuel (Liter)</label><input type="number" step="0.1" id="excaFuelVol" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">Harga Fuel (IDR/L)</label><input type="number" id="excaFuelPrice" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div class="lg:col-span-5 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs">Simpan Record Excavator</button></div>
+                                <div class="lg:col-span-5 flex justify-end">
+                                    <button type="submit" id="excaSubmitBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition">Simpan Record Excavator</button>
+                                </div>
                             </form>
                         </div>
                         <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 print-card">
@@ -562,14 +570,22 @@
                     <!-- COMPACT -->
                     <div id="heavy-compact" class="space-y-6 hidden">
                         <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
-                            <h3 class="text-sm font-bold text-white mb-3">Input Daily Log HM & Fuel Compact</h3>
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 id="compactFormTitle" class="text-sm font-bold text-white">Input Daily Log HM & Fuel Compact</h3>
+                                <button type="button" id="cancelEditCompactBtn" onclick="resetCompactForm()" class="hidden text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1 rounded-lg transition">
+                                    <i class="fa-solid fa-xmark"></i> Batal Edit
+                                </button>
+                            </div>
                             <form id="compactForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                                <input type="hidden" id="editingCompactId" value="">
                                 <div><label class="block text-xs text-slate-300 mb-1">Pilih Tanggal</label><input type="date" id="compactDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">HM Awal</label><input type="number" step="0.1" id="compactHmAwal" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">HM Akhir</label><input type="number" step="0.1" id="compactHmAkhir" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">Volume Fuel (Liter)</label><input type="number" step="0.1" id="compactFuelVol" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">Harga Fuel (IDR/L)</label><input type="number" id="compactFuelPrice" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div class="lg:col-span-5 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs">Simpan Record Compact</button></div>
+                                <div class="lg:col-span-5 flex justify-end">
+                                    <button type="submit" id="compactSubmitBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition">Simpan Record Compact</button>
+                                </div>
                             </form>
                         </div>
                         <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 print-card">
@@ -592,12 +608,20 @@
                     <!-- DUMP TRUCK -->
                     <div id="heavy-dt" class="space-y-6 hidden">
                         <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm no-print">
-                            <h3 class="text-sm font-bold text-white mb-3">Input Daily Log Ritase Dump Truck</h3>
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 id="dtFormTitle" class="text-sm font-bold text-white">Input Daily Log Ritase Dump Truck</h3>
+                                <button type="button" id="cancelEditDtBtn" onclick="resetDtForm()" class="hidden text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1 rounded-lg transition">
+                                    <i class="fa-solid fa-xmark"></i> Batal Edit
+                                </button>
+                            </div>
                             <form id="dtForm" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <input type="hidden" id="editingDtId" value="">
                                 <div><label class="block text-xs text-slate-300 mb-1">Pilih Tanggal</label><input type="date" id="dtDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">Jumlah Ritase (Rit)</label><input type="number" id="dtRitase" required min="1" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
                                 <div><label class="block text-xs text-slate-300 mb-1">HPP / Rit Vendor (IDR)</label><input type="number" id="dtPrice" placeholder="50000" required min="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></div>
-                                <div class="sm:col-span-3 flex justify-end"><button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs">Simpan Record Ritase</button></div>
+                                <div class="sm:col-span-3 flex justify-end">
+                                    <button type="submit" id="dtSubmitBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition">Simpan Record Ritase</button>
+                                </div>
                             </form>
                         </div>
                         <div class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-2xl shadow-sm space-y-4 print-card">
@@ -618,7 +642,7 @@
                 </div>
             </section>
 
-            <!-- TAB 3: KONTROL PEMBAYARAN & HUTANG PO (Hanya untuk Sporthall) -->
+            <!-- TAB 3: KONTROL PEMBAYARAN & Hutang PO (Hanya untuk Sporthall) -->
             <section id="tab-po-payment" class="space-y-6 hidden">
                 <!-- Ringkasan Statistik Pembayaran & Kewajiban -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -897,7 +921,7 @@
             if (projId === 'mess') {
                 navPoText.innerText = "Alat Berat & Ritase DT";
                 navPoIcon.className = "fa-solid fa-truck-monster w-4 text-center";
-                navPoPayment.classList.add('hidden'); // Sembunyikan sepenuhnya dari Mess
+                navPoPayment.classList.add('hidden'); 
                 kpiSporthall.classList.add('hidden');
                 kpiMess.classList.remove('hidden');
                 messComparison.classList.remove('hidden');
@@ -910,7 +934,7 @@
             } else {
                 navPoText.innerText = "Manajemen Pre-Order (PO)";
                 navPoIcon.className = "fa-solid fa-file-invoice-dollar w-4 text-center";
-                navPoPayment.classList.remove('hidden'); // Tampilkan khusus Sporthall
+                navPoPayment.classList.remove('hidden'); 
                 kpiSporthall.classList.remove('hidden');
                 kpiMess.classList.add('hidden');
                 messComparison.classList.add('hidden');
@@ -961,6 +985,7 @@
                 const existing = cloudData.find(w => Number(w.week) === i);
                 if (existing) {
                     spiCpiWeeks.push({
+                        id: existing.id || `week_${i}`, // ID unik mingguan
                         week: i,
                         startDate: existing.startDate || '',
                         endDate: existing.endDate || '',
@@ -969,6 +994,7 @@
                     });
                 } else {
                     spiCpiWeeks.push({
+                        id: `week_${i}`, // ID unik untuk baris kosong
                         week: i,
                         startDate: '',
                         endDate: '',
@@ -989,7 +1015,6 @@
             const navPo = document.getElementById('nav-po');
             const navPoPayment = document.getElementById('nav-po-payment');
 
-            // Gunakan classList secara eksplisit agar class "hidden" bawaan project tidak tertimpa
             const activeClasses = ['bg-cyan-600', 'text-white', 'shadow-md', 'shadow-cyan-600/20', 'font-semibold'];
             const inactiveClasses = ['text-slate-300', 'hover:bg-slate-700/60', 'hover:text-white', 'font-medium'];
 
@@ -1826,12 +1851,22 @@
         }
 
         async function saveAllSpiCpiWeeks() {
-            showToast('Menyimpan seluruh data progres M1-M32 ke Cloud...', 'info');
-            for (let i = 0; i < spiCpiWeeks.length; i++) {
-                await saveCloudData('spicpi_weeks', spiCpiWeeks[i]);
+            showToast('Menyimpan data progres ke Cloud (harap tunggu)...', 'info');
+            try {
+                // Filter: Hanya simpan minggu yang sudah diisi datanya
+                const weeksToSave = spiCpiWeeks.filter(w => w.startDate || w.endDate || w.planPct > 0 || w.actualPct > 0);
+                
+                // Simpan satu per satu secara berurutan agar tidak dibatasi oleh limit Google
+                for (const w of weeksToSave) {
+                    await saveCloudData('spicpi_weeks', w);
+                }
+                
+                renderSpiCpiChart();
+                showToast('Data progres mingguan berhasil tersimpan!', 'success');
+            } catch (error) {
+                console.error(error);
+                showToast('Terjadi kesalahan saat menyimpan data!', 'error');
             }
-            renderSpiCpiChart();
-            showToast('Semua data progres mingguan (M1-M32) berhasil tersimpan!', 'success');
         }
 
         function renderSpiCpiChart() {
@@ -1883,8 +1918,38 @@
             });
         }
 
+        function editExcaLog(id) {
+            const log = excaLogs.find(l => l.id === id);
+            if (!log) return;
+            document.getElementById('editingExcaId').value = log.id;
+            document.getElementById('excaDate').value = log.date || '';
+            document.getElementById('excaHmAwal').value = log.hmAwal || '';
+            document.getElementById('excaHmAkhir').value = log.hmAkhir || '';
+            document.getElementById('excaFuelVol').value = log.fuelVol || '';
+            document.getElementById('excaFuelPrice').value = log.fuelPrice || '';
+
+            document.getElementById('excaFormTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Log Excavator`;
+            document.getElementById('excaSubmitBtn').innerText = "Perbarui Record Excavator";
+            document.getElementById('excaSubmitBtn').className = "bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition";
+            document.getElementById('cancelEditExcaBtn').classList.remove('hidden');
+            document.getElementById('excaForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetExcaForm() {
+            document.getElementById('editingExcaId').value = '';
+            document.getElementById('excaForm').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('excaDate').value = today;
+
+            document.getElementById('excaFormTitle').innerText = "Input Daily Log HM & Fuel Excavator";
+            document.getElementById('excaSubmitBtn').innerText = "Simpan Record Excavator";
+            document.getElementById('excaSubmitBtn').className = "bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition";
+            document.getElementById('cancelEditExcaBtn').classList.add('hidden');
+        }
+
         document.getElementById('excaForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            const editingId = document.getElementById('editingExcaId').value;
             const selectedDate = document.getElementById('excaDate').value;
             const hmAwal = parseFloat(document.getElementById('excaHmAwal').value) || 0;
             const hmAkhir = parseFloat(document.getElementById('excaHmAkhir').value) || 0;
@@ -1892,24 +1957,71 @@
             const fuelPrice = parseFloat(document.getElementById('excaFuelPrice').value) || 0;
             const totalHours = hmAkhir - hmAwal;
 
-            const log = {
-                id: Date.now(),
-                date: selectedDate,
-                hmAwal, hmAkhir,
-                totalHours: totalHours,
-                fuelVol, fuelPrice,
-                totalCost: (fuelVol * fuelPrice)
-            };
-            excaLogs.push(log);
+            if (editingId) {
+                const numericId = Number(editingId);
+                const index = excaLogs.findIndex(l => l.id === numericId);
+                if (index !== -1) {
+                    excaLogs[index] = {
+                        ...excaLogs[index],
+                        date: selectedDate,
+                        hmAwal, hmAkhir,
+                        totalHours,
+                        fuelVol, fuelPrice,
+                        totalCost: (fuelVol * fuelPrice)
+                    };
+                    await saveCloudData('exca', excaLogs[index]);
+                    showToast('Log Excavator berhasil diperbarui!', 'success');
+                }
+            } else {
+                const log = {
+                    id: Date.now(),
+                    date: selectedDate,
+                    hmAwal, hmAkhir,
+                    totalHours,
+                    fuelVol, fuelPrice,
+                    totalCost: (fuelVol * fuelPrice)
+                };
+                excaLogs.push(log);
+                await saveCloudData('exca', log);
+                showToast('Log Excavator tersimpan!', 'success');
+            }
             renderExcaTable();
             updateDashboard();
-            this.reset();
-            document.getElementById('excaDate').value = selectedDate;
-            await saveCloudData('exca', log);
+            resetExcaForm();
         });
+
+        function editCompactLog(id) {
+            const log = compactLogs.find(l => l.id === id);
+            if (!log) return;
+            document.getElementById('editingCompactId').value = log.id;
+            document.getElementById('compactDate').value = log.date || '';
+            document.getElementById('compactHmAwal').value = log.hmAwal || '';
+            document.getElementById('compactHmAkhir').value = log.hmAkhir || '';
+            document.getElementById('compactFuelVol').value = log.fuelVol || '';
+            document.getElementById('compactFuelPrice').value = log.fuelPrice || '';
+
+            document.getElementById('compactFormTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Log Compact Roller`;
+            document.getElementById('compactSubmitBtn').innerText = "Perbarui Record Compact";
+            document.getElementById('compactSubmitBtn').className = "bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition";
+            document.getElementById('cancelEditCompactBtn').classList.remove('hidden');
+            document.getElementById('compactForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetCompactForm() {
+            document.getElementById('editingCompactId').value = '';
+            document.getElementById('compactForm').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('compactDate').value = today;
+
+            document.getElementById('compactFormTitle').innerText = "Input Daily Log HM & Fuel Compact";
+            document.getElementById('compactSubmitBtn').innerText = "Simpan Record Compact";
+            document.getElementById('compactSubmitBtn').className = "bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition";
+            document.getElementById('cancelEditCompactBtn').classList.add('hidden');
+        }
 
         document.getElementById('compactForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            const editingId = document.getElementById('editingCompactId').value;
             const selectedDate = document.getElementById('compactDate').value;
             const hmAwal = parseFloat(document.getElementById('compactHmAwal').value) || 0;
             const hmAkhir = parseFloat(document.getElementById('compactHmAkhir').value) || 0;
@@ -1917,38 +2029,102 @@
             const fuelPrice = parseFloat(document.getElementById('compactFuelPrice').value) || 0;
             const totalHours = hmAkhir - hmAwal;
 
-            const log = {
-                id: Date.now(),
-                date: selectedDate,
-                hmAwal, hmAkhir,
-                totalHours: totalHours,
-                fuelVol, fuelPrice,
-                totalCost: (fuelVol * fuelPrice)
-            };
-            compactLogs.push(log);
+            if (editingId) {
+                const numericId = Number(editingId);
+                const index = compactLogs.findIndex(l => l.id === numericId);
+                if (index !== -1) {
+                    compactLogs[index] = {
+                        ...compactLogs[index],
+                        date: selectedDate,
+                        hmAwal, hmAkhir,
+                        totalHours,
+                        fuelVol, fuelPrice,
+                        totalCost: (fuelVol * fuelPrice)
+                    };
+                    await saveCloudData('compact', compactLogs[index]);
+                    showToast('Log Compact berhasil diperbarui!', 'success');
+                }
+            } else {
+                const log = {
+                    id: Date.now(),
+                    date: selectedDate,
+                    hmAwal, hmAkhir,
+                    totalHours,
+                    fuelVol, fuelPrice,
+                    totalCost: (fuelVol * fuelPrice)
+                };
+                compactLogs.push(log);
+                await saveCloudData('compact', log);
+                showToast('Log Compact tersimpan!', 'success');
+            }
             renderCompactTable();
             updateDashboard();
-            this.reset();
-            document.getElementById('compactDate').value = selectedDate;
-            await saveCloudData('compact', log);
+            resetCompactForm();
         });
+
+        function editDtLog(id) {
+            const log = dtLogs.find(l => l.id === id);
+            if (!log) return;
+            document.getElementById('editingDtId').value = log.id;
+            document.getElementById('dtDate').value = log.date || '';
+            document.getElementById('dtRitase').value = log.ritase || '';
+            document.getElementById('dtPrice').value = log.price || '';
+
+            document.getElementById('dtFormTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Log Ritase Dump Truck`;
+            document.getElementById('dtSubmitBtn').innerText = "Perbarui Record Ritase";
+            document.getElementById('dtSubmitBtn').className = "bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition";
+            document.getElementById('cancelEditDtBtn').classList.remove('hidden');
+            document.getElementById('dtForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetDtForm() {
+            document.getElementById('editingDtId').value = '';
+            document.getElementById('dtForm').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dtDate').value = today;
+
+            document.getElementById('dtFormTitle').innerText = "Input Daily Log Ritase Dump Truck";
+            document.getElementById('dtSubmitBtn').innerText = "Simpan Record Ritase";
+            document.getElementById('dtSubmitBtn').className = "bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition";
+            document.getElementById('cancelEditDtBtn').classList.add('hidden');
+        }
 
         document.getElementById('dtForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            const editingId = document.getElementById('editingDtId').value;
             const selectedDate = document.getElementById('dtDate').value;
-            const log = {
-                id: Date.now(),
-                date: selectedDate,
-                ritase: parseInt(document.getElementById('dtRitase').value) || 0,
-                price: parseFloat(document.getElementById('dtPrice').value) || 0,
-                totalCost: (parseInt(document.getElementById('dtRitase').value) || 0) * (parseFloat(document.getElementById('dtPrice').value) || 0)
-            };
-            dtLogs.push(log);
+            const ritase = parseInt(document.getElementById('dtRitase').value) || 0;
+            const price = parseFloat(document.getElementById('dtPrice').value) || 0;
+
+            if (editingId) {
+                const numericId = Number(editingId);
+                const index = dtLogs.findIndex(l => l.id === numericId);
+                if (index !== -1) {
+                    dtLogs[index] = {
+                        ...dtLogs[index],
+                        date: selectedDate,
+                        ritase,
+                        price,
+                        totalCost: ritase * price
+                    };
+                    await saveCloudData('dt', dtLogs[index]);
+                    showToast('Log Ritase DT berhasil diperbarui!', 'success');
+                }
+            } else {
+                const log = {
+                    id: Date.now(),
+                    date: selectedDate,
+                    ritase,
+                    price,
+                    totalCost: ritase * price
+                };
+                dtLogs.push(log);
+                await saveCloudData('dt', log);
+                showToast('Log Ritase DT tersimpan!', 'success');
+            }
             renderDtTable();
             updateDashboard();
-            this.reset();
-            document.getElementById('dtDate').value = selectedDate;
-            await saveCloudData('dt', log);
+            resetDtForm();
         });
 
         async function deleteTransaction(id) {
@@ -1997,7 +2173,6 @@
             }
         }
 
-        // Helper Inti Sinkronisasi Periode: Tanggal 26 s.d. 25 Bulan Berikutnya
         function getPeriodInfo(dateStr) {
             if (!dateStr) return { key: 'Lainnya', name: 'Lainnya' };
             const d = new Date(dateStr);
@@ -2007,7 +2182,6 @@
             let month = d.getMonth() + 1; 
             let date = d.getDate();
             
-            // Aturan Cut-off: Jika tanggal >= 26, maka dihitung masuk ke periode bulan depannya
             if (date >= 26) {
                 month += 1;
                 if (month > 12) {
@@ -2048,7 +2222,6 @@
                 const monthName = grouped[mKey].name;
                 const logs = grouped[mKey].logs;
 
-                // Urutkan item harian di dalam kelompok bulan secara kronologis (tanggal terlama ke terbaru)
                 logs.sort((a, b) => new Date(a.date) - new Date(b.date));
 
                 let mHours = 0, mFuel = 0, mCost = 0;
@@ -2087,7 +2260,10 @@
                             <td class="py-2 px-4 text-center font-mono text-amber-400">${fuel.toFixed(1)} L</td>
                             <td class="py-2 px-4 text-center font-mono text-purple-300">${cons > 0 ? cons.toFixed(2) + ' L/J' : '-'}</td>
                             <td class="py-2 px-4 text-right font-mono text-emerald-400">${formatIDR(cost)}</td>
-                            <td class="py-2 px-4 text-center no-print"><button onclick="deleteExcaLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
+                            <td class="py-2 px-4 text-center no-print">
+                                <button onclick="editExcaLog(${l.id})" title="Edit" class="text-amber-400 hover:text-amber-300 p-1 mr-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button onclick="deleteExcaLog(${l.id})" title="Hapus" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                            </td>
                         </tr>`;
                 });
             });
@@ -2122,7 +2298,6 @@
                 const monthName = grouped[mKey].name;
                 const logs = grouped[mKey].logs;
 
-                // Urutkan item harian di dalam kelompok bulan secara kronologis
                 logs.sort((a, b) => new Date(a.date) - new Date(b.date));
 
                 let mHours = 0, mFuel = 0, mCost = 0;
@@ -2161,7 +2336,10 @@
                             <td class="py-2 px-4 text-center font-mono text-amber-400">${fuel.toFixed(1)} L</td>
                             <td class="py-2 px-4 text-center font-mono text-purple-300">${cons > 0 ? cons.toFixed(2) + ' L/J' : '-'}</td>
                             <td class="py-2 px-4 text-right font-mono text-emerald-400">${formatIDR(cost)}</td>
-                            <td class="py-2 px-4 text-center no-print"><button onclick="deleteCompactLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
+                            <td class="py-2 px-4 text-center no-print">
+                                <button onclick="editCompactLog(${l.id})" title="Edit" class="text-amber-400 hover:text-amber-300 p-1 mr-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button onclick="deleteCompactLog(${l.id})" title="Hapus" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                            </td>
                         </tr>`;
                 });
             });
@@ -2196,7 +2374,6 @@
                 const monthName = grouped[mKey].name;
                 const logs = grouped[mKey].logs;
 
-                // Urutkan item harian di dalam kelompok bulan secara kronologis
                 logs.sort((a, b) => new Date(a.date) - new Date(b.date));
 
                 let mRit = 0, mCost = 0;
@@ -2230,7 +2407,10 @@
                             <td class="py-2 px-4 text-center font-bold text-cyan-400 font-mono">${rit} Rit</td>
                             <td class="py-2 px-4 text-center font-mono text-slate-300">${hours.toFixed(2)} Jam</td>
                             <td class="py-2 px-4 text-right font-mono text-amber-400">${formatIDR(l.totalCost)}</td>
-                            <td class="py-2 px-4 text-center no-print"><button onclick="deleteDtLog(${l.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button></td>
+                            <td class="py-2 px-4 text-center no-print">
+                                <button onclick="editDtLog(${l.id})" title="Edit" class="text-amber-400 hover:text-amber-300 p-1 mr-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button onclick="deleteDtLog(${l.id})" title="Hapus" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                            </td>
                         </tr>`;
                 });
             });
@@ -2248,7 +2428,6 @@
             }
         }
 
-        // Helper untuk memisahkan jam aktual dan jam tagihan (billable)
         function calculateMonthlyHppDetails(logs, ratePerHour) {
             const monthlyData = {};
 
@@ -2274,8 +2453,6 @@
                 const item = monthlyData[key];
 
                 let billableHours = item.actualHours;
-                
-                // Aturan 200 jam minimum HANYA untuk periode September (key: 2026-09) dan Oktober (key: 2026-10)
                 if (key === '2026-09' || key === '2026-10') {
                     billableHours = item.actualHours < 200 ? 200 : item.actualHours;
                 }
@@ -2298,7 +2475,6 @@
         }
 
         function renderMessDashboard() {
-            // Data untuk Panel KPI di atas
             let totalExcaActualHours = 0, totalExcaFuelVol = 0, totalExcaFuelCost = 0;
             excaLogs.forEach(l => {
                 totalExcaActualHours += Number(l.totalHours) || 0;
@@ -2321,7 +2497,6 @@
 
             const totalDtHours = totalDtRit / 8;
             
-            // Hitung HPP Bulanan Detail berdasarkan Aturan (Billable)
             const excaMonthlyHpp = calculateMonthlyHppDetails(excaLogs, 250000);
             const compactMonthlyHpp = calculateMonthlyHppDetails(compactLogs, 210000);
 
@@ -2332,12 +2507,10 @@
             document.getElementById('messKpiTotalHours').innerText = combinedActual.toFixed(1) + ' Jam (Aktual)';
             document.getElementById('messKpiFuelSummary').innerText = `Fuel: ${combinedFuelVol.toFixed(1)} L (${formatIDR(combinedFuelCost)})`;
 
-            // Hitung total bayar ke vendor PT. Restu Tanjung Permai (Sewa Exca + Compact berdasarkan billable hours)
             let totalExcaVendorSewa = excaMonthlyHpp.reduce((acc, m) => acc + m.hppAlat, 0);
             let totalCompactVendorSewa = compactMonthlyHpp.reduce((acc, m) => acc + m.hppAlat, 0);
             const totalVendorRestuTanjungPermai = totalExcaVendorSewa + totalCompactVendorSewa;
 
-            // Update Card Khusus Rincian HPP Vendor & Fuel
             document.getElementById('breakdownFuelCost').innerText = formatIDR(combinedFuelCost);
             document.getElementById('breakdownFuelVol').innerText = `${combinedFuelVol.toFixed(1)} Liter`;
             document.getElementById('breakdownVendorCost').innerText = formatIDR(totalVendorRestuTanjungPermai);
@@ -2345,13 +2518,11 @@
             let totalExcaHpp = excaMonthlyHpp.reduce((acc, m) => acc + m.totalHpp, 0);
             let totalCompactHpp = compactMonthlyHpp.reduce((acc, m) => acc + m.totalHpp, 0);
 
-            // Pendapatan MURNI menggunakan jam AKTUAL Lapangan
             const excaRevenue = totalExcaActualHours * 669500;
             const compactRevenue = totalCompactActualHours * 571000;
             const dtRevenue = totalDtHours * 566300;
             const totalRevenue = excaRevenue + compactRevenue + dtRevenue;
 
-            // HPP menggunakan aturan tagihan (billable)
             const totalHpp = totalExcaHpp + totalCompactHpp + totalDtVendorHpp;
             document.getElementById('breakdownTotalHpp').innerText = formatIDR(totalHpp);
             
@@ -2374,7 +2545,6 @@
                 marginPctEl.className = "text-xs text-red-400 mt-1";
             }
 
-            // Render Tabel Analisa Finansial Bulanan tersinkronisasi
             const tbody = document.getElementById('messComparisonTableBody');
             tbody.innerHTML = '';
 
@@ -2383,16 +2553,16 @@
                 if (!allMonths[m.periodKey]) allMonths[m.periodKey] = { name: m.monthName, excaH: 0, excaAct: 0, excaRev: 0, excaHpp: 0, compH: 0, compAct: 0, compRev: 0, compHpp: 0, dtRit: 0, dtRev: 0, dtHpp: 0 };
                 allMonths[m.periodKey].excaH = m.billableHours;
                 allMonths[m.periodKey].excaAct = m.actualHours;
-                allMonths[m.periodKey].excaRev = m.actualHours * 669500; // PENDAPATAN MURNI AKTUAL
-                allMonths[m.periodKey].excaHpp = m.totalHpp;             // HPP SESUAI ATURAN TAGIHAN
+                allMonths[m.periodKey].excaRev = m.actualHours * 669500;
+                allMonths[m.periodKey].excaHpp = m.totalHpp;
             });
 
             compactMonthlyHpp.forEach(m => {
                 if (!allMonths[m.periodKey]) allMonths[m.periodKey] = { name: m.monthName, excaH: 0, excaAct: 0, excaRev: 0, excaHpp: 0, compH: 0, compAct: 0, compRev: 0, compHpp: 0, dtRit: 0, dtRev: 0, dtHpp: 0 };
                 allMonths[m.periodKey].compH = m.billableHours;
                 allMonths[m.periodKey].compAct = m.actualHours;
-                allMonths[m.periodKey].compRev = m.actualHours * 571000; // PENDAPATAN MURNI AKTUAL
-                allMonths[m.periodKey].compHpp = m.totalHpp;             // HPP SESUAI ATURAN TAGIHAN
+                allMonths[m.periodKey].compRev = m.actualHours * 571000;
+                allMonths[m.periodKey].compHpp = m.totalHpp;
             });
 
             dtLogs.forEach(l => {
@@ -2417,7 +2587,6 @@
                 
                 if (dat.excaAct > 0) {
                     const margin = dat.excaRev - dat.excaHpp;
-                    
                     let excaVolText = `${dat.excaAct.toFixed(1)} Jam`;
                     if (dat.excaH !== dat.excaAct) {
                         excaVolText = `Pendapatan: ${dat.excaAct.toFixed(1)} Jam<br><span class="text-[10px] text-amber-400 font-normal">HPP Vendor: ${dat.excaH.toFixed(1)} Jam</span>`;
@@ -2437,7 +2606,6 @@
 
                 if (dat.compAct > 0) {
                     const margin = dat.compRev - dat.compHpp;
-
                     let compVolText = `${dat.compAct.toFixed(1)} Jam`;
                     if (dat.compH !== dat.compAct) {
                         compVolText = `Pendapatan: ${dat.compAct.toFixed(1)} Jam<br><span class="text-[10px] text-amber-400 font-normal">HPP Vendor: ${dat.compH.toFixed(1)} Jam</span>`;
