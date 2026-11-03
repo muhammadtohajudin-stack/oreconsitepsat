@@ -2048,6 +2048,9 @@
                 const monthName = grouped[mKey].name;
                 const logs = grouped[mKey].logs;
 
+                // Urutkan item harian di dalam kelompok bulan secara kronologis (tanggal terlama ke terbaru)
+                logs.sort((a, b) => new Date(a.date) - new Date(b.date));
+
                 let mHours = 0, mFuel = 0, mCost = 0;
                 logs.forEach(l => {
                     mHours += Number(l.totalHours) || 0;
@@ -2119,6 +2122,9 @@
                 const monthName = grouped[mKey].name;
                 const logs = grouped[mKey].logs;
 
+                // Urutkan item harian di dalam kelompok bulan secara kronologis
+                logs.sort((a, b) => new Date(a.date) - new Date(b.date));
+
                 let mHours = 0, mFuel = 0, mCost = 0;
                 logs.forEach(l => {
                     mHours += Number(l.totalHours) || 0;
@@ -2189,6 +2195,9 @@
             sortedKeys.forEach(mKey => {
                 const monthName = grouped[mKey].name;
                 const logs = grouped[mKey].logs;
+
+                // Urutkan item harian di dalam kelompok bulan secara kronologis
+                logs.sort((a, b) => new Date(a.date) - new Date(b.date));
 
                 let mRit = 0, mCost = 0;
                 logs.forEach(l => {
