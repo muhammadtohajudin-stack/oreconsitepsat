@@ -690,7 +690,7 @@
                                     <th class="py-3 px-4 text-center">Tgl Invoice</th>
                                     <th class="py-3 px-4 text-center">Jatuh Tempo</th>
                                     <th class="py-3 px-4 text-right">Sisa Hutang / Nominal</th>
-                                    <th class="py-3 px-4 text-center no-print">Aksi</th>
+                                    <th class="py-3 px-4 text-center no-print min-w-[130px]">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="reminderTableBody" class="divide-y divide-slate-700/50"></tbody>
@@ -729,7 +729,7 @@
                                     <th class="py-3 px-4 text-right">Total Nilai PO</th>
                                     <th class="py-3 px-4 text-right">Telah Dibayar (Kas Out)</th>
                                     <th class="py-3 px-4 text-right">Sisa Hutang</th>
-                                    <th class="py-3 px-4 text-center no-print">Aksi</th>
+                                    <th class="py-3 px-4 text-center no-print min-w-[160px]">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="paymentTableBody" class="divide-y divide-slate-700/50"></tbody>
@@ -739,18 +739,20 @@
             </section>
         </main>
 
-        <!-- MODAL TAMBAH PEMBAYARAN PO -->
+        <!-- MODAL KELOLA & TAMBAH PEMBAYARAN PO -->
         <div id="paymentModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
             <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-money-bill-wave text-emerald-400"></i> Tambah Pembayaran & Update Skema PO
+                    <h3 id="modalPaymentTitle" class="text-sm font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-money-bill-wave text-emerald-400"></i> Kelola Pembayaran PO
                     </h3>
                     <button onclick="closePaymentModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
 
                 <form id="updatePaymentForm" onsubmit="savePaymentUpdate(event)" class="space-y-4">
                     <input type="hidden" id="modalPoId" value="">
+                    <input type="hidden" id="modalActionType" value="">
+                    
                     <div>
                         <p class="text-xs text-slate-400">Nomor PO: <strong id="modalPoNum" class="text-cyan-400"></strong></p>
                         <p class="text-xs text-slate-400">Vendor: <strong id="modalPoVendor" class="text-white"></strong></p>
@@ -769,7 +771,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Status Pembayaran</label>
-                            <select id="modalPayStatus" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 cursor-pointer font-semibold" disabled title="Dihitung Otomatis">
+                            <select id="modalPayStatus" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 cursor-pointer font-semibold" disabled title="Dihitung Otomatis berdasarkan nominal terbayar">
                                 <option value="LUNAS">🟢 Lunas</option>
                                 <option value="DP">🔵 DP / Termin (Bayar Sebagian)</option>
                                 <option value="TEMPO">🟡 Tempo</option>
@@ -798,18 +800,18 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Tanggal Invoice / Pembayaran</label>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Tanggal Invoice / Transaksi</label>
                             <input type="date" id="modalInvoiceDate" oninput="calculateModalDueDate()" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer focus:outline-none focus:border-cyan-500">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Tambah Nominal Bayar (IDR)</label>
-                            <input type="number" id="modalPaidAmount" placeholder="Kosongkan jika hanya ubah tempo" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-cyan-200 font-mono focus:outline-none focus:border-cyan-500">
+                            <label id="modalPaidAmountLabel" class="block text-xs font-medium text-slate-300 mb-1">Nominal (IDR)</label>
+                            <input type="number" id="modalPaidAmount" placeholder="" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-cyan-200 font-mono focus:outline-none focus:border-cyan-500">
                         </div>
                     </div>
 
                     <div class="pt-2 border-t border-slate-700 flex justify-end gap-2">
                         <button type="button" onclick="closePaymentModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold px-4 py-2 rounded-xl text-xs transition">Batal</button>
-                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-md">Simpan Tambah Bayar</button>
+                        <button type="submit" id="modalSubmitBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-md">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -1753,9 +1755,14 @@
                         <td class="py-3.5 px-4 text-right font-mono text-emerald-400 font-semibold">${formatIDR(paid)}</td>
                         <td class="py-3.5 px-4 text-right font-mono font-bold ${debt > 0 ? 'text-red-400' : 'text-slate-500'}">${formatIDR(debt)}</td>
                         <td class="py-3.5 px-4 text-center no-print" onclick="event.stopPropagation()">
-                            <button onclick="openPaymentModal(${po.id})" class="text-xs bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/40 border border-cyan-500/30 px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5 mx-auto">
-                                <i class="fa-solid fa-plus"></i> Tambah Bayar
-                            </button>
+                            <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                                <button onclick="openPaymentModal(${po.id}, 'edit')" class="text-xs bg-amber-600/20 text-amber-300 hover:bg-amber-600/40 border border-amber-500/30 px-2.5 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5" title="Edit/Ubah Skema">
+                                    <i class="fa-solid fa-pen-to-square"></i> Edit
+                                </button>
+                                <button onclick="openPaymentModal(${po.id}, 'add')" class="text-xs bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/40 border border-cyan-500/30 px-2.5 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5" title="Catat Pembayaran Lanjutan">
+                                    <i class="fa-solid fa-plus"></i> Tambah
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     <tr id="pay-detail-${po.id}" class="bg-slate-900/90 border-b border-slate-700/80 hidden">
@@ -1782,7 +1789,7 @@
                                                 </div>
                                                 <span class="font-mono text-emerald-400 font-bold text-xs">+ ${formatIDR(t.amount)}</span>
                                             </div>
-                                        `).join('') : '<p class="text-[10px] text-slate-500 italic p-2">Belum ada riwayat pembayaran tercatat.</p>'}
+                                        `).join('') : '<p class="text-[10px] text-slate-500 italic p-2">Belum ada riwayat transaksi tercatat otomatis.</p>'}
                                     </div>
                                 </div>
                             </div>
@@ -1842,12 +1849,15 @@
                         <td class="py-3 px-4 text-center font-mono font-bold text-amber-400 text-xs">${dueDate}</td>
                         <td class="py-3 px-4 text-right font-mono font-bold text-red-400">${formatIDR(debt)}</td>
                         <td class="py-3 px-4 text-center no-print" onclick="event.stopPropagation()">
-                            <div class="flex items-center justify-center gap-1.5">
-                                <button onclick="quickMarkPaid(${po.id})" class="text-[11px] bg-emerald-600/20 text-emerald-300 hover:bg-emerald-600/40 border border-emerald-500/30 px-2.5 py-1 rounded-lg transition font-semibold" title="Tandai Lunas">
-                                    <i class="fa-solid fa-check"></i> Lunas
+                            <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                                <button onclick="quickMarkPaid(${po.id})" class="text-[10px] bg-emerald-600/20 text-emerald-300 hover:bg-emerald-600/40 border border-emerald-500/30 px-2 py-1 rounded-lg transition font-semibold" title="Tandai Lunas Penuh">
+                                    <i class="fa-solid fa-check"></i>
                                 </button>
-                                <button onclick="openPaymentModal(${po.id})" class="text-[11px] bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/40 border border-cyan-500/30 px-2.5 py-1 rounded-lg transition" title="Tambah Pembayaran Baru">
-                                    <i class="fa-solid fa-plus"></i> Tambah
+                                <button onclick="openPaymentModal(${po.id}, 'edit')" class="text-[10px] bg-amber-600/20 text-amber-300 hover:bg-amber-600/40 border border-amber-500/30 px-2 py-1 rounded-lg transition" title="Edit/Ubah Skema PO">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button onclick="openPaymentModal(${po.id}, 'add')" class="text-[10px] bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/40 border border-cyan-500/30 px-2 py-1 rounded-lg transition" title="Catat Tambah Bayar Lanjutan">
+                                    <i class="fa-solid fa-plus"></i>
                                 </button>
                             </div>
                         </td>
@@ -1876,7 +1886,7 @@
                                                 </div>
                                                 <span class="font-mono text-emerald-400 font-bold text-xs">+ ${formatIDR(t.amount)}</span>
                                             </div>
-                                        `).join('') : '<p class="text-[10px] text-slate-500 italic p-2">Belum ada riwayat pembayaran tercatat.</p>'}
+                                        `).join('') : '<p class="text-[10px] text-slate-500 italic p-2">Belum ada riwayat transaksi tercatat otomatis.</p>'}
                                     </div>
                                 </div>
                             </div>
@@ -1926,11 +1936,13 @@
             updateDashboard();
         }
 
-        function openPaymentModal(poId) {
+        function openPaymentModal(poId, actionType = 'add') {
             const po = purchaseOrders.find(p => p.id === poId);
             if (!po) return;
 
             document.getElementById('modalPoId').value = po.id;
+            document.getElementById('modalActionType').value = actionType;
+            
             document.getElementById('modalPoNum').innerText = po.poNumber || 'PO-' + po.id;
             document.getElementById('modalPoVendor').innerText = po.vendor || '-';
             document.getElementById('modalPoTotal').innerText = formatIDR(po.total || 0);
@@ -1943,8 +1955,27 @@
             document.getElementById('modalInvoiceDate').value = new Date().toISOString().split('T')[0];
             
             const remainingDebt = Number(po.total) - (Number(po.paidAmount) || 0);
-            document.getElementById('modalPaidAmount').placeholder = `Sisa Hutang: ${remainingDebt > 0 ? remainingDebt : 0}`;
-            document.getElementById('modalPaidAmount').value = ''; // Kosongkan agar tidak overwrite tanpa disengaja
+            
+            const amountInput = document.getElementById('modalPaidAmount');
+            const amountLabel = document.getElementById('modalPaidAmountLabel');
+            const submitBtn = document.getElementById('modalSubmitBtn');
+            const modalTitle = document.getElementById('modalPaymentTitle');
+
+            if (actionType === 'edit') {
+                modalTitle.innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Skema & Nominal PO`;
+                amountLabel.innerText = "Ubah Total Telah Dibayar (Edit Override)";
+                amountInput.value = po.paidAmount || 0;
+                amountInput.placeholder = `Total Nilai PO: ${po.total}`;
+                submitBtn.innerText = "Simpan Perubahan";
+                submitBtn.className = "bg-amber-600 hover:bg-amber-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-md";
+            } else {
+                modalTitle.innerHTML = `<i class="fa-solid fa-money-bill-wave text-emerald-400"></i> Tambah Pembayaran & Skema PO`;
+                amountLabel.innerText = "Tambah Nominal Bayar Baru (IDR)";
+                amountInput.value = '';
+                amountInput.placeholder = `Sisa Hutang: ${remainingDebt > 0 ? remainingDebt : 0}`;
+                submitBtn.innerText = "Simpan Tambah Bayar";
+                submitBtn.className = "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-md";
+            }
 
             handleModalSchemeChange();
             calculateModalDueDate();
@@ -1960,10 +1991,6 @@
             const terminWrapper = document.getElementById('modalTerminWrapper');
             const tempoWrapper = document.getElementById('modalTempoWrapper');
             const payStatus = document.getElementById('modalPayStatus');
-            const paidInput = document.getElementById('modalPaidAmount');
-            const poId = Number(document.getElementById('modalPoId').value);
-            const po = purchaseOrders.find(p => p.id === poId);
-            const remaining = po ? (Number(po.total) - (Number(po.paidAmount) || 0)) : 0;
 
             terminWrapper.classList.add('hidden');
             tempoWrapper.classList.add('hidden');
@@ -1971,17 +1998,13 @@
             if (scheme === 'termin') {
                 terminWrapper.classList.remove('hidden');
                 payStatus.value = 'DP';
-                paidInput.value = '';
             } else if (scheme === 'tempo') {
                 tempoWrapper.classList.remove('hidden');
                 payStatus.value = 'TEMPO';
-                paidInput.value = '';
             } else if (scheme === 'dp') {
                 payStatus.value = 'DP';
-                paidInput.value = '';
             } else if (scheme === 'lunas') {
                 payStatus.value = 'LUNAS';
-                paidInput.value = remaining > 0 ? remaining : 0;
             }
             calculateModalDueDate();
         }
@@ -2005,28 +2028,43 @@
         async function savePaymentUpdate(e) {
             e.preventDefault();
             const poId = Number(document.getElementById('modalPoId').value);
+            const actionType = document.getElementById('modalActionType').value;
             const scheme = document.getElementById('modalPaymentScheme').value;
             const terminNum = document.getElementById('modalTerminNumber').value.trim();
             const tempoDays = parseInt(document.getElementById('modalTempoDays').value) || 30;
             const invDate = document.getElementById('modalInvoiceDate').value;
             const dueDate = document.getElementById('modalDueDate').value;
-            const payAmount = parseFloat(document.getElementById('modalPaidAmount').value) || 0;
+            const inputAmount = parseFloat(document.getElementById('modalPaidAmount').value) || 0;
             
             const index = purchaseOrders.findIndex(p => p.id === poId);
             if (index === -1) return;
 
             const po = purchaseOrders[index];
             
-            // AKUMULASI NOMINAL PEMBAYARAN BARU
-            const newPaidAmount = (Number(po.paidAmount) || 0) + payAmount;
+            let newPaidAmount = 0;
+            let payAmountForLedger = 0;
+
+            if (actionType === 'add') {
+                // Menambah ke akumulasi sebelumnya
+                newPaidAmount = (Number(po.paidAmount) || 0) + inputAmount;
+                payAmountForLedger = inputAmount;
+            } else {
+                // Mengubah / menimpa data (Edit)
+                newPaidAmount = inputAmount; 
+                payAmountForLedger = 0; 
+            }
+
             let remainingDebt = Number(po.total) - newPaidAmount;
             if(remainingDebt < 0) remainingDebt = 0;
 
-            let newStatus = po.paymentStatus;
+            // Kalkulasi Status Otomatis
+            let newStatus = 'BELUM_BAYAR';
             if (newPaidAmount >= Number(po.total)) {
                 newStatus = 'LUNAS';
             } else if (newPaidAmount > 0) {
-                newStatus = 'DP'; // Atau Termin
+                newStatus = 'DP';
+            } else if (newPaidAmount === 0 && scheme === 'tempo') {
+                newStatus = 'TEMPO';
             }
 
             purchaseOrders[index] = {
@@ -2041,10 +2079,10 @@
                 remainingDebt: remainingDebt
             };
 
-            // TAMBAH TRANSAKSI BARU JIKA ADA NOMINAL YANG DIBAYARKAN (BUKAN OVERWRITE)
-            if (payAmount > 0) {
+            // TAMBAH TRANSAKSI BARU JIKA MODE "ADD" DAN ADA NOMINAL DIBAYAR
+            if (actionType === 'add' && payAmountForLedger > 0) {
                 const poCategoryName = "Pengadaan PO";
-                let descStr = `Pembayaran PO ${po.poNumber || po.id} (${po.vendor})`;
+                let descStr = `Pembayaran Lanjutan PO ${po.poNumber || po.id} (${po.vendor})`;
                 if (scheme === 'termin') descStr += ` - Termin ${terminNum}`;
                 else descStr += ` - ${scheme.toUpperCase()}`;
 
@@ -2053,7 +2091,7 @@
                     date: invDate,
                     type: 'EXPENSE',
                     category: poCategoryName,
-                    amount: payAmount,
+                    amount: payAmountForLedger,
                     desc: descStr,
                     poRefId: poId
                 };
@@ -2062,7 +2100,12 @@
             }
 
             await saveCloudData('po', purchaseOrders[index]);
-            showToast(`Update Pembayaran PO ${po.poNumber} berhasil ditambahkan!`, 'success');
+
+            if (actionType === 'add') {
+                showToast(`Update Tambah Pembayaran PO ${po.poNumber} berhasil!`, 'success');
+            } else {
+                showToast(`Edit Skema Pembayaran PO ${po.poNumber} berhasil diperbarui!`, 'success');
+            }
 
             closePaymentModal();
             renderPaymentControlTable();
