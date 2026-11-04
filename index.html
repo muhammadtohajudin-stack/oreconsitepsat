@@ -1550,13 +1550,13 @@
         function getSchemeBadge(po) {
             const scheme = po.paymentScheme || 'tempo';
             if (scheme === 'termin') {
-                return `<div class="flex flex-col"><span class="text-cyan-300 font-semibold">📑 ${po.terminNumber || 'Termin'}</span><span class="text-[10px] text-slate-400">Inv: ${po.invoiceDate || '-'}</span></div>`;
+                return `<span class="text-cyan-300 font-medium">📑 ${po.terminNumber || 'Termin'}</span><br><span class="text-[10px] text-slate-400">Inv: ${po.invoiceDate || '-'}</span>`;
             } else if (scheme === 'dp') {
-                return `<div class="flex items-center gap-1.5"><span class="text-cyan-400 font-semibold">🔵 DP</span><span class="text-[10px] text-slate-400">(${po.invoiceDate || '-'})</span></div>`;
+                return `<span class="text-cyan-400 font-medium">🔵 DP (Uang Muka)</span><br><span class="text-[10px] text-slate-400">Inv: ${po.invoiceDate || '-'}</span>`;
             } else if (scheme === 'tempo') {
-                return `<div class="flex flex-col"><span class="text-amber-300 font-semibold">🟡 Tempo (${po.tempoDays || 30}h)</span><span class="text-[10px] text-slate-400">Jt: ${po.dueDate || po.invoiceDate || '-'}</span></div>`;
+                return `<span class="text-amber-300 font-medium">🟡 Tempo (${po.tempoDays || 30}h)</span><br><span class="text-[10px] text-slate-400">Jt: ${po.dueDate || po.invoiceDate || '-'}</span>`;
             } else {
-                return `<div class="flex items-center gap-1.5"><span class="text-emerald-300 font-semibold">🟢 Lunas</span><span class="text-[10px] text-slate-400">(${po.invoiceDate || '-'})</span></div>`;
+                return `<span class="text-emerald-300 font-medium">🟢 Lunas / Cash</span><br><span class="text-[10px] text-slate-400">Inv: ${po.invoiceDate || '-'}</span>`;
             }
         }
 
