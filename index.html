@@ -690,7 +690,7 @@
                                     <th class="py-3 px-4 text-center">Tgl Invoice</th>
                                     <th class="py-3 px-4 text-center">Jatuh Tempo</th>
                                     <th class="py-3 px-4 text-right">Sisa Hutang / Nominal</th>
-                                    <th class="py-3 px-4 text-center no-print min-w-[130px]">Aksi</th>
+                                    <th class="py-3 px-4 text-center no-print min-w-[90px]">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="reminderTableBody" class="divide-y divide-slate-700/50"></tbody>
@@ -705,7 +705,7 @@
                             <h3 class="text-sm font-bold text-white flex items-center gap-2">
                                 <i class="fa-solid fa-wallet text-amber-400"></i> Daftar Kewajiban & Update Pembayaran PO
                             </h3>
-                            <p class="text-xs text-slate-400">Pilih status pembayaran dan update nominal DP / pelunasan untuk masing-masing PO.</p>
+                            <p class="text-xs text-slate-400">Kelola riwayat pembayaran atau tambah bayar lanjutan untuk masing-masing PO.</p>
                         </div>
                         <div class="flex items-center gap-2 no-print">
                             <span class="text-xs text-slate-400">Filter Pembayaran:</span>
@@ -729,7 +729,7 @@
                                     <th class="py-3 px-4 text-right">Total Nilai PO</th>
                                     <th class="py-3 px-4 text-right">Telah Dibayar (Kas Out)</th>
                                     <th class="py-3 px-4 text-right">Sisa Hutang</th>
-                                    <th class="py-3 px-4 text-center no-print min-w-[160px]">Aksi</th>
+                                    <th class="py-3 px-4 text-center no-print min-w-[100px]">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="paymentTableBody" class="divide-y divide-slate-700/50"></tbody>
@@ -746,22 +746,23 @@
                     <h3 id="modalPaymentTitle" class="text-sm font-bold text-white flex items-center gap-2">
                         <i class="fa-solid fa-money-bill-wave text-emerald-400"></i> Kelola Pembayaran PO
                     </h3>
-                    <button onclick="closePaymentModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                    <button type="button" onclick="closePaymentModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
 
                 <form id="updatePaymentForm" onsubmit="savePaymentUpdate(event)" class="space-y-4">
                     <input type="hidden" id="modalPoId" value="">
                     <input type="hidden" id="modalActionType" value="">
+                    <input type="hidden" id="modalTxId" value="">
                     
                     <div>
                         <p class="text-xs text-slate-400">Nomor PO: <strong id="modalPoNum" class="text-cyan-400"></strong></p>
                         <p class="text-xs text-slate-400">Vendor: <strong id="modalPoVendor" class="text-white"></strong></p>
-                        <p class="text-xs text-slate-400">Total PO: <strong id="modalPoTotal" class="text-emerald-400"></strong></p>
+                        <p class="text-xs text-slate-400">Total Nilai PO: <strong id="modalPoTotal" class="text-emerald-400 font-mono"></strong></p>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Skema Pembayaran Saat Ini</label>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Pilih Skema</label>
                             <select id="modalPaymentScheme" onchange="handleModalSchemeChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 cursor-pointer font-semibold">
                                 <option value="lunas">🟢 Langsung Lunas / Cash</option>
                                 <option value="dp">🔵 DP (Uang Muka)</option>
@@ -800,7 +801,7 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Tanggal Invoice / Transaksi</label>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Tanggal Transaksi / Invoice</label>
                             <input type="date" id="modalInvoiceDate" oninput="calculateModalDueDate()" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white cursor-pointer focus:outline-none focus:border-cyan-500">
                         </div>
                         <div>
@@ -937,7 +938,6 @@
         }
 
         async function deleteCloudData(type, id) {
-            showToast('Menghapus data di Cloud...', 'info');
             try {
                 const bodyObj = { action: 'delete', projKey: getCloudKey(type), id: id };
                 await fetch(WEB_APP_URL, {
@@ -945,7 +945,6 @@
                     headers: { 'Content-Type': 'text/plain' },
                     body: JSON.stringify(bodyObj)
                 });
-                showToast('Data terhapus!', 'info');
             } catch (err) {
                 console.error("Gagal menghapus:", err);
             }
@@ -1452,33 +1451,20 @@
                 const index = purchaseOrders.findIndex(p => p.id === numericId);
                 if (index !== -1) {
                     const existingPo = purchaseOrders[index];
-                    const payStatus = existingPo.paymentStatus || 'BELUM_BAYAR';
-                    let paidAmount = Number(existingPo.paidAmount) || 0;
-                    if (payStatus === 'LUNAS') paidAmount = totalAmount;
-
-                    const remainingDebt = totalAmount - paidAmount;
-
+                    
                     purchaseOrders[index] = {
                         ...existingPo,
                         poNumber: poNum,
                         vendor: vendorName,
                         date: selectedDate,
                         items: itemsList,
-                        total: totalAmount,
-                        paymentStatus: payStatus,
-                        paidAmount: paidAmount,
-                        remainingDebt: remainingDebt > 0 ? remainingDebt : 0
+                        total: totalAmount
                     };
 
-                    const txIndex = transactions.findIndex(t => t.poRefId === numericId);
-                    if (txIndex !== -1) {
-                        transactions[txIndex].amount = paidAmount;
-                        transactions[txIndex].date = selectedDate;
-                        transactions[txIndex].desc = `Pengadaan ${poNum} (${vendorName}) - Status: ${payStatus}`;
-                        await saveCloudData('transactions', transactions[txIndex]);
-                    }
-
                     await saveCloudData('po', purchaseOrders[index]);
+                    
+                    // Recalculate secara otomatis debt/paid amount setelah PO Master diubah (karena totalnya berubah)
+                    await recalculatePoPayment(numericId);
                     showToast(`PO ${poNum} berhasil diperbarui!`, 'success');
                 }
             } else {
@@ -1523,6 +1509,51 @@
             updateDashboard();
             resetPoForm();
         });
+
+        // -----------------------------------------------------
+        // FUNGSI INTI UNTUK REKALKULASI PO SECARA OTOMATIS
+        // -----------------------------------------------------
+        async function recalculatePoPayment(poId, newSchemeObj = null) {
+            const index = purchaseOrders.findIndex(p => p.id === poId);
+            if (index === -1) return;
+            
+            const po = purchaseOrders[index];
+            const poTxs = transactions.filter(t => t.poRefId === poId);
+            
+            // Hitung murni dari jumlah sum transaksi ledger yang berkaitan dengan PO
+            const totalPaid = poTxs.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+            const totalPo = Number(po.total) || 0;
+            
+            let remaining = totalPo - totalPaid;
+            if (remaining < 0) remaining = 0;
+            
+            let newStatus = 'BELUM_BAYAR';
+            if (totalPaid >= totalPo && totalPo > 0) newStatus = 'LUNAS';
+            else if (totalPaid > 0) newStatus = 'DP';
+            else if (po.paymentScheme === 'tempo' || (newSchemeObj && newSchemeObj.paymentScheme === 'tempo')) newStatus = 'TEMPO';
+
+            purchaseOrders[index] = {
+                ...po,
+                paidAmount: totalPaid,
+                remainingDebt: remaining,
+                paymentStatus: newStatus,
+                ...(newSchemeObj || {})
+            };
+
+            await saveCloudData('po', purchaseOrders[index]);
+        }
+
+        async function deletePaymentHistory(poId, txId) {
+            if (confirm('Hapus riwayat pembayaran ini secara permanen? Saldo Kas dan Sisa Hutang PO akan otomatis disesuaikan.')) {
+                transactions = transactions.filter(t => t.id !== txId);
+                await deleteCloudData('transactions', txId);
+                await recalculatePoPayment(poId);
+                
+                renderPaymentControlTable();
+                updateDashboard();
+                showToast('Riwayat pembayaran berhasil dihapus!', 'info');
+            }
+        }
 
         function getStatusBadge(status) {
             switch(status) {
@@ -1755,14 +1786,9 @@
                         <td class="py-3.5 px-4 text-right font-mono text-emerald-400 font-semibold">${formatIDR(paid)}</td>
                         <td class="py-3.5 px-4 text-right font-mono font-bold ${debt > 0 ? 'text-red-400' : 'text-slate-500'}">${formatIDR(debt)}</td>
                         <td class="py-3.5 px-4 text-center no-print" onclick="event.stopPropagation()">
-                            <div class="flex items-center justify-center gap-1.5 flex-wrap">
-                                <button onclick="openPaymentModal(${po.id}, 'edit')" class="text-xs bg-amber-600/20 text-amber-300 hover:bg-amber-600/40 border border-amber-500/30 px-2.5 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5" title="Edit/Ubah Skema">
-                                    <i class="fa-solid fa-pen-to-square"></i> Edit
-                                </button>
-                                <button onclick="openPaymentModal(${po.id}, 'add')" class="text-xs bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/40 border border-cyan-500/30 px-2.5 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5" title="Catat Pembayaran Lanjutan">
-                                    <i class="fa-solid fa-plus"></i> Tambah
-                                </button>
-                            </div>
+                            <button onclick="openPaymentModal(${po.id}, 'add')" class="text-xs bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/40 border border-cyan-500/30 px-3 py-1.5 rounded-lg transition font-medium flex items-center justify-center gap-1.5 mx-auto" title="Catat Pembayaran Lanjutan">
+                                <i class="fa-solid fa-plus"></i> Tambah
+                            </button>
                         </td>
                     </tr>
                     <tr id="pay-detail-${po.id}" class="bg-slate-900/90 border-b border-slate-700/80 hidden">
@@ -1780,16 +1806,26 @@
                                 </div>
                                 <div class="flex-grow">
                                     <h5 class="text-xs font-bold text-slate-300 mb-2 border-b border-slate-700 pb-1.5"><i class="fa-solid fa-receipt text-cyan-400"></i> Riwayat Pembayaran (Kas Out)</h5>
-                                    <div class="space-y-1.5 max-h-32 overflow-y-auto pr-1">
+                                    <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
                                         ${poTransactions.length > 0 ? poTransactions.map(t => `
-                                            <div class="flex justify-between items-center bg-slate-900 p-2 rounded border border-slate-700/50">
+                                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-slate-900 p-3 rounded-lg border border-slate-700/50 hover:border-slate-600 transition gap-2">
                                                 <div>
                                                     <span class="text-[11px] font-mono text-cyan-300">${t.date}</span>
-                                                    <p class="text-[10px] text-slate-400">${t.desc}</p>
+                                                    <p class="text-xs text-slate-300 mt-0.5">${t.desc}</p>
                                                 </div>
-                                                <span class="font-mono text-emerald-400 font-bold text-xs">+ ${formatIDR(t.amount)}</span>
+                                                <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+                                                    <span class="font-mono text-emerald-400 font-bold text-sm">+ ${formatIDR(t.amount)}</span>
+                                                    <div class="flex gap-1.5 border-l border-slate-700 pl-3">
+                                                        <button onclick="openPaymentModal(${po.id}, 'edit_history', ${t.id})" class="bg-amber-500/20 text-amber-400 hover:bg-amber-500/40 p-2 rounded-lg transition" title="Edit Transaksi">
+                                                            <i class="fa-solid fa-pen text-xs"></i>
+                                                        </button>
+                                                        <button onclick="deletePaymentHistory(${po.id}, ${t.id})" class="bg-red-500/20 text-red-400 hover:bg-red-500/40 p-2 rounded-lg transition" title="Hapus Transaksi">
+                                                            <i class="fa-solid fa-trash-can text-xs"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        `).join('') : '<p class="text-[10px] text-slate-500 italic p-2">Belum ada riwayat transaksi tercatat otomatis.</p>'}
+                                        `).join('') : '<p class="text-[10px] text-slate-500 italic p-2">Belum ada riwayat pembayaran tercatat.</p>'}
                                     </div>
                                 </div>
                             </div>
@@ -1798,7 +1834,6 @@
                 `;
             });
 
-            // Render Card Reminder 10 Teratas
             renderReminderCardTop10();
         }
 
@@ -1808,21 +1843,20 @@
             if (!reminderTbody) return;
             reminderTbody.innerHTML = '';
 
-            // Filter PO yang belum lunas (sisa hutang > 0 atau status belum lunas)
+            // Filter PO yang belum lunas
             let pendingList = purchaseOrders.filter(p => {
                 const debt = Number(p.remainingDebt) || (Number(p.total) - Number(p.paidAmount));
                 const status = p.paymentStatus || 'TEMPO';
                 return status !== 'LUNAS' && debt > 0;
             });
 
-            // Urutkan berdasarkan tanggal terdekat (dueDate atau invoiceDate)
+            // Urutkan berdasarkan tanggal jatuh tempo terdekat
             pendingList.sort((a, b) => {
                 const dateA = new Date(a.dueDate || a.invoiceDate || a.date || '2099-12-31');
                 const dateB = new Date(b.dueDate || b.invoiceDate || b.date || '2099-12-31');
                 return dateA - dateB;
             });
 
-            // Ambil 10 teratas
             const top10 = pendingList.slice(0, 10);
             reminderBadge.innerText = `${top10.length} Tagihan Pending Terdekat`;
 
@@ -1850,13 +1884,10 @@
                         <td class="py-3 px-4 text-right font-mono font-bold text-red-400">${formatIDR(debt)}</td>
                         <td class="py-3 px-4 text-center no-print" onclick="event.stopPropagation()">
                             <div class="flex items-center justify-center gap-1.5 flex-wrap">
-                                <button onclick="quickMarkPaid(${po.id})" class="text-[10px] bg-emerald-600/20 text-emerald-300 hover:bg-emerald-600/40 border border-emerald-500/30 px-2 py-1 rounded-lg transition font-semibold" title="Tandai Lunas Penuh">
+                                <button onclick="quickMarkPaid(${po.id})" class="text-[10px] bg-emerald-600/20 text-emerald-300 hover:bg-emerald-600/40 border border-emerald-500/30 px-2.5 py-1.5 rounded-lg transition font-semibold" title="Tandai Lunas Penuh (Bayar Semua Sisa)">
                                     <i class="fa-solid fa-check"></i>
                                 </button>
-                                <button onclick="openPaymentModal(${po.id}, 'edit')" class="text-[10px] bg-amber-600/20 text-amber-300 hover:bg-amber-600/40 border border-amber-500/30 px-2 py-1 rounded-lg transition" title="Edit/Ubah Skema PO">
-                                    <i class="fa-solid fa-pen"></i>
-                                </button>
-                                <button onclick="openPaymentModal(${po.id}, 'add')" class="text-[10px] bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/40 border border-cyan-500/30 px-2 py-1 rounded-lg transition" title="Catat Tambah Bayar Lanjutan">
+                                <button onclick="openPaymentModal(${po.id}, 'add')" class="text-[10px] bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/40 border border-cyan-500/30 px-2.5 py-1.5 rounded-lg transition" title="Catat Tambah Bayar Lanjutan">
                                     <i class="fa-solid fa-plus"></i>
                                 </button>
                             </div>
@@ -1877,16 +1908,26 @@
                                 </div>
                                 <div class="flex-grow">
                                     <h5 class="text-xs font-bold text-slate-300 mb-2 border-b border-slate-700 pb-1.5"><i class="fa-solid fa-receipt text-cyan-400"></i> Riwayat Pembayaran (Kas Out)</h5>
-                                    <div class="space-y-1.5 max-h-32 overflow-y-auto pr-1">
+                                    <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
                                         ${poTransactions.length > 0 ? poTransactions.map(t => `
-                                            <div class="flex justify-between items-center bg-slate-900 p-2 rounded border border-slate-700/50">
+                                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-slate-900 p-3 rounded-lg border border-slate-700/50 hover:border-slate-600 transition gap-2">
                                                 <div>
                                                     <span class="text-[11px] font-mono text-cyan-300">${t.date}</span>
-                                                    <p class="text-[10px] text-slate-400">${t.desc}</p>
+                                                    <p class="text-xs text-slate-300 mt-0.5">${t.desc}</p>
                                                 </div>
-                                                <span class="font-mono text-emerald-400 font-bold text-xs">+ ${formatIDR(t.amount)}</span>
+                                                <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+                                                    <span class="font-mono text-emerald-400 font-bold text-sm">+ ${formatIDR(t.amount)}</span>
+                                                    <div class="flex gap-1.5 border-l border-slate-700 pl-3">
+                                                        <button onclick="openPaymentModal(${po.id}, 'edit_history', ${t.id})" class="bg-amber-500/20 text-amber-400 hover:bg-amber-500/40 p-2 rounded-lg transition" title="Edit Transaksi">
+                                                            <i class="fa-solid fa-pen text-xs"></i>
+                                                        </button>
+                                                        <button onclick="deletePaymentHistory(${po.id}, ${t.id})" class="bg-red-500/20 text-red-400 hover:bg-red-500/40 p-2 rounded-lg transition" title="Hapus Transaksi">
+                                                            <i class="fa-solid fa-trash-can text-xs"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        `).join('') : '<p class="text-[10px] text-slate-500 italic p-2">Belum ada riwayat transaksi tercatat otomatis.</p>'}
+                                        `).join('') : '<p class="text-[10px] text-slate-500 italic p-2">Belum ada riwayat pembayaran tercatat.</p>'}
                                     </div>
                                 </div>
                             </div>
@@ -1902,46 +1943,43 @@
 
             const po = purchaseOrders[index];
             const tot = Number(po.total) || 0;
-            const paidSoFar = Number(po.paidAmount) || 0;
-            const remainingDebt = tot - paidSoFar;
+            
+            const poTxs = transactions.filter(t => t.poRefId === poId);
+            const totalPaidSoFar = poTxs.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+            const remainingDebt = tot - totalPaidSoFar;
 
             if (remainingDebt <= 0) {
                 showToast('PO ini sudah lunas!', 'info');
                 return;
             }
 
-            purchaseOrders[index] = {
-                ...po,
-                paymentStatus: 'LUNAS',
-                paidAmount: tot,
-                remainingDebt: 0
-            };
-
-            // Tambahkan transaksi untuk sisa hutang yang dilunasi
             const newTx = {
                 id: Date.now(),
                 date: new Date().toISOString().split('T')[0],
                 type: 'EXPENSE',
                 category: "Pengadaan PO",
                 amount: remainingDebt,
-                desc: `Pelunasan Cepat PO ${po.poNumber || po.id} (${po.vendor})`,
+                desc: `Pelunasan Lunas PO ${po.poNumber || po.id} (${po.vendor})`,
                 poRefId: poId
             };
+            
             transactions.push(newTx);
             await saveCloudData('transactions', newTx);
-
-            await saveCloudData('po', purchaseOrders[index]);
-            showToast(`PO ${po.poNumber} ditandai Lunas!`, 'success');
+            await recalculatePoPayment(poId);
+            
+            showToast(`Sisa tagihan PO ${po.poNumber} berhasil dilunasi!`, 'success');
             renderPaymentControlTable();
             updateDashboard();
         }
 
-        function openPaymentModal(poId, actionType = 'add') {
+        // FUNGSI MODAL DINAMIS UNTUK TAMBAH/EDIT PEMBAYARAN
+        function openPaymentModal(poId, actionType = 'add', txId = null) {
             const po = purchaseOrders.find(p => p.id === poId);
             if (!po) return;
 
             document.getElementById('modalPoId').value = po.id;
             document.getElementById('modalActionType').value = actionType;
+            document.getElementById('modalTxId').value = txId || '';
             
             document.getElementById('modalPoNum').innerText = po.poNumber || 'PO-' + po.id;
             document.getElementById('modalPoVendor').innerText = po.vendor || '-';
@@ -1952,27 +1990,29 @@
             document.getElementById('modalPayStatus').value = po.paymentStatus || 'TEMPO';
             document.getElementById('modalTerminNumber').value = po.terminNumber || '';
             document.getElementById('modalTempoDays').value = po.tempoDays || 30;
-            document.getElementById('modalInvoiceDate').value = new Date().toISOString().split('T')[0];
-            
-            const remainingDebt = Number(po.total) - (Number(po.paidAmount) || 0);
             
             const amountInput = document.getElementById('modalPaidAmount');
             const amountLabel = document.getElementById('modalPaidAmountLabel');
             const submitBtn = document.getElementById('modalSubmitBtn');
             const modalTitle = document.getElementById('modalPaymentTitle');
 
-            if (actionType === 'edit') {
-                modalTitle.innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Skema & Nominal PO`;
-                amountLabel.innerText = "Ubah Total Telah Dibayar (Edit Override)";
-                amountInput.value = po.paidAmount || 0;
-                amountInput.placeholder = `Total Nilai PO: ${po.total}`;
+            if (actionType === 'edit_history' && txId) {
+                const tx = transactions.find(t => t.id === txId);
+                if (!tx) return;
+
+                modalTitle.innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Riwayat Pembayaran PO`;
+                amountLabel.innerText = "Revisi Nominal Pembayaran (IDR)";
+                amountInput.value = tx.amount || 0;
+                document.getElementById('modalInvoiceDate').value = tx.date || '';
+                
                 submitBtn.innerText = "Simpan Perubahan";
                 submitBtn.className = "bg-amber-600 hover:bg-amber-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-md";
             } else {
-                modalTitle.innerHTML = `<i class="fa-solid fa-money-bill-wave text-emerald-400"></i> Tambah Pembayaran & Skema PO`;
-                amountLabel.innerText = "Tambah Nominal Bayar Baru (IDR)";
+                modalTitle.innerHTML = `<i class="fa-solid fa-money-bill-wave text-emerald-400"></i> Tambah Pembayaran & Set Skema`;
+                amountLabel.innerText = "Nominal Bayar Lanjutan (IDR)";
                 amountInput.value = '';
-                amountInput.placeholder = `Sisa Hutang: ${remainingDebt > 0 ? remainingDebt : 0}`;
+                document.getElementById('modalInvoiceDate').value = new Date().toISOString().split('T')[0];
+                
                 submitBtn.innerText = "Simpan Tambah Bayar";
                 submitBtn.className = "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-md";
             }
@@ -2029,6 +2069,8 @@
             e.preventDefault();
             const poId = Number(document.getElementById('modalPoId').value);
             const actionType = document.getElementById('modalActionType').value;
+            const txId = document.getElementById('modalTxId').value;
+            
             const scheme = document.getElementById('modalPaymentScheme').value;
             const terminNum = document.getElementById('modalTerminNumber').value.trim();
             const tempoDays = parseInt(document.getElementById('modalTempoDays').value) || 30;
@@ -2038,73 +2080,52 @@
             
             const index = purchaseOrders.findIndex(p => p.id === poId);
             if (index === -1) return;
-
             const po = purchaseOrders[index];
-            
-            let newPaidAmount = 0;
-            let payAmountForLedger = 0;
 
-            if (actionType === 'add') {
-                // Menambah ke akumulasi sebelumnya
-                newPaidAmount = (Number(po.paidAmount) || 0) + inputAmount;
-                payAmountForLedger = inputAmount;
-            } else {
-                // Mengubah / menimpa data (Edit)
-                newPaidAmount = inputAmount; 
-                payAmountForLedger = 0; 
+            // Tentukan deskripsi transaksi
+            let descStr = `Pembayaran PO ${po.poNumber || po.id} (${po.vendor})`;
+            if (scheme === 'termin') descStr += ` - Termin ${terminNum}`;
+            else descStr += ` - ${scheme.toUpperCase()}`;
+
+            if (actionType === 'edit_history' && txId) {
+                // Update transaksi yang sudah ada
+                const tIndex = transactions.findIndex(t => t.id === Number(txId));
+                if (tIndex !== -1) {
+                    transactions[tIndex].amount = inputAmount;
+                    transactions[tIndex].date = invDate;
+                    transactions[tIndex].desc = descStr;
+                    await saveCloudData('transactions', transactions[tIndex]);
+                }
+            } else if (actionType === 'add') {
+                // Catat transaksi baru
+                if (inputAmount > 0 || scheme === 'tempo') {
+                    const newTx = {
+                        id: Date.now(),
+                        date: invDate,
+                        type: 'EXPENSE',
+                        category: "Pengadaan PO",
+                        amount: inputAmount,
+                        desc: descStr,
+                        poRefId: poId
+                    };
+                    transactions.push(newTx);
+                    await saveCloudData('transactions', newTx);
+                }
             }
 
-            let remainingDebt = Number(po.total) - newPaidAmount;
-            if(remainingDebt < 0) remainingDebt = 0;
-
-            // Kalkulasi Status Otomatis
-            let newStatus = 'BELUM_BAYAR';
-            if (newPaidAmount >= Number(po.total)) {
-                newStatus = 'LUNAS';
-            } else if (newPaidAmount > 0) {
-                newStatus = 'DP';
-            } else if (newPaidAmount === 0 && scheme === 'tempo') {
-                newStatus = 'TEMPO';
-            }
-
-            purchaseOrders[index] = {
-                ...po,
+            // Hitung ulang sisa hutang dan status PO berdasarkan seluruh record transaksi
+            await recalculatePoPayment(poId, {
                 paymentScheme: scheme,
-                terminNumber: terminNum || po.terminNumber,
+                terminNumber: terminNum,
                 tempoDays: tempoDays,
                 invoiceDate: invDate,
-                dueDate: dueDate,
-                paymentStatus: newStatus,
-                paidAmount: newPaidAmount,
-                remainingDebt: remainingDebt
-            };
-
-            // TAMBAH TRANSAKSI BARU JIKA MODE "ADD" DAN ADA NOMINAL DIBAYAR
-            if (actionType === 'add' && payAmountForLedger > 0) {
-                const poCategoryName = "Pengadaan PO";
-                let descStr = `Pembayaran Lanjutan PO ${po.poNumber || po.id} (${po.vendor})`;
-                if (scheme === 'termin') descStr += ` - Termin ${terminNum}`;
-                else descStr += ` - ${scheme.toUpperCase()}`;
-
-                const newTx = {
-                    id: Date.now(),
-                    date: invDate,
-                    type: 'EXPENSE',
-                    category: poCategoryName,
-                    amount: payAmountForLedger,
-                    desc: descStr,
-                    poRefId: poId
-                };
-                transactions.push(newTx);
-                await saveCloudData('transactions', newTx);
-            }
-
-            await saveCloudData('po', purchaseOrders[index]);
+                dueDate: dueDate
+            });
 
             if (actionType === 'add') {
-                showToast(`Update Tambah Pembayaran PO ${po.poNumber} berhasil!`, 'success');
+                showToast(`Pembayaran PO ${po.poNumber} berhasil ditambahkan!`, 'success');
             } else {
-                showToast(`Edit Skema Pembayaran PO ${po.poNumber} berhasil diperbarui!`, 'success');
+                showToast(`Riwayat pembayaran PO ${po.poNumber} berhasil diperbarui!`, 'success');
             }
 
             closePaymentModal();
@@ -2513,20 +2534,23 @@
                 await deleteCloudData('transactions', id);
             }
         }
+        
         async function deletePO(id) {
-            if (confirm('Hapus PO ini beserta catatan pengeluarannya di Dashboard?')) {
-                const relatedTx = transactions.find(t => t.poRefId === id);
-                if (relatedTx) {
-                    transactions = transactions.filter(t => t.poRefId !== id);
-                    await deleteCloudData('transactions', relatedTx.id);
+            if (confirm('Hapus PO ini beserta seluruh catatan pengeluarannya di Dashboard?')) {
+                const relatedTx = transactions.filter(t => t.poRefId === id);
+                for (const tx of relatedTx) {
+                    transactions = transactions.filter(t => t.id !== tx.id);
+                    await deleteCloudData('transactions', tx.id);
                 }
 
                 purchaseOrders = purchaseOrders.filter(p => p.id !== id);
                 renderPOTable();
                 updateDashboard();
                 await deleteCloudData('po', id);
+                showToast('Dokumen PO dan transaksi terkait berhasil dihapus!', 'info');
             }
         }
+        
         async function deleteExcaLog(id) {
             if (confirm('Hapus log Exca ini?')) {
                 excaLogs = excaLogs.filter(l => l.id !== id);
