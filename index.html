@@ -523,10 +523,24 @@
 
                 <!-- MODUL OPERASIONAL ALAT BERAT -->
                 <div id="module-heavy" class="space-y-6 hidden">
-                    <div class="flex flex-wrap gap-2 border-b border-slate-700 pb-3 no-print">
-                        <button onclick="switchHeavySubTab('exca')" id="subnav-exca" class="px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-600 text-white transition"><i class="fa-solid fa-truck-monster"></i> HM Excavator</button>
-                        <button onclick="switchHeavySubTab('compact')" id="subnav-compact" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-700 transition"><i class="fa-solid fa-compact-disc"></i> HM Compact</button>
-                        <button onclick="switchHeavySubTab('dt')" id="subnav-dt" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-700 transition"><i class="fa-solid fa-truck-moving"></i> Ritase DT</button>
+                    
+                    <!-- Area Header & Sub-Navigasi (Dilengkapi Filter Tanggal Range Global untuk Alat Berat) -->
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-700 pb-3 no-print">
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="switchHeavySubTab('exca')" id="subnav-exca" class="px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-600 text-white transition"><i class="fa-solid fa-truck-monster"></i> HM Excavator</button>
+                            <button onclick="switchHeavySubTab('compact')" id="subnav-compact" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-700 transition"><i class="fa-solid fa-compact-disc"></i> HM Compact</button>
+                            <button onclick="switchHeavySubTab('dt')" id="subnav-dt" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-700 transition"><i class="fa-solid fa-truck-moving"></i> Ritase DT</button>
+                        </div>
+                        
+                        <!-- FILTER RANGE TANGGAL LOG -->
+                        <div class="flex items-center gap-2 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl w-full md:w-auto">
+                            <i class="fa-solid fa-filter text-slate-400 text-xs"></i>
+                            <span class="text-xs text-slate-400 font-medium whitespace-nowrap">Filter Tgl:</span>
+                            <input type="date" id="filterHeavyStart" onchange="renderAllHeavyTables()" class="bg-transparent text-xs text-cyan-300 font-semibold focus:outline-none cursor-pointer w-full md:w-auto">
+                            <span class="text-xs text-slate-500">s/d</span>
+                            <input type="date" id="filterHeavyEnd" onchange="renderAllHeavyTables()" class="bg-transparent text-xs text-cyan-300 font-semibold focus:outline-none cursor-pointer w-full md:w-auto">
+                            <button onclick="resetHeavyFilter()" class="text-xs text-slate-400 hover:text-cyan-400 p-1 ml-1" title="Reset Filter Tanggal"><i class="fa-solid fa-rotate-right"></i></button>
+                        </div>
                     </div>
 
                     <!-- EXCAVATOR -->
@@ -559,9 +573,9 @@
                                 </table>
                             </div>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900 p-4 rounded-xl text-xs font-mono">
-                                <div>Total Jam (Aktual): <span id="sumExcaHours" class="text-cyan-400 font-bold">0.0 Jam</span></div>
-                                <div>Total Fuel: <span id="sumExcaFuel" class="text-amber-400 font-bold">0.0 Liter</span></div>
-                                <div>Total Biaya: <span id="sumExcaCost" class="text-emerald-400 font-bold">Rp 0</span></div>
+                                <div>Total Jam (Tampil): <span id="sumExcaHours" class="text-cyan-400 font-bold">0.0 Jam</span></div>
+                                <div>Total Fuel (Tampil): <span id="sumExcaFuel" class="text-amber-400 font-bold">0.0 Liter</span></div>
+                                <div>Total Biaya (Tampil): <span id="sumExcaCost" class="text-emerald-400 font-bold">Rp 0</span></div>
                                 <div>Rata-rata Konsumsi: <span id="avgExcaCons" class="text-purple-400 font-bold">0.00 L/Jam</span></div>
                             </div>
                         </div>
@@ -597,9 +611,9 @@
                                 </table>
                             </div>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900 p-4 rounded-xl text-xs font-mono">
-                                <div>Total Jam (Aktual): <span id="sumCompactHours" class="text-cyan-400 font-bold">0.0 Jam</span></div>
-                                <div>Total Fuel: <span id="sumCompactFuel" class="text-amber-400 font-bold">0.0 Liter</span></div>
-                                <div>Total Biaya: <span id="sumCompactCost" class="text-emerald-400 font-bold">Rp 0</span></div>
+                                <div>Total Jam (Tampil): <span id="sumCompactHours" class="text-cyan-400 font-bold">0.0 Jam</span></div>
+                                <div>Total Fuel (Tampil): <span id="sumCompactFuel" class="text-amber-400 font-bold">0.0 Liter</span></div>
+                                <div>Total Biaya (Tampil): <span id="sumCompactCost" class="text-emerald-400 font-bold">Rp 0</span></div>
                                 <div>Rata-rata Konsumsi: <span id="avgCompactCons" class="text-purple-400 font-bold">0.00 L/Jam</span></div>
                             </div>
                         </div>
@@ -633,9 +647,9 @@
                                 </table>
                             </div>
                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-slate-900 p-4 rounded-xl text-xs font-mono">
-                                <div>Total Ritase: <span id="sumDtRitase" class="text-cyan-400 font-bold">0 Rit</span></div>
-                                <div>Total Jam DT: <span id="sumDtHours" class="text-cyan-400 font-bold">0.00 Jam</span></div>
-                                <div>Total HPP DT: <span id="sumDtCost" class="text-amber-400 font-bold">Rp 0</span></div>
+                                <div>Total Ritase (Tampil): <span id="sumDtRitase" class="text-cyan-400 font-bold">0 Rit</span></div>
+                                <div>Total Jam DT (Tampil): <span id="sumDtHours" class="text-cyan-400 font-bold">0.00 Jam</span></div>
+                                <div>Total HPP DT (Tampil): <span id="sumDtCost" class="text-amber-400 font-bold">Rp 0</span></div>
                             </div>
                         </div>
                     </div>
@@ -1113,14 +1127,25 @@
             if (currentProjectId === 'mess') {
                 document.getElementById('module-po').classList.add('hidden');
                 document.getElementById('module-heavy').classList.remove('hidden');
-                renderExcaTable();
-                renderCompactTable();
-                renderDtTable();
+                renderAllHeavyTables();
             } else {
                 document.getElementById('module-po').classList.remove('hidden');
                 document.getElementById('module-heavy').classList.add('hidden');
                 renderPOTable();
             }
+        }
+
+        // FUNGSI BARU UNTUK RENDER SEMUA TABEL ALAT BERAT & RESET FILTER
+        function renderAllHeavyTables() {
+            renderExcaTable();
+            renderCompactTable();
+            renderDtTable();
+        }
+
+        function resetHeavyFilter() {
+            document.getElementById('filterHeavyStart').value = '';
+            document.getElementById('filterHeavyEnd').value = '';
+            renderAllHeavyTables();
         }
 
         function switchHeavySubTab(sub) {
@@ -1462,8 +1487,6 @@
                     };
 
                     await saveCloudData('po', purchaseOrders[index]);
-                    
-                    // Recalculate secara otomatis debt/paid amount setelah PO Master diubah (karena totalnya berubah)
                     await recalculatePoPayment(numericId);
                     showToast(`PO ${poNum} berhasil diperbarui!`, 'success');
                 }
@@ -1510,9 +1533,6 @@
             resetPoForm();
         });
 
-        // -----------------------------------------------------
-        // FUNGSI INTI UNTUK REKALKULASI PO SECARA OTOMATIS
-        // -----------------------------------------------------
         async function recalculatePoPayment(poId, newSchemeObj = null) {
             const index = purchaseOrders.findIndex(p => p.id === poId);
             if (index === -1) return;
@@ -1520,7 +1540,6 @@
             const po = purchaseOrders[index];
             const poTxs = transactions.filter(t => t.poRefId === poId);
             
-            // Hitung murni dari jumlah sum transaksi ledger yang berkaitan dengan PO
             const totalPaid = poTxs.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
             const totalPo = Number(po.total) || 0;
             
@@ -1557,25 +1576,18 @@
 
         function getStatusBadge(status) {
             switch(status) {
-                case 'SELESAI':
-                    return `<span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🟢 Selesai</span>`;
-                case 'DALAM_PROSES':
-                    return `<span class="bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🔵 Dalam Proses</span>`;
-                default:
-                    return `<span class="bg-amber-500/15 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🟡 Belum Diproses</span>`;
+                case 'SELESAI': return `<span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🟢 Selesai</span>`;
+                case 'DALAM_PROSES': return `<span class="bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🔵 Dalam Proses</span>`;
+                default: return `<span class="bg-amber-500/15 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">🟡 Belum Diproses</span>`;
             }
         }
 
         function getPaymentStatusBadge(status) {
             switch(status) {
-                case 'LUNAS':
-                    return `<span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟢 Lunas</span>`;
-                case 'DP':
-                    return `<span class="bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔵 Bayar DP / Termin</span>`;
-                case 'TEMPO':
-                    return `<span class="bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟡 Tempo</span>`;
-                default:
-                    return `<span class="bg-red-500/15 text-red-400 border border-red-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔴 Belum Bayar</span>`;
+                case 'LUNAS': return `<span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟢 Lunas</span>`;
+                case 'DP': return `<span class="bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔵 Bayar DP / Termin</span>`;
+                case 'TEMPO': return `<span class="bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟡 Tempo</span>`;
+                default: return `<span class="bg-red-500/15 text-red-400 border border-red-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔴 Belum Bayar</span>`;
             }
         }
 
@@ -1637,9 +1649,7 @@
             const filteredPOs = purchaseOrders.filter(p => {
                 if (filterVal === 'ALL') return true;
                 const itemsArray = p.items || [{ status: p.status || 'BELUM_PROSES' }];
-                if (filterVal === 'SELESAI') {
-                    return itemsArray.every(it => (it.status || 'BELUM_PROSES') === 'SELESAI');
-                }
+                if (filterVal === 'SELESAI') return itemsArray.every(it => (it.status || 'BELUM_PROSES') === 'SELESAI');
                 return itemsArray.some(it => (it.status || 'BELUM_PROSES') === filterVal);
             });
 
@@ -1653,22 +1663,16 @@
             filteredPOs.forEach(po => {
                 const itemsArray = po.items || [{ itemName: po.itemName || '-', specs: po.specs || '-', volume: po.volume || '-', price: po.total || 0, status: po.status || 'BELUM_PROSES', note: '' }];
                 const itemsCount = itemsArray.length;
-
                 const finishedCount = itemsArray.filter(it => (it.status || 'BELUM_PROSES') === 'SELESAI').length;
                 let progressBadge = '';
-                if (finishedCount === itemsCount) {
-                    progressBadge = `<span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟢 Semua Selesai (${finishedCount}/${itemsCount})</span>`;
-                } else if (finishedCount > 0) {
-                    progressBadge = `<span class="bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔵 ${finishedCount}/${itemsCount} Selesai</span>`;
-                } else {
-                    progressBadge = `<span class="bg-amber-500/15 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟡 Dalam Proses / Belum</span>`;
-                }
+                
+                if (finishedCount === itemsCount) progressBadge = `<span class="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟢 Semua Selesai (${finishedCount}/${itemsCount})</span>`;
+                else if (finishedCount > 0) progressBadge = `<span class="bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🔵 ${finishedCount}/${itemsCount} Selesai</span>`;
+                else progressBadge = `<span class="bg-amber-500/15 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">🟡 Dalam Proses / Belum</span>`;
 
                 tbody.innerHTML += `
                     <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition cursor-pointer" onclick="togglePoDetail(${po.id})">
-                        <td class="py-3.5 px-4 text-center no-print">
-                            <i id="po-icon-${po.id}" class="fa-solid fa-chevron-down text-cyan-400 text-xs"></i>
-                        </td>
+                        <td class="py-3.5 px-4 text-center no-print"><i id="po-icon-${po.id}" class="fa-solid fa-chevron-down text-cyan-400 text-xs"></i></td>
                         <td class="py-3.5 px-4 font-bold text-cyan-400 font-mono">${po.poNumber || 'PO-' + po.id.toString().slice(-4)}</td>
                         <td class="py-3.5 px-4 font-semibold text-white">${po.vendor || '-'}</td>
                         <td class="py-3.5 px-4 font-mono text-slate-300 text-xs">${po.date}</td>
@@ -1680,29 +1684,16 @@
                             <button onclick="deletePO(${po.id})" title="Hapus PO" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash-can"></i></button>
                         </td>
                     </tr>
-                    
                     <tr id="po-detail-${po.id}" class="bg-slate-900/90 border-b border-slate-700/80">
                         <td colspan="8" class="p-4">
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                                 <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                                        <i class="fa-solid fa-list-check text-cyan-400"></i> Rincian Barang / Material - ${po.poNumber || 'PO-' + po.id}
-                                    </h4>
+                                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-list-check text-cyan-400"></i> Rincian Barang / Material - ${po.poNumber || 'PO-' + po.id}</h4>
                                     <span class="text-xs text-slate-400">Vendor: <strong class="text-cyan-300 font-semibold">${po.vendor || '-'}</strong> | Tanggal PO: <strong class="text-slate-200">${po.date}</strong></span>
                                 </div>
                                 <div class="overflow-x-auto">
                                     <table class="w-full text-left text-xs border-collapse">
-                                        <thead>
-                                            <tr class="text-slate-500 border-b border-slate-800">
-                                                <th class="py-1.5 px-2">No</th>
-                                                <th class="py-1.5 px-2">Nama Barang / Uraian</th>
-                                                <th class="py-1.5 px-2">Spesifikasi</th>
-                                                <th class="py-1.5 px-2 text-center">Volume / Qty</th>
-                                                <th class="py-1.5 px-2 text-right">Harga Total Item</th>
-                                                <th class="py-1.5 px-2 text-center">Status Item</th>
-                                                <th class="py-1.5 px-2">Keterangan</th>
-                                            </tr>
-                                        </thead>
+                                        <thead><tr class="text-slate-500 border-b border-slate-800"><th class="py-1.5 px-2">No</th><th class="py-1.5 px-2">Nama Barang / Uraian</th><th class="py-1.5 px-2">Spesifikasi</th><th class="py-1.5 px-2 text-center">Volume / Qty</th><th class="py-1.5 px-2 text-right">Harga Total Item</th><th class="py-1.5 px-2 text-center">Status Item</th><th class="py-1.5 px-2">Keterangan</th></tr></thead>
                                         <tbody class="divide-y divide-slate-800/60 text-slate-300">
                                             ${itemsArray.map((it, idx) => `
                                                 <tr>
@@ -1732,26 +1723,17 @@
 
             const filterVal = document.getElementById('filterPaymentStatus') ? document.getElementById('filterPaymentStatus').value : 'ALL';
             
-            let totalPoCommit = 0;
-            let totalPaidCash = 0;
-            let totalDebt = 0;
-            let paidCount = 0;
-
+            let totalPoCommit = 0, totalPaidCash = 0, totalDebt = 0, paidCount = 0;
             const filteredPOs = purchaseOrders.filter(p => {
                 const payStat = p.paymentStatus || 'BELUM_BAYAR';
-                if (filterVal === 'ALL') return true;
-                return payStat === filterVal;
+                return filterVal === 'ALL' || payStat === filterVal;
             });
 
             purchaseOrders.forEach(p => {
                 const tot = Number(p.total) || 0;
                 const paid = Number(p.paidAmount) || 0;
                 const debt = Number(p.remainingDebt) || (tot - paid);
-
-                totalPoCommit += tot;
-                totalPaidCash += paid;
-                totalDebt += (debt > 0 ? debt : 0);
-
+                totalPoCommit += tot; totalPaidCash += paid; totalDebt += (debt > 0 ? debt : 0);
                 if (p.paymentStatus === 'LUNAS') paidCount++;
             });
 
@@ -1759,7 +1741,6 @@
             document.getElementById('payKpiTotalPaid').innerText = formatIDR(totalPaidCash);
             document.getElementById('payKpiRemainingDebt').innerText = formatIDR(totalDebt);
             document.getElementById('payKpiRatio').innerText = `${paidCount} / ${purchaseOrders.length} PO Lunas`;
-            
             const ratioPct = purchaseOrders.length > 0 ? (paidCount / purchaseOrders.length) * 100 : 0;
             document.getElementById('payKpiRatioPct').innerText = `${ratioPct.toFixed(1)}% Terbayar Lunas`;
 
@@ -1772,56 +1753,38 @@
                 const tot = Number(po.total) || 0;
                 const paid = Number(po.paidAmount) || 0;
                 const debt = Number(po.remainingDebt) || (tot - paid);
-                
                 const poTransactions = transactions.filter(t => t.poRefId === po.id);
 
                 tbody.innerHTML += `
                     <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition cursor-pointer" onclick="togglePayDetail(${po.id})">
-                        <td class="py-3.5 px-4 text-center no-print">
-                            <i id="pay-icon-${po.id}" class="fa-solid fa-chevron-right text-slate-400 text-xs"></i>
-                        </td>
+                        <td class="py-3.5 px-4 text-center no-print"><i id="pay-icon-${po.id}" class="fa-solid fa-chevron-right text-slate-400 text-xs"></i></td>
                         <td class="py-3.5 px-4 font-bold text-cyan-400 font-mono">${po.poNumber || 'PO-' + po.id.toString().slice(-4)}</td>
                         <td class="py-3.5 px-4 font-semibold text-white">${po.vendor || '-'}</td>
                         <td class="py-3.5 px-4 text-right font-mono font-bold text-white">${formatIDR(tot)}</td>
                         <td class="py-3.5 px-4 text-right font-mono text-emerald-400 font-semibold">${formatIDR(paid)}</td>
                         <td class="py-3.5 px-4 text-right font-mono font-bold ${debt > 0 ? 'text-red-400' : 'text-slate-500'}">${formatIDR(debt)}</td>
                         <td class="py-3.5 px-4 text-center no-print" onclick="event.stopPropagation()">
-                            <button onclick="openPaymentModal(${po.id}, 'add')" class="text-xs bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/40 border border-cyan-500/30 px-3 py-1.5 rounded-lg transition font-medium flex items-center justify-center gap-1.5 mx-auto" title="Catat Pembayaran Lanjutan">
-                                <i class="fa-solid fa-plus"></i> Tambah
-                            </button>
+                            <button onclick="openPaymentModal(${po.id}, 'add')" class="text-xs bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/40 border border-cyan-500/30 px-3 py-1.5 rounded-lg transition font-medium flex items-center justify-center gap-1.5 mx-auto" title="Catat Pembayaran Lanjutan"><i class="fa-solid fa-plus"></i> Tambah</button>
                         </td>
                     </tr>
                     <tr id="pay-detail-${po.id}" class="bg-slate-900/90 border-b border-slate-700/80 hidden">
                         <td colspan="7" class="p-4">
                             <div class="flex flex-col md:flex-row gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
                                 <div class="flex flex-col gap-3 min-w-[200px]">
-                                    <div class="bg-slate-900 border border-slate-700 p-3 rounded-lg">
-                                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-1.5">Status Pembayaran</p>
-                                        ${getPaymentStatusBadge(po.paymentStatus || 'BELUM_BAYAR')}
-                                    </div>
-                                    <div class="bg-slate-900 border border-slate-700 p-3 rounded-lg">
-                                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-1.5">Informasi Skema</p>
-                                        ${getSchemeBadge(po)}
-                                    </div>
+                                    <div class="bg-slate-900 border border-slate-700 p-3 rounded-lg"><p class="text-[10px] text-slate-400 uppercase font-bold mb-1.5">Status Pembayaran</p>${getPaymentStatusBadge(po.paymentStatus || 'BELUM_BAYAR')}</div>
+                                    <div class="bg-slate-900 border border-slate-700 p-3 rounded-lg"><p class="text-[10px] text-slate-400 uppercase font-bold mb-1.5">Informasi Skema</p>${getSchemeBadge(po)}</div>
                                 </div>
                                 <div class="flex-grow">
                                     <h5 class="text-xs font-bold text-slate-300 mb-2 border-b border-slate-700 pb-1.5"><i class="fa-solid fa-receipt text-cyan-400"></i> Riwayat Pembayaran (Kas Out)</h5>
                                     <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
                                         ${poTransactions.length > 0 ? poTransactions.map(t => `
                                             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-slate-900 p-3 rounded-lg border border-slate-700/50 hover:border-slate-600 transition gap-2">
-                                                <div>
-                                                    <span class="text-[11px] font-mono text-cyan-300">${t.date}</span>
-                                                    <p class="text-xs text-slate-300 mt-0.5">${t.desc}</p>
-                                                </div>
+                                                <div><span class="text-[11px] font-mono text-cyan-300">${t.date}</span><p class="text-xs text-slate-300 mt-0.5">${t.desc}</p></div>
                                                 <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
                                                     <span class="font-mono text-emerald-400 font-bold text-sm">+ ${formatIDR(t.amount)}</span>
                                                     <div class="flex gap-1.5 border-l border-slate-700 pl-3">
-                                                        <button onclick="openPaymentModal(${po.id}, 'edit_history', ${t.id})" class="bg-amber-500/20 text-amber-400 hover:bg-amber-500/40 p-2 rounded-lg transition" title="Edit Transaksi">
-                                                            <i class="fa-solid fa-pen text-xs"></i>
-                                                        </button>
-                                                        <button onclick="deletePaymentHistory(${po.id}, ${t.id})" class="bg-red-500/20 text-red-400 hover:bg-red-500/40 p-2 rounded-lg transition" title="Hapus Transaksi">
-                                                            <i class="fa-solid fa-trash-can text-xs"></i>
-                                                        </button>
+                                                        <button onclick="openPaymentModal(${po.id}, 'edit_history', ${t.id})" class="bg-amber-500/20 text-amber-400 hover:bg-amber-500/40 p-2 rounded-lg transition" title="Edit Transaksi"><i class="fa-solid fa-pen text-xs"></i></button>
+                                                        <button onclick="deletePaymentHistory(${po.id}, ${t.id})" class="bg-red-500/20 text-red-400 hover:bg-red-500/40 p-2 rounded-lg transition" title="Hapus Transaksi"><i class="fa-solid fa-trash-can text-xs"></i></button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1833,7 +1796,6 @@
                     </tr>
                 `;
             });
-
             renderReminderCardTop10();
         }
 
@@ -1843,14 +1805,12 @@
             if (!reminderTbody) return;
             reminderTbody.innerHTML = '';
 
-            // Filter PO yang belum lunas
             let pendingList = purchaseOrders.filter(p => {
                 const debt = Number(p.remainingDebt) || (Number(p.total) - Number(p.paidAmount));
                 const status = p.paymentStatus || 'TEMPO';
                 return status !== 'LUNAS' && debt > 0;
             });
 
-            // Urutkan berdasarkan tanggal jatuh tempo terdekat
             pendingList.sort((a, b) => {
                 const dateA = new Date(a.dueDate || a.invoiceDate || a.date || '2099-12-31');
                 const dateB = new Date(b.dueDate || b.invoiceDate || b.date || '2099-12-31');
@@ -1869,14 +1829,11 @@
                 const debt = Number(po.remainingDebt) || (Number(po.total) - Number(po.paidAmount));
                 const invDate = po.invoiceDate || po.date || '-';
                 const dueDate = po.dueDate || po.invoiceDate || po.date || '-';
-                
                 const poTransactions = transactions.filter(t => t.poRefId === po.id);
 
                 reminderTbody.innerHTML += `
                     <tr class="border-b border-slate-700/40 hover:bg-slate-700/30 transition cursor-pointer" onclick="toggleReminderDetail(${po.id})">
-                        <td class="py-3 px-4 text-center no-print">
-                            <i id="rem-icon-${po.id}" class="fa-solid fa-chevron-right text-slate-400 text-xs"></i>
-                        </td>
+                        <td class="py-3 px-4 text-center no-print"><i id="rem-icon-${po.id}" class="fa-solid fa-chevron-right text-slate-400 text-xs"></i></td>
                         <td class="py-3 px-4 font-bold text-cyan-400 font-mono">${po.poNumber || 'PO-' + po.id.toString().slice(-4)}</td>
                         <td class="py-3 px-4 font-semibold text-white">${po.vendor || '-'}</td>
                         <td class="py-3 px-4 text-center font-mono text-slate-300 text-xs">${invDate}</td>
@@ -1884,12 +1841,8 @@
                         <td class="py-3 px-4 text-right font-mono font-bold text-red-400">${formatIDR(debt)}</td>
                         <td class="py-3 px-4 text-center no-print" onclick="event.stopPropagation()">
                             <div class="flex items-center justify-center gap-1.5 flex-wrap">
-                                <button onclick="quickMarkPaid(${po.id})" class="text-[10px] bg-emerald-600/20 text-emerald-300 hover:bg-emerald-600/40 border border-emerald-500/30 px-2.5 py-1.5 rounded-lg transition font-semibold" title="Tandai Lunas Penuh (Bayar Semua Sisa)">
-                                    <i class="fa-solid fa-check"></i>
-                                </button>
-                                <button onclick="openPaymentModal(${po.id}, 'add')" class="text-[10px] bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/40 border border-cyan-500/30 px-2.5 py-1.5 rounded-lg transition" title="Catat Tambah Bayar Lanjutan">
-                                    <i class="fa-solid fa-plus"></i>
-                                </button>
+                                <button onclick="quickMarkPaid(${po.id})" class="text-[10px] bg-emerald-600/20 text-emerald-300 hover:bg-emerald-600/40 border border-emerald-500/30 px-2.5 py-1.5 rounded-lg transition font-semibold" title="Tandai Lunas Penuh (Bayar Semua Sisa)"><i class="fa-solid fa-check"></i></button>
+                                <button onclick="openPaymentModal(${po.id}, 'add')" class="text-[10px] bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/40 border border-cyan-500/30 px-2.5 py-1.5 rounded-lg transition" title="Catat Tambah Bayar Lanjutan"><i class="fa-solid fa-plus"></i></button>
                             </div>
                         </td>
                     </tr>
@@ -1897,33 +1850,20 @@
                         <td colspan="7" class="p-4">
                             <div class="flex flex-col md:flex-row gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
                                 <div class="flex flex-col gap-3 min-w-[200px]">
-                                    <div class="bg-slate-900 border border-slate-700 p-3 rounded-lg">
-                                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-1.5">Status Pembayaran</p>
-                                        ${getPaymentStatusBadge(po.paymentStatus || 'BELUM_BAYAR')}
-                                    </div>
-                                    <div class="bg-slate-900 border border-slate-700 p-3 rounded-lg">
-                                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-1.5">Informasi Skema</p>
-                                        ${getSchemeBadge(po)}
-                                    </div>
+                                    <div class="bg-slate-900 border border-slate-700 p-3 rounded-lg"><p class="text-[10px] text-slate-400 uppercase font-bold mb-1.5">Status Pembayaran</p>${getPaymentStatusBadge(po.paymentStatus || 'BELUM_BAYAR')}</div>
+                                    <div class="bg-slate-900 border border-slate-700 p-3 rounded-lg"><p class="text-[10px] text-slate-400 uppercase font-bold mb-1.5">Informasi Skema</p>${getSchemeBadge(po)}</div>
                                 </div>
                                 <div class="flex-grow">
                                     <h5 class="text-xs font-bold text-slate-300 mb-2 border-b border-slate-700 pb-1.5"><i class="fa-solid fa-receipt text-cyan-400"></i> Riwayat Pembayaran (Kas Out)</h5>
                                     <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
                                         ${poTransactions.length > 0 ? poTransactions.map(t => `
                                             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-slate-900 p-3 rounded-lg border border-slate-700/50 hover:border-slate-600 transition gap-2">
-                                                <div>
-                                                    <span class="text-[11px] font-mono text-cyan-300">${t.date}</span>
-                                                    <p class="text-xs text-slate-300 mt-0.5">${t.desc}</p>
-                                                </div>
+                                                <div><span class="text-[11px] font-mono text-cyan-300">${t.date}</span><p class="text-xs text-slate-300 mt-0.5">${t.desc}</p></div>
                                                 <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
                                                     <span class="font-mono text-emerald-400 font-bold text-sm">+ ${formatIDR(t.amount)}</span>
                                                     <div class="flex gap-1.5 border-l border-slate-700 pl-3">
-                                                        <button onclick="openPaymentModal(${po.id}, 'edit_history', ${t.id})" class="bg-amber-500/20 text-amber-400 hover:bg-amber-500/40 p-2 rounded-lg transition" title="Edit Transaksi">
-                                                            <i class="fa-solid fa-pen text-xs"></i>
-                                                        </button>
-                                                        <button onclick="deletePaymentHistory(${po.id}, ${t.id})" class="bg-red-500/20 text-red-400 hover:bg-red-500/40 p-2 rounded-lg transition" title="Hapus Transaksi">
-                                                            <i class="fa-solid fa-trash-can text-xs"></i>
-                                                        </button>
+                                                        <button onclick="openPaymentModal(${po.id}, 'edit_history', ${t.id})" class="bg-amber-500/20 text-amber-400 hover:bg-amber-500/40 p-2 rounded-lg transition" title="Edit Transaksi"><i class="fa-solid fa-pen text-xs"></i></button>
+                                                        <button onclick="deletePaymentHistory(${po.id}, ${t.id})" class="bg-red-500/20 text-red-400 hover:bg-red-500/40 p-2 rounded-lg transition" title="Hapus Transaksi"><i class="fa-solid fa-trash-can text-xs"></i></button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1943,7 +1883,6 @@
 
             const po = purchaseOrders[index];
             const tot = Number(po.total) || 0;
-            
             const poTxs = transactions.filter(t => t.poRefId === poId);
             const totalPaidSoFar = poTxs.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
             const remainingDebt = tot - totalPaidSoFar;
@@ -1972,7 +1911,6 @@
             updateDashboard();
         }
 
-        // FUNGSI MODAL DINAMIS UNTUK TAMBAH/EDIT PEMBAYARAN
         function openPaymentModal(poId, actionType = 'add', txId = null) {
             const po = purchaseOrders.find(p => p.id === poId);
             if (!po) return;
@@ -1980,7 +1918,6 @@
             document.getElementById('modalPoId').value = po.id;
             document.getElementById('modalActionType').value = actionType;
             document.getElementById('modalTxId').value = txId || '';
-            
             document.getElementById('modalPoNum').innerText = po.poNumber || 'PO-' + po.id;
             document.getElementById('modalPoVendor').innerText = po.vendor || '-';
             document.getElementById('modalPoTotal').innerText = formatIDR(po.total || 0);
@@ -1999,12 +1936,10 @@
             if (actionType === 'edit_history' && txId) {
                 const tx = transactions.find(t => t.id === txId);
                 if (!tx) return;
-
                 modalTitle.innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Riwayat Pembayaran PO`;
                 amountLabel.innerText = "Revisi Nominal Pembayaran (IDR)";
                 amountInput.value = tx.amount || 0;
                 document.getElementById('modalInvoiceDate').value = tx.date || '';
-                
                 submitBtn.innerText = "Simpan Perubahan";
                 submitBtn.className = "bg-amber-600 hover:bg-amber-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-md";
             } else {
@@ -2012,7 +1947,6 @@
                 amountLabel.innerText = "Nominal Bayar Lanjutan (IDR)";
                 amountInput.value = '';
                 document.getElementById('modalInvoiceDate').value = new Date().toISOString().split('T')[0];
-                
                 submitBtn.innerText = "Simpan Tambah Bayar";
                 submitBtn.className = "bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-md";
             }
@@ -2035,17 +1969,10 @@
             terminWrapper.classList.add('hidden');
             tempoWrapper.classList.add('hidden');
 
-            if (scheme === 'termin') {
-                terminWrapper.classList.remove('hidden');
-                payStatus.value = 'DP';
-            } else if (scheme === 'tempo') {
-                tempoWrapper.classList.remove('hidden');
-                payStatus.value = 'TEMPO';
-            } else if (scheme === 'dp') {
-                payStatus.value = 'DP';
-            } else if (scheme === 'lunas') {
-                payStatus.value = 'LUNAS';
-            }
+            if (scheme === 'termin') { terminWrapper.classList.remove('hidden'); payStatus.value = 'DP'; } 
+            else if (scheme === 'tempo') { tempoWrapper.classList.remove('hidden'); payStatus.value = 'TEMPO'; } 
+            else if (scheme === 'dp') { payStatus.value = 'DP'; } 
+            else if (scheme === 'lunas') { payStatus.value = 'LUNAS'; }
             calculateModalDueDate();
         }
 
@@ -2070,7 +1997,6 @@
             const poId = Number(document.getElementById('modalPoId').value);
             const actionType = document.getElementById('modalActionType').value;
             const txId = document.getElementById('modalTxId').value;
-            
             const scheme = document.getElementById('modalPaymentScheme').value;
             const terminNum = document.getElementById('modalTerminNumber').value.trim();
             const tempoDays = parseInt(document.getElementById('modalTempoDays').value) || 30;
@@ -2082,13 +2008,11 @@
             if (index === -1) return;
             const po = purchaseOrders[index];
 
-            // Tentukan deskripsi transaksi
             let descStr = `Pembayaran PO ${po.poNumber || po.id} (${po.vendor})`;
             if (scheme === 'termin') descStr += ` - Termin ${terminNum}`;
             else descStr += ` - ${scheme.toUpperCase()}`;
 
             if (actionType === 'edit_history' && txId) {
-                // Update transaksi yang sudah ada
                 const tIndex = transactions.findIndex(t => t.id === Number(txId));
                 if (tIndex !== -1) {
                     transactions[tIndex].amount = inputAmount;
@@ -2097,36 +2021,17 @@
                     await saveCloudData('transactions', transactions[tIndex]);
                 }
             } else if (actionType === 'add') {
-                // Catat transaksi baru
                 if (inputAmount > 0 || scheme === 'tempo') {
-                    const newTx = {
-                        id: Date.now(),
-                        date: invDate,
-                        type: 'EXPENSE',
-                        category: "Pengadaan PO",
-                        amount: inputAmount,
-                        desc: descStr,
-                        poRefId: poId
-                    };
+                    const newTx = { id: Date.now(), date: invDate, type: 'EXPENSE', category: "Pengadaan PO", amount: inputAmount, desc: descStr, poRefId: poId };
                     transactions.push(newTx);
                     await saveCloudData('transactions', newTx);
                 }
             }
 
-            // Hitung ulang sisa hutang dan status PO berdasarkan seluruh record transaksi
-            await recalculatePoPayment(poId, {
-                paymentScheme: scheme,
-                terminNumber: terminNum,
-                tempoDays: tempoDays,
-                invoiceDate: invDate,
-                dueDate: dueDate
-            });
-
-            if (actionType === 'add') {
-                showToast(`Pembayaran PO ${po.poNumber} berhasil ditambahkan!`, 'success');
-            } else {
-                showToast(`Riwayat pembayaran PO ${po.poNumber} berhasil diperbarui!`, 'success');
-            }
+            await recalculatePoPayment(poId, { paymentScheme: scheme, terminNumber: terminNum, tempoDays: tempoDays, invoiceDate: invDate, dueDate: dueDate });
+            
+            if (actionType === 'add') showToast(`Pembayaran PO ${po.poNumber} berhasil ditambahkan!`, 'success');
+            else showToast(`Riwayat pembayaran PO ${po.poNumber} berhasil diperbarui!`, 'success');
 
             closePaymentModal();
             renderPaymentControlTable();
@@ -2136,23 +2041,14 @@
         function calculateCumulativeActualCost(endDate) {
             if (!endDate) return 0;
             let totalAC = 0;
-
-            transactions.forEach(t => {
-                if (t.type !== 'INCOME' && t.date && t.date <= endDate) {
-                    totalAC += Number(t.amount) || 0;
-                }
-            });
-
+            transactions.forEach(t => { if (t.type !== 'INCOME' && t.date && t.date <= endDate) totalAC += Number(t.amount) || 0; });
             purchaseOrders.forEach(p => {
                 const paid = Number(p.paidAmount) || 0;
                 if (paid > 0 && p.date && p.date <= endDate) {
                     const isAlreadyInTx = transactions.some(t => t.poRefId === p.id);
-                    if (!isAlreadyInTx) {
-                        totalAC += paid;
-                    }
+                    if (!isAlreadyInTx) totalAC += paid;
                 }
             });
-
             return totalAC;
         }
 
@@ -2164,41 +2060,21 @@
             spiCpiWeeks.forEach((w) => {
                 const planPct = Number(w.planPct) || 0;
                 const actualPct = Number(w.actualPct) || 0;
-
                 const pv = (planPct / 100) * currentContractValue;
                 const ev = (actualPct / 100) * currentContractValue;
+                let ac = 0, spi = 1.0, cpi = 1.0;
 
-                let ac = 0;
-                let spi = 1.0;
-                let cpi = 1.0;
-
-                if (pv > 0) {
-                    spi = ev / pv;
-                }
-
-                if (actualPct > 0 && w.endDate) {
-                    ac = calculateCumulativeActualCost(w.endDate);
-                    cpi = ac > 0 ? (ev / ac) : 1.0;
-                } else {
-                    ac = 0;
-                    cpi = 0;
-                }
+                if (pv > 0) spi = ev / pv;
+                if (actualPct > 0 && w.endDate) { ac = calculateCumulativeActualCost(w.endDate); cpi = ac > 0 ? (ev / ac) : 1.0; } 
+                else { ac = 0; cpi = 0; }
 
                 tbody.innerHTML += `
                     <tr class="border-b border-slate-700/40 hover:bg-slate-700/35 transition">
                         <td class="py-2 px-2 text-center font-mono font-bold text-cyan-400">M${w.week}</td>
-                        <td class="py-2 px-2 text-center">
-                            <input type="date" value="${w.startDate || ''}" oninput="updateWeekField(${w.week}, 'startDate', this.value)" class="w-32 bg-slate-900 border border-slate-700 rounded-lg p-1 text-xs text-center text-white focus:outline-none focus:border-cyan-500">
-                        </td>
-                        <td class="py-2 px-2 text-center">
-                            <input type="date" value="${w.endDate || ''}" oninput="updateWeekField(${w.week}, 'endDate', this.value)" class="w-32 bg-slate-900 border border-slate-700 rounded-lg p-1 text-xs text-center text-white focus:outline-none focus:border-cyan-500">
-                        </td>
-                        <td class="py-2 px-2 text-center">
-                            <input type="number" step="0.01" min="0" max="100" value="${planPct}" oninput="updateWeekField(${w.week}, 'planPct', this.value)" class="w-20 bg-slate-900 border border-slate-700 rounded-lg p-1 text-xs text-center text-white font-mono focus:outline-none focus:border-cyan-500">
-                        </td>
-                        <td class="py-2 px-2 text-center">
-                            <input type="number" step="0.01" min="0" max="100" value="${actualPct}" oninput="updateWeekField(${w.week}, 'actualPct', this.value)" class="w-20 bg-slate-900 border border-slate-700 rounded-lg p-1 text-xs text-center text-cyan-300 font-mono font-bold focus:outline-none focus:border-cyan-500">
-                        </td>
+                        <td class="py-2 px-2 text-center"><input type="date" value="${w.startDate || ''}" oninput="updateWeekField(${w.week}, 'startDate', this.value)" class="w-32 bg-slate-900 border border-slate-700 rounded-lg p-1 text-xs text-center text-white focus:outline-none focus:border-cyan-500"></td>
+                        <td class="py-2 px-2 text-center"><input type="date" value="${w.endDate || ''}" oninput="updateWeekField(${w.week}, 'endDate', this.value)" class="w-32 bg-slate-900 border border-slate-700 rounded-lg p-1 text-xs text-center text-white focus:outline-none focus:border-cyan-500"></td>
+                        <td class="py-2 px-2 text-center"><input type="number" step="0.01" min="0" max="100" value="${planPct}" oninput="updateWeekField(${w.week}, 'planPct', this.value)" class="w-20 bg-slate-900 border border-slate-700 rounded-lg p-1 text-xs text-center text-white font-mono focus:outline-none focus:border-cyan-500"></td>
+                        <td class="py-2 px-2 text-center"><input type="number" step="0.01" min="0" max="100" value="${actualPct}" oninput="updateWeekField(${w.week}, 'actualPct', this.value)" class="w-20 bg-slate-900 border border-slate-700 rounded-lg p-1 text-xs text-center text-cyan-300 font-mono font-bold focus:outline-none focus:border-cyan-500"></td>
                         <td class="py-2 px-2 text-right font-mono text-slate-300 text-xs">${formatIDR(pv)}</td>
                         <td class="py-2 px-2 text-right font-mono text-emerald-400 font-semibold text-xs">${formatIDR(ev)}</td>
                         <td class="py-2 px-2 text-right font-mono text-amber-400 font-semibold text-xs">${ac > 0 ? formatIDR(ac) : 'Rp 0'}</td>
@@ -2212,11 +2088,8 @@
         function updateWeekField(weekNum, field, val) {
             const item = spiCpiWeeks.find(w => w.week === weekNum);
             if (item) {
-                if (field === 'planPct' || field === 'actualPct') {
-                    item[field] = parseFloat(val) || 0;
-                } else {
-                    item[field] = val;
-                }
+                if (field === 'planPct' || field === 'actualPct') item[field] = parseFloat(val) || 0;
+                else item[field] = val;
                 renderSpiCpiTableSilent();
                 renderSpiCpiChart();
             }
@@ -2228,15 +2101,9 @@
                 const actualPct = Number(w.actualPct) || 0;
                 const pv = (planPct / 100) * currentContractValue;
                 const ev = (actualPct / 100) * currentContractValue;
-                
-                let ac = 0;
-                let spi = pv > 0 ? (ev / pv) : 1.0;
-                let cpi = 0;
+                let ac = 0, spi = pv > 0 ? (ev / pv) : 1.0, cpi = 0;
 
-                if (actualPct > 0 && w.endDate) {
-                    ac = calculateCumulativeActualCost(w.endDate);
-                    cpi = ac > 0 ? (ev / ac) : 1.0;
-                }
+                if (actualPct > 0 && w.endDate) { ac = calculateCumulativeActualCost(w.endDate); cpi = ac > 0 ? (ev / ac) : 1.0; }
 
                 const row = document.querySelector(`#spiCpiTableBody tr:nth-child(${w.week})`);
                 if (row) {
@@ -2258,9 +2125,7 @@
             showToast('Menyimpan data progres ke Cloud (harap tunggu)...', 'info');
             try {
                 const weeksToSave = spiCpiWeeks.filter(w => w.startDate || w.endDate || w.planPct > 0 || w.actualPct > 0);
-                for (const w of weeksToSave) {
-                    await saveCloudData('spicpi_weeks', w);
-                }
+                for (const w of weeksToSave) await saveCloudData('spicpi_weeks', w);
                 renderSpiCpiChart();
                 showToast('Data progres mingguan berhasil tersimpan!', 'success');
             } catch (error) {
@@ -2273,14 +2138,12 @@
             const ctxEl = document.getElementById('spiCpiChart');
             if (!ctxEl) return;
             const ctx = ctxEl.getContext('2d');
-
             const labels = spiCpiWeeks.map(w => 'M' + w.week);
             const spiData = spiCpiWeeks.map(w => {
                 const pv = ((Number(w.planPct) || 0) / 100) * currentContractValue;
                 const ev = ((Number(w.actualPct) || 0) / 100) * currentContractValue;
                 return pv > 0 ? Number((ev / pv).toFixed(2)) : 1.0;
             });
-
             const cpiData = spiCpiWeeks.map(w => {
                 const actualPct = Number(w.actualPct) || 0;
                 if (actualPct <= 0 || !w.endDate) return null;
@@ -2299,22 +2162,7 @@
                         { label: 'CPI (Biaya Kas Real)', data: cpiData, borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.1)', tension: 0.2, borderWidth: 2, spanGaps: false }
                     ]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { 
-                            ticks: { color: '#94a3b8' },
-                            grid: { color: 'rgba(51, 65, 85, 0.4)' },
-                            suggestedMin: 0.5,
-                            suggestedMax: 1.5
-                        },
-                        x: { 
-                            ticks: { color: '#94a3b8', font: { size: 9 }, maxTicksLimit: 16 },
-                            grid: { display: false }
-                        }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(51, 65, 85, 0.4)' }, suggestedMin: 0.5, suggestedMax: 1.5 }, x: { ticks: { color: '#94a3b8', font: { size: 9 }, maxTicksLimit: 16 }, grid: { display: false } } } }
             });
         }
 
@@ -2338,9 +2186,7 @@
         function resetExcaForm() {
             document.getElementById('editingExcaId').value = '';
             document.getElementById('excaForm').reset();
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('excaDate').value = today;
-
+            document.getElementById('excaDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('excaFormTitle').innerText = "Input Daily Log HM & Fuel Excavator";
             document.getElementById('excaSubmitBtn').innerText = "Simpan Record Excavator";
             document.getElementById('excaSubmitBtn').className = "bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition";
@@ -2361,26 +2207,12 @@
                 const numericId = Number(editingId);
                 const index = excaLogs.findIndex(l => l.id === numericId);
                 if (index !== -1) {
-                    excaLogs[index] = {
-                        ...excaLogs[index],
-                        date: selectedDate,
-                        hmAwal, hmAkhir,
-                        totalHours,
-                        fuelVol, fuelPrice,
-                        totalCost: (fuelVol * fuelPrice)
-                    };
+                    excaLogs[index] = { ...excaLogs[index], date: selectedDate, hmAwal, hmAkhir, totalHours, fuelVol, fuelPrice, totalCost: (fuelVol * fuelPrice) };
                     await saveCloudData('exca', excaLogs[index]);
                     showToast('Log Excavator berhasil diperbarui!', 'success');
                 }
             } else {
-                const log = {
-                    id: Date.now(),
-                    date: selectedDate,
-                    hmAwal, hmAkhir,
-                    totalHours,
-                    fuelVol, fuelPrice,
-                    totalCost: (fuelVol * fuelPrice)
-                };
+                const log = { id: Date.now(), date: selectedDate, hmAwal, hmAkhir, totalHours, fuelVol, fuelPrice, totalCost: (fuelVol * fuelPrice) };
                 excaLogs.push(log);
                 await saveCloudData('exca', log);
                 showToast('Log Excavator tersimpan!', 'success');
@@ -2410,9 +2242,7 @@
         function resetCompactForm() {
             document.getElementById('editingCompactId').value = '';
             document.getElementById('compactForm').reset();
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('compactDate').value = today;
-
+            document.getElementById('compactDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('compactFormTitle').innerText = "Input Daily Log HM & Fuel Compact";
             document.getElementById('compactSubmitBtn').innerText = "Simpan Record Compact";
             document.getElementById('compactSubmitBtn').className = "bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition";
@@ -2433,26 +2263,12 @@
                 const numericId = Number(editingId);
                 const index = compactLogs.findIndex(l => l.id === numericId);
                 if (index !== -1) {
-                    compactLogs[index] = {
-                        ...compactLogs[index],
-                        date: selectedDate,
-                        hmAwal, hmAkhir,
-                        totalHours,
-                        fuelVol, fuelPrice,
-                        totalCost: (fuelVol * fuelPrice)
-                    };
+                    compactLogs[index] = { ...compactLogs[index], date: selectedDate, hmAwal, hmAkhir, totalHours, fuelVol, fuelPrice, totalCost: (fuelVol * fuelPrice) };
                     await saveCloudData('compact', compactLogs[index]);
                     showToast('Log Compact berhasil diperbarui!', 'success');
                 }
             } else {
-                const log = {
-                    id: Date.now(),
-                    date: selectedDate,
-                    hmAwal, hmAkhir,
-                    totalHours,
-                    fuelVol, fuelPrice,
-                    totalCost: (fuelVol * fuelPrice)
-                };
+                const log = { id: Date.now(), date: selectedDate, hmAwal, hmAkhir, totalHours, fuelVol, fuelPrice, totalCost: (fuelVol * fuelPrice) };
                 compactLogs.push(log);
                 await saveCloudData('compact', log);
                 showToast('Log Compact tersimpan!', 'success');
@@ -2480,9 +2296,7 @@
         function resetDtForm() {
             document.getElementById('editingDtId').value = '';
             document.getElementById('dtForm').reset();
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('dtDate').value = today;
-
+            document.getElementById('dtDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('dtFormTitle').innerText = "Input Daily Log Ritase Dump Truck";
             document.getElementById('dtSubmitBtn').innerText = "Simpan Record Ritase";
             document.getElementById('dtSubmitBtn').className = "bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2.5 px-6 rounded-xl text-xs transition";
@@ -2500,24 +2314,12 @@
                 const numericId = Number(editingId);
                 const index = dtLogs.findIndex(l => l.id === numericId);
                 if (index !== -1) {
-                    dtLogs[index] = {
-                        ...dtLogs[index],
-                        date: selectedDate,
-                        ritase,
-                        price,
-                        totalCost: ritase * price
-                    };
+                    dtLogs[index] = { ...dtLogs[index], date: selectedDate, ritase, price, totalCost: ritase * price };
                     await saveCloudData('dt', dtLogs[index]);
                     showToast('Log Ritase DT berhasil diperbarui!', 'success');
                 }
             } else {
-                const log = {
-                    id: Date.now(),
-                    date: selectedDate,
-                    ritase,
-                    price,
-                    totalCost: ritase * price
-                };
+                const log = { id: Date.now(), date: selectedDate, ritase, price, totalCost: ritase * price };
                 dtLogs.push(log);
                 await saveCloudData('dt', log);
                 showToast('Log Ritase DT tersimpan!', 'success');
@@ -2542,7 +2344,6 @@
                     transactions = transactions.filter(t => t.id !== tx.id);
                     await deleteCloudData('transactions', tx.id);
                 }
-
                 purchaseOrders = purchaseOrders.filter(p => p.id !== id);
                 renderPOTable();
                 updateDashboard();
@@ -2580,26 +2381,12 @@
             if (!dateStr) return { key: 'Lainnya', name: 'Lainnya' };
             const d = new Date(dateStr);
             if (isNaN(d)) return { key: 'Lainnya', name: 'Lainnya' };
-            
             let year = d.getFullYear();
             let month = d.getMonth() + 1; 
             let date = d.getDate();
-            
-            if (date >= 26) {
-                month += 1;
-                if (month > 12) {
-                    month = 1;
-                    year += 1;
-                }
-            }
-            
+            if (date >= 26) { month += 1; if (month > 12) { month = 1; year += 1; } }
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            const monthName = months[month - 1];
-            
-            return {
-                key: `${year}-${String(month).padStart(2, '0')}`,
-                name: `${monthName} ${year}`
-            };
+            return { key: `${year}-${String(month).padStart(2, '0')}`, name: `${months[month - 1]} ${year}` };
         }
 
         function renderExcaTable() {
@@ -2607,32 +2394,35 @@
             tbody.innerHTML = '';
             let sumH = 0, sumF = 0, sumC = 0;
 
+            const filterStart = document.getElementById('filterHeavyStart')?.value;
+            const filterEnd = document.getElementById('filterHeavyEnd')?.value;
+
+            const filteredLogs = excaLogs.filter(l => {
+                if (filterStart && l.date < filterStart) return false;
+                if (filterEnd && l.date > filterEnd) return false;
+                return true;
+            });
+
             const grouped = {};
-            excaLogs.forEach(l => {
+            filteredLogs.forEach(l => {
                 const pInfo = getPeriodInfo(l.date);
-                const mKey = pInfo.key;
-                if (!grouped[mKey]) grouped[mKey] = { name: pInfo.name, logs: [] };
-                grouped[mKey].logs.push(l);
+                if (!grouped[pInfo.key]) grouped[pInfo.key] = { name: pInfo.name, logs: [] };
+                grouped[pInfo.key].logs.push(l);
             });
 
             const sortedMonths = Object.keys(grouped).sort();
 
             if (sortedMonths.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="py-6 text-center text-slate-500 italic">Belum ada record operasional excavator.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="py-6 text-center text-slate-500 italic">Belum ada record operasional excavator pada rentang tanggal ini.</td></tr>`;
             }
 
             sortedMonths.forEach(mKey => {
                 const monthName = grouped[mKey].name;
                 const logs = grouped[mKey].logs;
-
                 logs.sort((a, b) => new Date(a.date) - new Date(b.date));
 
                 let mHours = 0, mFuel = 0, mCost = 0;
-                logs.forEach(l => {
-                    mHours += Number(l.totalHours) || 0;
-                    mFuel += Number(l.fuelVol) || 0;
-                    mCost += Number(l.totalCost) || 0;
-                });
+                logs.forEach(l => { mHours += Number(l.totalHours) || 0; mFuel += Number(l.fuelVol) || 0; mCost += Number(l.totalCost) || 0; });
                 sumH += mHours; sumF += mFuel; sumC += mCost;
                 const mCons = mHours > 0 ? (mFuel / mHours) : 0;
 
@@ -2648,11 +2438,7 @@
                 `;
 
                 logs.forEach(l => {
-                    const hours = Number(l.totalHours) || 0;
-                    const fuel = Number(l.fuelVol) || 0;
-                    const cost = Number(l.totalCost) || 0;
-                    const cons = hours > 0 ? (fuel / hours) : 0;
-
+                    const hours = Number(l.totalHours) || 0; const fuel = Number(l.fuelVol) || 0; const cost = Number(l.totalCost) || 0; const cons = hours > 0 ? (fuel / hours) : 0;
                     tbody.innerHTML += `
                         <tr class="border-b border-slate-700/40 hover:bg-slate-700/30">
                             <td class="py-2 px-4 text-slate-500 text-[10px]">↳ ${monthName}</td>
@@ -2683,32 +2469,35 @@
             tbody.innerHTML = '';
             let sumH = 0, sumF = 0, sumC = 0;
 
+            const filterStart = document.getElementById('filterHeavyStart')?.value;
+            const filterEnd = document.getElementById('filterHeavyEnd')?.value;
+
+            const filteredLogs = compactLogs.filter(l => {
+                if (filterStart && l.date < filterStart) return false;
+                if (filterEnd && l.date > filterEnd) return false;
+                return true;
+            });
+
             const grouped = {};
-            compactLogs.forEach(l => {
+            filteredLogs.forEach(l => {
                 const pInfo = getPeriodInfo(l.date);
-                const mKey = pInfo.key;
-                if (!grouped[mKey]) grouped[mKey] = { name: pInfo.name, logs: [] };
-                grouped[mKey].logs.push(l);
+                if (!grouped[pInfo.key]) grouped[pInfo.key] = { name: pInfo.name, logs: [] };
+                grouped[pInfo.key].logs.push(l);
             });
 
             const sortedKeys = Object.keys(grouped).sort();
 
             if (sortedKeys.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="py-6 text-center text-slate-500 italic">Belum ada record operasional compact roller.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="py-6 text-center text-slate-500 italic">Belum ada record operasional compact roller pada rentang tanggal ini.</td></tr>`;
             }
 
             sortedKeys.forEach(mKey => {
                 const monthName = grouped[mKey].name;
                 const logs = grouped[mKey].logs;
-
                 logs.sort((a, b) => new Date(a.date) - new Date(b.date));
 
                 let mHours = 0, mFuel = 0, mCost = 0;
-                logs.forEach(l => {
-                    mHours += Number(l.totalHours) || 0;
-                    mFuel += Number(l.fuelVol) || 0;
-                    mCost += Number(l.totalCost) || 0;
-                });
+                logs.forEach(l => { mHours += Number(l.totalHours) || 0; mFuel += Number(l.fuelVol) || 0; mCost += Number(l.totalCost) || 0; });
                 sumH += mHours; sumF += mFuel; sumC += mCost;
                 const mCons = mHours > 0 ? (mFuel / mHours) : 0;
 
@@ -2724,11 +2513,7 @@
                 `;
 
                 logs.forEach(l => {
-                    const hours = Number(l.totalHours) || 0;
-                    const fuel = Number(l.fuelVol) || 0;
-                    const cost = Number(l.totalCost) || 0;
-                    const cons = hours > 0 ? (fuel / hours) : 0;
-
+                    const hours = Number(l.totalHours) || 0; const fuel = Number(l.fuelVol) || 0; const cost = Number(l.totalCost) || 0; const cons = hours > 0 ? (fuel / hours) : 0;
                     tbody.innerHTML += `
                         <tr class="border-b border-slate-700/40 hover:bg-slate-700/30">
                             <td class="py-2 px-4 text-slate-500 text-[10px]">↳ ${monthName}</td>
@@ -2759,31 +2544,35 @@
             tbody.innerHTML = '';
             let sumR = 0, sumC = 0, sumH = 0;
 
+            const filterStart = document.getElementById('filterHeavyStart')?.value;
+            const filterEnd = document.getElementById('filterHeavyEnd')?.value;
+
+            const filteredLogs = dtLogs.filter(l => {
+                if (filterStart && l.date < filterStart) return false;
+                if (filterEnd && l.date > filterEnd) return false;
+                return true;
+            });
+
             const grouped = {};
-            dtLogs.forEach(l => {
+            filteredLogs.forEach(l => {
                 const pInfo = getPeriodInfo(l.date);
-                const mKey = pInfo.key;
-                if (!grouped[mKey]) grouped[mKey] = { name: pInfo.name, logs: [] };
-                grouped[mKey].logs.push(l);
+                if (!grouped[pInfo.key]) grouped[pInfo.key] = { name: pInfo.name, logs: [] };
+                grouped[pInfo.key].logs.push(l);
             });
 
             const sortedKeys = Object.keys(grouped).sort();
 
             if (sortedKeys.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 italic">Belum ada record ritase dump truck.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 italic">Belum ada record ritase dump truck pada rentang tanggal ini.</td></tr>`;
             }
 
             sortedKeys.forEach(mKey => {
                 const monthName = grouped[mKey].name;
                 const logs = grouped[mKey].logs;
-
                 logs.sort((a, b) => new Date(a.date) - new Date(b.date));
 
                 let mRit = 0, mCost = 0;
-                logs.forEach(l => {
-                    mRit += Number(l.ritase) || 0;
-                    mCost += Number(l.totalCost) || 0;
-                });
+                logs.forEach(l => { mRit += Number(l.ritase) || 0; mCost += Number(l.totalCost) || 0; });
                 sumR += mRit;
                 const mHours = mRit / 8;
                 sumH += mHours;
@@ -2802,7 +2591,6 @@
                 logs.forEach(l => {
                     const rit = Number(l.ritase) || 0;
                     const hours = rit / 8;
-                    
                     tbody.innerHTML += `
                         <tr class="border-b border-slate-700/40 hover:bg-slate-700/30">
                             <td class="py-2 px-4 text-slate-500 text-[10px]">↳ ${monthName}</td>
@@ -2824,82 +2612,42 @@
         }
 
         function updateDashboard() {
-            if (currentProjectId === 'mess') {
-                renderMessDashboard();
-            } else {
-                renderSporthallDashboard();
-            }
+            if (currentProjectId === 'mess') renderMessDashboard();
+            else renderSporthallDashboard();
         }
 
         function calculateMonthlyHppDetails(logs, ratePerHour) {
             const monthlyData = {};
-
             logs.forEach(l => {
                 if (!l.date) return;
                 const pInfo = getPeriodInfo(l.date);
-                const periodKey = pInfo.key;
-
-                if (!monthlyData[periodKey]) {
-                    monthlyData[periodKey] = {
-                        periodKey,
-                        monthName: pInfo.name,
-                        actualHours: 0,
-                        fuelCost: 0
-                    };
-                }
-                monthlyData[periodKey].actualHours += Number(l.totalHours) || 0;
-                monthlyData[periodKey].fuelCost += Number(l.totalCost) || 0;
+                if (!monthlyData[pInfo.key]) monthlyData[pInfo.key] = { periodKey: pInfo.key, monthName: pInfo.name, actualHours: 0, fuelCost: 0 };
+                monthlyData[pInfo.key].actualHours += Number(l.totalHours) || 0;
+                monthlyData[pInfo.key].fuelCost += Number(l.totalCost) || 0;
             });
-
             const result = [];
             Object.keys(monthlyData).sort().forEach(key => {
                 const item = monthlyData[key];
-
                 let billableHours = item.actualHours;
-                if (key === '2026-09' || key === '2026-10') {
-                    billableHours = item.actualHours < 200 ? 200 : item.actualHours;
-                }
-
+                if (key === '2026-09' || key === '2026-10') billableHours = item.actualHours < 200 ? 200 : item.actualHours;
                 const hppAlat = billableHours * ratePerHour;
                 const totalHpp = hppAlat + item.fuelCost;
-
-                result.push({
-                    periodKey: key,
-                    monthName: item.monthName,
-                    actualHours: item.actualHours, 
-                    billableHours: billableHours, 
-                    fuelCost: item.fuelCost,
-                    hppAlat: hppAlat,
-                    totalHpp: totalHpp
-                });
+                result.push({ periodKey: key, monthName: item.monthName, actualHours: item.actualHours, billableHours: billableHours, fuelCost: item.fuelCost, hppAlat: hppAlat, totalHpp: totalHpp });
             });
-
             return result;
         }
 
         function renderMessDashboard() {
             let totalExcaActualHours = 0, totalExcaFuelVol = 0, totalExcaFuelCost = 0;
-            excaLogs.forEach(l => {
-                totalExcaActualHours += Number(l.totalHours) || 0;
-                totalExcaFuelVol += Number(l.fuelVol) || 0;
-                totalExcaFuelCost += Number(l.totalCost) || 0;
-            });
-
+            excaLogs.forEach(l => { totalExcaActualHours += Number(l.totalHours) || 0; totalExcaFuelVol += Number(l.fuelVol) || 0; totalExcaFuelCost += Number(l.totalCost) || 0; });
+            
             let totalCompactActualHours = 0, totalCompactFuelVol = 0, totalCompactFuelCost = 0;
-            compactLogs.forEach(l => {
-                totalCompactActualHours += Number(l.totalHours) || 0;
-                totalCompactFuelVol += Number(l.fuelVol) || 0;
-                totalCompactFuelCost += Number(l.totalCost) || 0;
-            });
+            compactLogs.forEach(l => { totalCompactActualHours += Number(l.totalHours) || 0; totalCompactFuelVol += Number(l.fuelVol) || 0; totalCompactFuelCost += Number(l.totalCost) || 0; });
 
             let totalDtRit = 0, totalDtVendorHpp = 0;
-            dtLogs.forEach(l => {
-                totalDtRit += Number(l.ritase) || 0;
-                totalDtVendorHpp += Number(l.totalCost) || 0;
-            });
+            dtLogs.forEach(l => { totalDtRit += Number(l.ritase) || 0; totalDtVendorHpp += Number(l.totalCost) || 0; });
 
             const totalDtHours = totalDtRit / 8;
-            
             const excaMonthlyHpp = calculateMonthlyHppDetails(excaLogs, 250000);
             const compactMonthlyHpp = calculateMonthlyHppDetails(compactLogs, 210000);
 
@@ -2925,8 +2673,8 @@
             const compactRevenue = totalCompactActualHours * 571000;
             const dtRevenue = totalDtHours * 566300;
             const totalRevenue = excaRevenue + compactRevenue + dtRevenue;
-
             const totalHpp = totalExcaHpp + totalCompactHpp + totalDtVendorHpp;
+            
             document.getElementById('breakdownTotalHpp').innerText = formatIDR(totalHpp);
             
             const totalMargin = totalRevenue - totalHpp;
@@ -2940,13 +2688,8 @@
             marginEl.innerText = formatIDR(totalMargin);
             marginPctEl.innerText = `${marginPct.toFixed(1)}% Margin`;
 
-            if (totalMargin >= 0) {
-                marginEl.className = "text-2xl font-bold text-cyan-400 mt-2";
-                marginPctEl.className = "text-xs text-cyan-400 mt-1";
-            } else {
-                marginEl.className = "text-2xl font-bold text-red-400 mt-2";
-                marginPctEl.className = "text-xs text-red-400 mt-1";
-            }
+            if (totalMargin >= 0) { marginEl.className = "text-2xl font-bold text-cyan-400 mt-2"; marginPctEl.className = "text-xs text-cyan-400 mt-1"; } 
+            else { marginEl.className = "text-2xl font-bold text-red-400 mt-2"; marginPctEl.className = "text-xs text-red-400 mt-1"; }
 
             const tbody = document.getElementById('messComparisonTableBody');
             tbody.innerHTML = '';
@@ -2954,29 +2697,19 @@
             const allMonths = {};
             excaMonthlyHpp.forEach(m => {
                 if (!allMonths[m.periodKey]) allMonths[m.periodKey] = { name: m.monthName, excaH: 0, excaAct: 0, excaRev: 0, excaHpp: 0, compH: 0, compAct: 0, compRev: 0, compHpp: 0, dtRit: 0, dtRev: 0, dtHpp: 0 };
-                allMonths[m.periodKey].excaH = m.billableHours;
-                allMonths[m.periodKey].excaAct = m.actualHours;
-                allMonths[m.periodKey].excaRev = m.actualHours * 669500;
-                allMonths[m.periodKey].excaHpp = m.totalHpp;
+                allMonths[m.periodKey].excaH = m.billableHours; allMonths[m.periodKey].excaAct = m.actualHours; allMonths[m.periodKey].excaRev = m.actualHours * 669500; allMonths[m.periodKey].excaHpp = m.totalHpp;
             });
 
             compactMonthlyHpp.forEach(m => {
                 if (!allMonths[m.periodKey]) allMonths[m.periodKey] = { name: m.monthName, excaH: 0, excaAct: 0, excaRev: 0, excaHpp: 0, compH: 0, compAct: 0, compRev: 0, compHpp: 0, dtRit: 0, dtRev: 0, dtHpp: 0 };
-                allMonths[m.periodKey].compH = m.billableHours;
-                allMonths[m.periodKey].compAct = m.actualHours;
-                allMonths[m.periodKey].compRev = m.actualHours * 571000;
-                allMonths[m.periodKey].compHpp = m.totalHpp;
+                allMonths[m.periodKey].compH = m.billableHours; allMonths[m.periodKey].compAct = m.actualHours; allMonths[m.periodKey].compRev = m.actualHours * 571000; allMonths[m.periodKey].compHpp = m.totalHpp;
             });
 
             dtLogs.forEach(l => {
                 const pInfo = getPeriodInfo(l.date);
-                const pKey = pInfo.key;
-                if (!allMonths[pKey]) allMonths[pKey] = { name: pInfo.name, excaH: 0, excaAct: 0, excaRev: 0, excaHpp: 0, compH: 0, compAct: 0, compRev: 0, compHpp: 0, dtRit: 0, dtRev: 0, dtHpp: 0 };
-                
+                if (!allMonths[pInfo.key]) allMonths[pInfo.key] = { name: pInfo.name, excaH: 0, excaAct: 0, excaRev: 0, excaHpp: 0, compH: 0, compAct: 0, compRev: 0, compHpp: 0, dtRit: 0, dtRev: 0, dtHpp: 0 };
                 const r = Number(l.ritase) || 0;
-                allMonths[pKey].dtRit += r;
-                allMonths[pKey].dtRev += (r / 8) * 566300;
-                allMonths[pKey].dtHpp += Number(l.totalCost) || 0;
+                allMonths[pInfo.key].dtRit += r; allMonths[pInfo.key].dtRev += (r / 8) * 566300; allMonths[pInfo.key].dtHpp += Number(l.totalCost) || 0;
             });
 
             const sortedKeys = Object.keys(allMonths).sort();
@@ -2991,10 +2724,7 @@
                 if (dat.excaAct > 0) {
                     const margin = dat.excaRev - dat.excaHpp;
                     let excaVolText = `${dat.excaAct.toFixed(1)} Jam`;
-                    if (dat.excaH !== dat.excaAct) {
-                        excaVolText = `Pendapatan: ${dat.excaAct.toFixed(1)} Jam<br><span class="text-[10px] text-amber-400 font-normal">HPP Vendor: ${dat.excaH.toFixed(1)} Jam</span>`;
-                    }
-
+                    if (dat.excaH !== dat.excaAct) excaVolText = `Pendapatan: ${dat.excaAct.toFixed(1)} Jam<br><span class="text-[10px] text-amber-400 font-normal">HPP Vendor: ${dat.excaH.toFixed(1)} Jam</span>`;
                     tbody.innerHTML += `
                         <tr class="border-b border-slate-700/40 hover:bg-slate-800/50 transition">
                             <td class="py-3 px-4 font-bold text-cyan-400">${dat.name}</td>
@@ -3003,17 +2733,13 @@
                             <td class="py-3 px-4 text-right font-mono text-emerald-400">${formatIDR(dat.excaRev)}</td>
                             <td class="py-3 px-4 text-right font-mono text-amber-400">${formatIDR(dat.excaHpp)}</td>
                             <td class="py-3 px-4 text-right font-mono font-bold ${margin >= 0 ? 'text-cyan-400' : 'text-red-400'}">${formatIDR(margin)}</td>
-                        </tr>
-                    `;
+                        </tr>`;
                 }
 
                 if (dat.compAct > 0) {
                     const margin = dat.compRev - dat.compHpp;
                     let compVolText = `${dat.compAct.toFixed(1)} Jam`;
-                    if (dat.compH !== dat.compAct) {
-                        compVolText = `Pendapatan: ${dat.compAct.toFixed(1)} Jam<br><span class="text-[10px] text-amber-400 font-normal">HPP Vendor: ${dat.compH.toFixed(1)} Jam</span>`;
-                    }
-
+                    if (dat.compH !== dat.compAct) compVolText = `Pendapatan: ${dat.compAct.toFixed(1)} Jam<br><span class="text-[10px] text-amber-400 font-normal">HPP Vendor: ${dat.compH.toFixed(1)} Jam</span>`;
                     tbody.innerHTML += `
                         <tr class="border-b border-slate-700/40 hover:bg-slate-800/50 transition">
                             <td class="py-3 px-4 font-bold text-cyan-400">${dat.name}</td>
@@ -3022,8 +2748,7 @@
                             <td class="py-3 px-4 text-right font-mono text-emerald-400">${formatIDR(dat.compRev)}</td>
                             <td class="py-3 px-4 text-right font-mono text-amber-400">${formatIDR(dat.compHpp)}</td>
                             <td class="py-3 px-4 text-right font-mono font-bold ${margin >= 0 ? 'text-cyan-400' : 'text-red-400'}">${formatIDR(margin)}</td>
-                        </tr>
-                    `;
+                        </tr>`;
                 }
 
                 if (dat.dtRit > 0) {
@@ -3037,8 +2762,7 @@
                             <td class="py-3 px-4 text-right font-mono text-emerald-400">${formatIDR(dat.dtRev)}</td>
                             <td class="py-3 px-4 text-right font-mono text-amber-400">${formatIDR(dat.dtHpp)}</td>
                             <td class="py-3 px-4 text-right font-mono font-bold ${margin >= 0 ? 'text-cyan-400' : 'text-red-400'}">${formatIDR(margin)}</td>
-                        </tr>
-                    `;
+                        </tr>`;
                 }
             });
         }
@@ -3067,7 +2791,6 @@
             document.getElementById('kpiRAP').innerText = formatIDR(totalRealExpense);
             document.getElementById('kpiDebt').innerText = formatIDR(totalPoDebt);
             document.getElementById('kpiDebtDesc').innerText = `Sisa kewajiban Vendor`;
-            
             document.getElementById('kpiMargin').innerText = formatIDR(netMargin);
             document.getElementById('kpiMarginPct').innerText = `${marginPct.toFixed(1)}% (Kontrak - RAP - Hutang)`;
             document.getElementById('kpiCash').innerText = formatIDR(netCash);
@@ -3101,8 +2824,7 @@
 
             document.getElementById('txCount').innerText = filteredTx.length + ' Transaksi';
 
-            let subtotalIncome = 0;
-            let subtotalExpense = 0;
+            let subtotalIncome = 0, subtotalExpense = 0;
 
             if (filteredTx.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 italic">Tidak ada data transaksi yang cocok dengan filter.</td></tr>`;
@@ -3110,9 +2832,7 @@
                 filteredTx.forEach(t => {
                     const isIncome = t.type === 'INCOME';
                     const amt = Number(t.amount) || 0;
-
-                    if (isIncome) subtotalIncome += amt;
-                    else subtotalExpense += amt;
+                    if (isIncome) subtotalIncome += amt; else subtotalExpense += amt;
 
                     tbody.innerHTML += `
                         <tr class="border-b border-slate-700/40 hover:bg-slate-700/30 transition">
@@ -3133,7 +2853,6 @@
             const netFiltered = subtotalIncome - subtotalExpense;
             document.getElementById('filterSubtotalIncome').innerText = formatIDR(subtotalIncome);
             document.getElementById('filterSubtotalExpense').innerText = formatIDR(subtotalExpense);
-            
             const netEl = document.getElementById('filterSubtotalNet');
             netEl.innerText = formatIDR(netFiltered);
             netEl.className = `font-bold font-mono text-sm ${netFiltered >= 0 ? 'text-cyan-400' : 'text-amber-400'}`;
@@ -3142,12 +2861,7 @@
         function renderCharts() {
             const actuals = {};
             customCategoriesList.forEach(cat => actuals[cat] = 0);
-
-            transactions.forEach(t => {
-                if (t.type !== 'INCOME') {
-                    actuals[t.category] = (actuals[t.category] || 0) + Number(t.amount);
-                }
-            });
+            transactions.forEach(t => { if (t.type !== 'INCOME') actuals[t.category] = (actuals[t.category] || 0) + Number(t.amount); });
 
             const ctxCostEl = document.getElementById('costControlChart');
             if (ctxCostEl) {
@@ -3157,9 +2871,7 @@
                     type: 'bar',
                     data: {
                         labels: customCategoriesList,
-                        datasets: [
-                            { label: 'Realisasi Pengeluaran Kas', data: customCategoriesList.map(c => actuals[c] || 0), backgroundColor: 'rgba(14, 165, 233, 0.7)' }
-                        ]
+                        datasets: [{ label: 'Realisasi Pengeluaran Kas', data: customCategoriesList.map(c => actuals[c] || 0), backgroundColor: 'rgba(14, 165, 233, 0.7)' }]
                     },
                     options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#94a3b8', font: { size: 9 } } }, y: { ticks: { color: '#94a3b8' } } } }
                 });
@@ -3180,16 +2892,12 @@
             if (filterCategorySelect) {
                 const curFilterVal = filterCategorySelect.value;
                 filterCategorySelect.innerHTML = `<option value="ALL">Semua Kategori</option>`;
-                customCategoriesList.forEach(cat => {
-                    filterCategorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
-                });
+                customCategoriesList.forEach(cat => filterCategorySelect.innerHTML += `<option value="${cat}">${cat}</option>`);
                 filterCategorySelect.value = customCategoriesList.includes(curFilterVal) ? curFilterVal : 'ALL';
             }
 
             if (customCategoriesList.length > 0) {
-                customCategoriesList.forEach(cat => {
-                    categorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
-                });
+                customCategoriesList.forEach(cat => categorySelect.innerHTML += `<option value="${cat}">${cat}</option>`);
             } else {
                 categorySelect.innerHTML += `<option value="" disabled selected>Belum ada kategori (Buat Baru...)</option>`;
             }
